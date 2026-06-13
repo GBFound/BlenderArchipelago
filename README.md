@@ -1,0 +1,2 @@
+# BlenderArchipelago
+Blender Archipelago Randomizer
