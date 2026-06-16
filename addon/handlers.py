@@ -2,6 +2,7 @@ import bpy
 import os
 import tempfile
 from . import ap_client, ids, similarity, progress, unlocked, thresholds
+from bpy.app.handlers import persistent
 
 _msgbus_owner = object()
 
@@ -56,6 +57,7 @@ def _update_goal():
         ap_client.send_goal_complete()
 
 
+@persistent
 def _on_render_complete(scene, depsgraph):
     target_name = scene.ap_target_image
     if not target_name:
@@ -72,6 +74,7 @@ def _on_render_complete(scene, depsgraph):
     bpy.app.timers.register(_update_state, first_interval=0.0)
 
 
+@persistent
 def _mode_locked(scene = None, depsgraph = None):
     obj = bpy.context.active_object
     modes = {
@@ -89,8 +92,20 @@ def _mode_locked(scene = None, depsgraph = None):
             timer_popup(f"{unlock_text} is locked.")
             break
 
- 
+
+@persistent
+def _subscribe(scene, depsgraph):
+    bpy.msgbus.clear_by_owner(_msgbus_owner)
+    bpy.msgbus.subscribe_rna(
+        key=(bpy.types.Object, "mode"),
+        owner=_msgbus_owner,
+        args=(),
+        notify=_mode_locked,
+    )
+
+
 def register():
+    bpy.app.handlers.load_post.append(_subscribe)
     bpy.app.handlers.render_complete.append(_on_render_complete)
     bpy.app.handlers.undo_post.append(_mode_locked)
     bpy.app.handlers.redo_post.append(_mode_locked)
@@ -107,4 +122,5 @@ def unregister():
     bpy.app.handlers.redo_post.remove(_mode_locked)
     bpy.app.handlers.undo_post.remove(_mode_locked)
     bpy.app.handlers.render_complete.remove(_on_render_complete)
+    bpy.app.handlers.load_post.remove(_subscribe)
     
