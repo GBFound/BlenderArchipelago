@@ -15,6 +15,7 @@ ITEM_NAME_TO_CLASSIFICATION = {
     "Texture Paint Mode"  : ItemClassification.useful,
     "Grease Pencil Modes" : ItemClassification.useful,
     "Materials"           : ItemClassification.progression,
+    "Modifiers"           : ItemClassification.useful,
 }
 
 ITEM_NAME_TO_ID = {}

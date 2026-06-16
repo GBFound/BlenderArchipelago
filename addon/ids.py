@@ -10,6 +10,7 @@ class Item(IntEnum):
     TEXTURE_PAINT_MODE  = 4
     GREASE_PENCIL_MODES = 5
     MATERIALS           = 6
+    MODIFIERS           = 7
 
 ITEMS     = tuple(item.name for item in Item)
 LOCATIONS = tuple(f"similarity_check_{i}" for i in range(len(ITEMS)))

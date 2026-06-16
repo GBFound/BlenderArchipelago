@@ -104,23 +104,39 @@ def _mode_locked(scene = None, depsgraph = None):
 
 @persistent
 def _materials_locked(scene, depsgraph):
-    if not unlocked[ids.Item.MATERIALS]:
-        obj = bpy.context.active_object
-        if obj and hasattr(obj.data, "materials") and len(obj.data.materials) > 0:
-            obj.data.materials.clear()
-            timer_popup("Materials are locked.")
+    if unlocked[ids.Item.MATERIALS]:
+        return
+
+    obj = bpy.context.active_object
+    if obj and hasattr(obj.data, "materials") and len(obj.data.materials) > 0:
+        obj.data.materials.clear()
+        timer_popup("Materials are locked.")
 
 
 @persistent
 def _clear_materials(scene, depsgraph):
-    if not unlocked[ids.Item.MATERIALS]:
-        for obj in bpy.data.objects:
-            if hasattr(obj.data, "materials"):
-                obj.data.materials.clear()
+    if unlocked[ids.Item.MATERIALS]:
+        return
+    
+    for obj in bpy.data.objects:
+        if hasattr(obj.data, "materials"):
+            obj.data.materials.clear()
 
 
 @persistent
-def _subscribe(scene, depsgraph):
+def _modifiers_locked(scene, depsgraph):
+    if unlocked[ids.Item.MODIFIERS]:
+        return
+    
+    obj = bpy.context.active_object
+    if obj and obj.modifiers:
+        obj.modifiers.clear()
+        timer_popup("Modifiers are locked.")
+
+
+@persistent
+
+def _subscribe(scene = None, depsgraph = None):
     bpy.msgbus.clear_by_owner(_msgbus_owner)
     bpy.msgbus.subscribe_rna(
         key=(bpy.types.Object, "mode"),
@@ -128,12 +144,19 @@ def _subscribe(scene, depsgraph):
         args=(),
         notify=_mode_locked,
     )
+    bpy.msgbus.subscribe_rna(
+        key=(bpy.types.Object, "modifiers"),
+        owner=_msgbus_owner,
+        args=(),
+        notify=_modifiers_locked,
+    )
 
 
 _handlers = [
     (bpy.app.handlers.load_post, _subscribe),
     (bpy.app.handlers.load_post, _clear_materials),
     (bpy.app.handlers.depsgraph_update_post, _materials_locked),
+    (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     (bpy.app.handlers.render_complete, _on_render_complete),
     (bpy.app.handlers.undo_post, _mode_locked),
     (bpy.app.handlers.redo_post, _mode_locked),
@@ -143,12 +166,7 @@ _handlers = [
 def register():
     for handler_list, handler in _handlers:
         handler_list.append(handler)
-    bpy.msgbus.subscribe_rna(
-        key=(bpy.types.Object, "mode"),
-        owner=_msgbus_owner,
-        args=(),
-        notify=_mode_locked,
-    )
+    _subscribe()
  
  
 def unregister():
