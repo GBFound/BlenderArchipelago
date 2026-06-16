@@ -94,6 +94,23 @@ def _mode_locked(scene = None, depsgraph = None):
 
 
 @persistent
+def _materials_locked(scene, depsgraph):
+    if not unlocked[ids.Item.MATERIALS]:
+        obj = bpy.context.active_object
+        if obj and hasattr(obj.data, "materials") and len(obj.data.materials) > 0:
+            obj.data.materials.clear()
+            timer_popup("Materials are locked.")
+
+
+@persistent
+def _clear_materials(scene, depsgraph):
+    if not unlocked[ids.Item.MATERIALS]:
+        for obj in bpy.data.objects:
+            if hasattr(obj.data, "materials"):
+                obj.data.materials.clear()
+
+
+@persistent
 def _subscribe(scene, depsgraph):
     bpy.msgbus.clear_by_owner(_msgbus_owner)
     bpy.msgbus.subscribe_rna(
@@ -104,11 +121,19 @@ def _subscribe(scene, depsgraph):
     )
 
 
+_handlers = [
+    (bpy.app.handlers.load_post, _subscribe),
+    (bpy.app.handlers.load_post, _clear_materials),
+    (bpy.app.handlers.depsgraph_update_post, _materials_locked),
+    (bpy.app.handlers.render_complete, _on_render_complete),
+    (bpy.app.handlers.undo_post, _mode_locked),
+    (bpy.app.handlers.redo_post, _mode_locked),
+]
+
+
 def register():
-    bpy.app.handlers.load_post.append(_subscribe)
-    bpy.app.handlers.render_complete.append(_on_render_complete)
-    bpy.app.handlers.undo_post.append(_mode_locked)
-    bpy.app.handlers.redo_post.append(_mode_locked)
+    for handler_list, handler in _handlers:
+        handler_list.append(handler)
     bpy.msgbus.subscribe_rna(
         key=(bpy.types.Object, "mode"),
         owner=_msgbus_owner,
@@ -119,8 +144,6 @@ def register():
  
 def unregister():
     bpy.msgbus.clear_by_owner(_msgbus_owner)
-    bpy.app.handlers.redo_post.remove(_mode_locked)
-    bpy.app.handlers.undo_post.remove(_mode_locked)
-    bpy.app.handlers.render_complete.remove(_on_render_complete)
-    bpy.app.handlers.load_post.remove(_subscribe)
+    for handler_list, handler in reversed(_handlers):
+        handler_list.remove(handler)
     

@@ -10,8 +10,8 @@ class Item(IntEnum):
     TEXTURE_PAINT_MODE = 4
     MATERIALS          = 5
 
-ITEMS     = [item.name for item in Item]
-LOCATIONS = [f"similarity_check_{i}" for i in range(len(ITEMS))]
+ITEMS     = tuple(item.name for item in Item)
+LOCATIONS = tuple(f"similarity_check_{i}" for i in range(len(ITEMS)))
 
 ID_TO_ITEM     : dict[int, Item] = {BASE_ID + item.value: item for item in Item}
 ITEM_TO_ID     : dict[Item, int] = {item: BASE_ID + item.value for item in Item}
