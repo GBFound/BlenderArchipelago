@@ -218,8 +218,8 @@ def _clear_inventory():
     if bpy.context and bpy.context.scene:
         bpy.context.scene.ap_last_item_index = 0
 
-    for unlock in unlocked:
-        unlocked[unlock] = False
+    for item in unlocked:
+        unlocked[item] = False
 
 
 async def _resync():
@@ -229,7 +229,7 @@ async def _resync():
     location_ids = []
     for i in range(len(thresholds)):
         location_name = ids.LOCATIONS[i]
-        location_id = ids.LOCATION_NAME_TO_ID[location_name]
+        location_id = ids.LOCATION_TO_ID[location_name]
         location_ids.append(location_id)
 
     sent_flags = []
@@ -246,13 +246,13 @@ async def _resync():
 
 
 def _unlock_item(item_id: int):
-    unlock_name = ids.ITEM_ID_TO_NAME.get(item_id)
+    item = ids.ID_TO_ITEM.get(item_id)
 
-    if unlocked.get(unlock_name):
+    if unlocked.get(item):
         return
 
-    unlocked[unlock_name] = True
-    unlock_text = unlock_name.replace("_", " ").title()
+    unlocked[item] = True
+    unlock_text = item.name.replace("_", " ").title()
     bpy.app.timers.register(_redraw_panels, first_interval=0.0)
     handlers.timer_popup(f"{unlock_text} has been unlocked!")
 

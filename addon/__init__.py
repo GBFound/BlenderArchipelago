@@ -7,7 +7,7 @@ progress = {
     "goal_percent": 50,      # Goal
 }
 
-unlocked = {name: False for name in ids.ITEMS}
+unlocked = {item: False for item in ids.Item}
 
 thresholds: dict[float, bool] = {}
 

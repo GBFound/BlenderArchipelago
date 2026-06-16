@@ -44,7 +44,7 @@ def _update_checks():
         if progress["percent"] >= threshold:
             if not checked:
                 location_name = ids.LOCATIONS[i]
-                location_id = ids.LOCATION_NAME_TO_ID.get(location_name)
+                location_id = ids.LOCATION_TO_ID.get(location_name)
                 thresholds[threshold] = True
                 ap_client.send_check(location_id)
         else:
@@ -56,13 +56,14 @@ def _update_goal():
         ap_client.send_goal_complete()
 
 
-def on_render_complete(scene, depsgraph = None):
+def _on_render_complete(scene, depsgraph):
     target_name = scene.ap_target_image
     if not target_name:
         timer_popup("No target image selected.")
         return
     
-    # A timer for each function does not guarantee they run in order, so they are put into one function so that they are guaranteed to run in this order
+    # A timer for each function does not guarantee they run in order,
+    # so they are put into one function so that they are guaranteed to run in this order
     def _update_state():
         _update_similarity_percent(target_name)
         _update_checks()
@@ -71,40 +72,39 @@ def on_render_complete(scene, depsgraph = None):
     bpy.app.timers.register(_update_state, first_interval=0.0)
 
 
-def mode_locked(scene = None, depsgraph = None):
+def _mode_locked(scene = None, depsgraph = None):
     obj = bpy.context.active_object
     modes = {
-        "EDIT": "edit_mode",
-        "SCULPT": "sculpt_mode",
-        "VERTEX_PAINT": "vertex_paint_mode",
-        "WEIGHT_PAINT": "weight_paint_mode",
-        "TEXTURE_PAINT": "texture_paint_mode",
+        "EDIT":          ids.Item.EDIT_MODE,
+        "SCULPT":        ids.Item.SCULPT_MODE,
+        "VERTEX_PAINT":  ids.Item.VERTEX_PAINT_MODE,
+        "WEIGHT_PAINT":  ids.Item.WEIGHT_PAINT_MODE,
+        "TEXTURE_PAINT": ids.Item.TEXTURE_PAINT_MODE,
     }
 
-    if not obj:
-        return
-
-    for mode, unlock in modes.items():
-        if obj.mode == mode and not unlocked[unlock]:
+    for mode, item in modes.items():
+        if obj and obj.mode == mode and not unlocked[item]:
             bpy.ops.object.mode_set(mode="OBJECT")
-            unlock_text = unlock.replace("_", " ").title()
+            unlock_text = item.name.replace("_", " ").title()
             timer_popup(f"{unlock_text} is locked.")
             break
 
  
 def register():
-    bpy.app.handlers.render_complete.append(on_render_complete)
-    bpy.app.handlers.undo_post.append(mode_locked)
+    bpy.app.handlers.render_complete.append(_on_render_complete)
+    bpy.app.handlers.undo_post.append(_mode_locked)
+    bpy.app.handlers.redo_post.append(_mode_locked)
     bpy.msgbus.subscribe_rna(
         key=(bpy.types.Object, "mode"),
         owner=_msgbus_owner,
         args=(),
-        notify=mode_locked,
+        notify=_mode_locked,
     )
  
  
 def unregister():
     bpy.msgbus.clear_by_owner(_msgbus_owner)
-    bpy.app.handlers.undo_post.remove(mode_locked)
-    bpy.app.handlers.render_complete.remove(on_render_complete)
+    bpy.app.handlers.redo_post.remove(_mode_locked)
+    bpy.app.handlers.undo_post.remove(_mode_locked)
+    bpy.app.handlers.render_complete.remove(_on_render_complete)
     

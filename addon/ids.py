@@ -1,22 +1,19 @@
+from enum import IntEnum
+
 BASE_ID = 7897897890
 
-ITEMS = [
-    "edit_mode",
-    "sculpt_mode",
-    "vertex_paint_mode",
-    "weight_paint_mode",
-    "texture_paint_mode",
-]
+class Item(IntEnum):
+    EDIT_MODE          = 0
+    SCULPT_MODE        = 1
+    VERTEX_PAINT_MODE  = 2
+    WEIGHT_PAINT_MODE  = 3
+    TEXTURE_PAINT_MODE = 4
+    MATERIALS          = 5
 
-LOCATIONS = [
-    "similarity_check_0",
-    "similarity_check_1",
-    "similarity_check_2",
-    "similarity_check_3",
-    "similarity_check_4",
-]
+ITEMS     = [item.name for item in Item]
+LOCATIONS = [f"similarity_check_{i}" for i in range(len(ITEMS))]
 
-ITEM_ID_TO_NAME     = {BASE_ID + i: name for i, name in enumerate(ITEMS)}
-ITEM_NAME_TO_ID     = {name: BASE_ID + i for i, name in enumerate(ITEMS)}
-LOCATION_NAME_TO_ID = {name: BASE_ID + i for i, name in enumerate(LOCATIONS)}
-LOCATION_ID_TO_NAME = {BASE_ID + i: name for i, name in enumerate(LOCATIONS)}
+ID_TO_ITEM     : dict[int, Item] = {BASE_ID + item.value: item for item in Item}
+ITEM_TO_ID     : dict[Item, int] = {item: BASE_ID + item.value for item in Item}
+LOCATION_TO_ID : dict[str, int]  = {location: BASE_ID + i for i, location in enumerate(LOCATIONS)}
+ID_TO_LOCATION : dict[int, str]  = {BASE_ID + i: location for i, location in enumerate(LOCATIONS)}
