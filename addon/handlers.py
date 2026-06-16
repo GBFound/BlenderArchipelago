@@ -135,7 +135,23 @@ def _modifiers_locked(scene, depsgraph):
 
 
 @persistent
+def _world_shaders_locked():
+    if unlocked[ids.Item.WORLD_SHADERS]:
+        return
+    
+    bpy.context.scene.world = None
+    timer_popup("World Shaders are locked.")
 
+
+@persistent
+def _clear_world_shaders(scene, depsgraph):
+    if unlocked[ids.Item.WORLD_SHADERS]:
+        return
+    
+    bpy.context.scene.world = None
+
+
+@persistent
 def _subscribe(scene = None, depsgraph = None):
     bpy.msgbus.clear_by_owner(_msgbus_owner)
     bpy.msgbus.subscribe_rna(
@@ -150,11 +166,18 @@ def _subscribe(scene = None, depsgraph = None):
         args=(),
         notify=_modifiers_locked,
     )
+    bpy.msgbus.subscribe_rna(
+        key=(bpy.types.Scene, "world"),
+        owner=_msgbus_owner,
+        args=(),
+        notify=_world_shaders_locked,
+    )
 
 
 _handlers = [
     (bpy.app.handlers.load_post, _subscribe),
     (bpy.app.handlers.load_post, _clear_materials),
+    (bpy.app.handlers.load_post, _clear_world_shaders),
     (bpy.app.handlers.depsgraph_update_post, _materials_locked),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     (bpy.app.handlers.render_complete, _on_render_complete),

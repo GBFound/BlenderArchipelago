@@ -16,6 +16,7 @@ ITEM_NAME_TO_CLASSIFICATION = {
     "Grease Pencil Modes" : ItemClassification.useful,
     "Materials"           : ItemClassification.progression,
     "Modifiers"           : ItemClassification.useful,
+    "World Shaders"       : ItemClassification.useful,
 }
 
 ITEM_NAME_TO_ID = {}

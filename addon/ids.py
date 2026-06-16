@@ -11,6 +11,7 @@ class Item(IntEnum):
     GREASE_PENCIL_MODES = 5
     MATERIALS           = 6
     MODIFIERS           = 7
+    WORLD_SHADERS       = 8
 
 ITEMS     = tuple(item.name for item in Item)
 LOCATIONS = tuple(f"similarity_check_{i}" for i in range(len(ITEMS)))
