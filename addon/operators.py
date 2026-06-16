@@ -25,6 +25,7 @@ class WM_OT_AP_LoadTargetImage(bpy.types.Operator):
     bl_idname  = "wm.ap_load_target_image"
 
     filepath: bpy.props.StringProperty(subtype="FILE_PATH")
+    directory: bpy.props.StringProperty(subtype="DIR_PATH")
     filter_image: bpy.props.BoolProperty(default=True, options={"HIDDEN"})
     filter_folder: bpy.props.BoolProperty(default=True, options={"HIDDEN"})
 
@@ -33,6 +34,12 @@ class WM_OT_AP_LoadTargetImage(bpy.types.Operator):
         context.scene.ap_target_image = image.name
         bpy.context.scene.render.resolution_x = image.size[0]
         bpy.context.scene.render.resolution_y = image.size[1]
+        
+        camera = bpy.context.scene.camera
+        bg = camera.data.background_images.new()
+        bg.image = image
+        camera.data.show_background_images = True
+        
         return {"FINISHED"}
 
     def invoke(self, context, event):
