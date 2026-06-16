@@ -32,7 +32,7 @@ def _update_similarity_percent(target_name: str):
 
     try:
         score = similarity.compare_images(render, target)
-        progress["percent"] = score
+        progress.percent = score
         print(f"[Blender AP] Similarity: {score:.3f}%")
     finally:
         bpy.data.images.remove(render)
@@ -42,7 +42,7 @@ def _update_similarity_percent(target_name: str):
 
 def _update_checks():
     for i, (threshold, checked) in enumerate(sorted(thresholds.items())):
-        if progress["percent"] >= threshold:
+        if progress.percent >= threshold:
             if not checked:
                 location_name = ids.LOCATIONS[i]
                 location_id = ids.LOCATION_TO_ID.get(location_name)
@@ -53,7 +53,7 @@ def _update_checks():
 
 
 def _update_goal():
-    if progress["percent"] >= progress["goal_percent"]:
+    if progress.percent >= progress.goal_percent:
         ap_client.send_goal_complete()
 
 

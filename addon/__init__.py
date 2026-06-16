@@ -1,11 +1,16 @@
 from . import auto_load, ids
+from dataclasses import dataclass
 
-progress = {
-    "percent":      0,  # Current similarity percent
-    "min_percent":  20, # Checks will generate at and above this percent
-    "max_percent":  50, # Checks will generate below this percent
-    "goal_percent": 50, # Goal
-}
+
+@dataclass
+class Progress:
+    percent:      int = 0
+    min_percent:  int = 20
+    max_percent:  int = 50
+    goal_percent: int = 50
+
+
+progress = Progress()
 
 unlocked = {item: False for item in ids.Item}
 

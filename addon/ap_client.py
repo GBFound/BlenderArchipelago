@@ -166,9 +166,9 @@ async def _handle_packet(packet: dict):
 
 def _initialize_progress(packet: dict):
     slot_data = packet.get("slot_data")
-    progress["min_percent"] = slot_data.get("min_percent")
-    progress["max_percent"] = slot_data.get("max_percent")
-    progress["goal_percent"] = slot_data.get("goal_percent")
+    progress.min_percent = slot_data.get("min_percent")
+    progress.max_percent = slot_data.get("max_percent")
+    progress.goal_percent = slot_data.get("goal_percent")
 
 
 def _initialize_thresholds(packet: dict):
