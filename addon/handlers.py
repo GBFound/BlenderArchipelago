@@ -103,7 +103,7 @@ def _mode_locked(scene = None, depsgraph = None):
 
 
 @persistent
-def _materials_locked(scene, depsgraph):
+def _materials_locked(scene = None, depsgraph = None):
     if unlocked[ids.Item.MATERIALS]:
         return
 
@@ -124,7 +124,7 @@ def _clear_materials(scene, depsgraph):
 
 
 @persistent
-def _modifiers_locked(scene, depsgraph):
+def _modifiers_locked(scene = None, depsgraph = None):
     if unlocked[ids.Item.MODIFIERS]:
         return
     
@@ -154,36 +154,30 @@ def _clear_world_shaders(scene, depsgraph):
 @persistent
 def _subscribe(scene = None, depsgraph = None):
     bpy.msgbus.clear_by_owner(_msgbus_owner)
-    bpy.msgbus.subscribe_rna(
-        key=(bpy.types.Object, "mode"),
-        owner=_msgbus_owner,
-        args=(),
-        notify=_mode_locked,
-    )
-    bpy.msgbus.subscribe_rna(
-        key=(bpy.types.Object, "modifiers"),
-        owner=_msgbus_owner,
-        args=(),
-        notify=_modifiers_locked,
-    )
-    bpy.msgbus.subscribe_rna(
-        key=(bpy.types.Scene, "world"),
-        owner=_msgbus_owner,
-        args=(),
-        notify=_world_shaders_locked,
+    subscriptions = (
+        (bpy.types.Object, "mode",            _mode_locked),
+        (bpy.types.Object, "active_material", _materials_locked),
+        (bpy.types.Scene,  "world",           _world_shaders_locked),
     )
 
+    for rna_struct, property, handler in subscriptions:
+        bpy.msgbus.subscribe_rna(
+            key=(rna_struct, property),
+            owner=_msgbus_owner,
+            args=(),
+            notify=handler,
+        )
 
-_handlers = [
+
+_handlers = (
     (bpy.app.handlers.load_post, _subscribe),
     (bpy.app.handlers.load_post, _clear_materials),
     (bpy.app.handlers.load_post, _clear_world_shaders),
-    (bpy.app.handlers.depsgraph_update_post, _materials_locked),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     (bpy.app.handlers.render_complete, _on_render_complete),
     (bpy.app.handlers.undo_post, _mode_locked),
     (bpy.app.handlers.redo_post, _mode_locked),
-]
+)
 
 
 def register():
