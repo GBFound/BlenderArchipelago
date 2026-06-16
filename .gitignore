@@ -219,3 +219,6 @@ __marimo__/
 
 # Blender VSCode development extension
 blender_vscode_development/
+
+# Wheels
+wheels/
