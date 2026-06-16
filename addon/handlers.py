@@ -78,18 +78,27 @@ def _on_render_complete(scene, depsgraph):
 def _mode_locked(scene = None, depsgraph = None):
     obj = bpy.context.active_object
     modes = {
-        "EDIT":          ids.Item.EDIT_MODE,
-        "SCULPT":        ids.Item.SCULPT_MODE,
-        "VERTEX_PAINT":  ids.Item.VERTEX_PAINT_MODE,
-        "WEIGHT_PAINT":  ids.Item.WEIGHT_PAINT_MODE,
-        "TEXTURE_PAINT": ids.Item.TEXTURE_PAINT_MODE,
+        "EDIT"          : ids.Item.EDIT_MODE,
+        "SCULPT"        : ids.Item.SCULPT_MODE,
+        "VERTEX_PAINT"  : ids.Item.VERTEX_PAINT_MODE,
+        "WEIGHT_PAINT"  : ids.Item.WEIGHT_PAINT_MODE,
+        "TEXTURE_PAINT" : ids.Item.TEXTURE_PAINT_MODE,
+
+        "SCULPT_GREASE_PENCIL" : ids.Item.GREASE_PENCIL_MODES,
+        "PAINT_GREASE_PENCIL"  : ids.Item.GREASE_PENCIL_MODES,
+        "WEIGHT_GREASE_PENCIL" : ids.Item.GREASE_PENCIL_MODES,
+        "VERTEX_GREASE_PENCIL" : ids.Item.GREASE_PENCIL_MODES,
     }
 
     for mode, item in modes.items():
         if obj and obj.mode == mode and not unlocked[item]:
             bpy.ops.object.mode_set(mode="OBJECT")
             unlock_text = item.name.replace("_", " ").title()
-            timer_popup(f"{unlock_text} is locked.")
+            if item == ids.Item.GREASE_PENCIL_MODES:
+                timer_popup(f"{unlock_text} are locked.")
+            else:
+                unlock_text = item.name.replace("_", " ").title()
+                timer_popup(f"{unlock_text} is locked.")
             break
 
 

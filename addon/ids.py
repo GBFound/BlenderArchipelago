@@ -3,12 +3,13 @@ from enum import IntEnum
 BASE_ID = 7897897890
 
 class Item(IntEnum):
-    EDIT_MODE          = 0
-    SCULPT_MODE        = 1
-    VERTEX_PAINT_MODE  = 2
-    WEIGHT_PAINT_MODE  = 3
-    TEXTURE_PAINT_MODE = 4
-    MATERIALS          = 5
+    EDIT_MODE           = 0
+    SCULPT_MODE         = 1
+    VERTEX_PAINT_MODE   = 2
+    WEIGHT_PAINT_MODE   = 3
+    TEXTURE_PAINT_MODE  = 4
+    GREASE_PENCIL_MODES = 5
+    MATERIALS           = 6
 
 ITEMS     = tuple(item.name for item in Item)
 LOCATIONS = tuple(f"similarity_check_{i}" for i in range(len(ITEMS)))

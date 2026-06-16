@@ -8,12 +8,13 @@ from BaseClasses import Item, ItemClassification
 BASE_ID = 7897897890
 
 ITEM_NAME_TO_CLASSIFICATION = {
-    "Edit Mode"         : ItemClassification.progression,
-    "Sculpt Mode"       : ItemClassification.useful,
-    "Vertex Paint Mode" : ItemClassification.useful,
-    "Weight Paint Mode" : ItemClassification.useful,
-    "Texture Paint Mode": ItemClassification.useful,
-    "Materials"         : ItemClassification.progression,
+    "Edit Mode"           : ItemClassification.progression,
+    "Sculpt Mode"         : ItemClassification.useful,
+    "Vertex Paint Mode"   : ItemClassification.useful,
+    "Weight Paint Mode"   : ItemClassification.useful,
+    "Texture Paint Mode"  : ItemClassification.useful,
+    "Grease Pencil Modes" : ItemClassification.useful,
+    "Materials"           : ItemClassification.progression,
 }
 
 ITEM_NAME_TO_ID = {}
