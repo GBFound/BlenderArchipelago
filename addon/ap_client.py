@@ -250,6 +250,10 @@ def _unlock_item(item_id: int):
 
     if unlocked.get(item):
         return
+    
+    if item == ids.Item.POP_UP:
+        handlers.timer_popup("your model look like poop from a butt 💔💔💔")
+        return
 
     unlocked[item] = True
     unlock_text = item.name.replace("_", " ").title()
