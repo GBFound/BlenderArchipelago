@@ -139,8 +139,9 @@ def _world_shaders_locked(scene = None, depsgraph = None):
     if unlocked[ids.Item.WORLD_SHADERS]:
         return
     
-    bpy.context.scene.world = None
-    timer_popup("World Shaders are locked.")
+    if bpy.context.scene.world:
+        bpy.context.scene.world = None
+        timer_popup("World Shaders are locked.")
 
 
 @persistent
