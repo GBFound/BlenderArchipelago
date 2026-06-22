@@ -10,9 +10,11 @@ BASE_ID = 7897897890
 
 LOCATION_NAME_TO_ID = {}
 # Location IDs need to be unique and greater than 0.
-for i in range(len(items.ITEM_NAME_TO_CLASSIFICATION)):
+total = len(items.ITEM_NAME_TO_CLASSIFICATION)
+padding = len(str(total))
+for i in range(total):
     id = BASE_ID + i
-    name = f"Similarity Check {i + 1}"
+    name = f"Similarity Check {str(i).zfill(padding)}"
     LOCATION_NAME_TO_ID[name] = id
 
 
