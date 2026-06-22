@@ -26,9 +26,9 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
             box.label(text="Similarity not yet found. Render first.")
 
         has_more_checks = False
-        for threshold, checked in thresholds.items():
+        for i, (threshold, checked) in enumerate(thresholds.items()):
             if not checked:
-                box.label(text=f"Next Check: {threshold}%")
+                box.label(text=f"Next Check: {threshold}% ({i})")
                 has_more_checks = True
                 break
         if not has_more_checks:
@@ -58,6 +58,9 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
         layout = self.layout
         box = layout.box()
         for item, is_unlocked in unlocked.items():
+            if item == ids.Item.POP_UP:
+                break
+
             unlock_text = item.name.replace("_", " ").title()
             if is_unlocked:
                 box.label(text=f"{unlock_text}: UNLOCKED", icon="UNLOCKED")

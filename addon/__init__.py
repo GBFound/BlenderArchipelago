@@ -12,7 +12,7 @@ class Progress:
 
 progress = Progress()
 
-unlocked = {item: False for item in ids.Item}
+unlocked = {item: False for item in ids.Item if item < ids.Item.POP_UP}
 
 thresholds: dict[float, bool] = {}
 

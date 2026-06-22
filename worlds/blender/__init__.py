@@ -38,11 +38,8 @@ class BlenderWorld(World):
         }
         
 
-    # TODO
-    """
     def get_filler_item_name(self) -> str:
         return items.get_filler_item_name(self)
-    """
 
         
     def generate_early(self) -> None:

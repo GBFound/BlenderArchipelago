@@ -17,6 +17,7 @@ ITEM_NAME_TO_CLASSIFICATION = {
     "Materials"           : ItemClassification.progression,
     "Modifiers"           : ItemClassification.useful,
     "World Shaders"       : ItemClassification.useful,
+    "Pop Up"              : ItemClassification.filler,
 }
 
 ITEM_NAME_TO_ID = {}
@@ -42,6 +43,11 @@ def create_item(world: BlenderWorld, name: str) -> None:
     return BlenderItem(name, classification, id, world.player)
 
 
-# TODO
+# 5 mins of random use of unlock
+# Undo trap
+# Subdiv modifier trap
+# Hide object in rendered view trap
+# Cube with random image trap
+# Explosion effect trap
 def get_filler_item_name(world: BlenderWorld) -> str:
-    return ""
+    return "Pop Up"

@@ -136,7 +136,10 @@ async def _handle_packet(packet: dict):
 
     elif cmd == "Connected":
         _connected = True
+
         bpy.app.timers.register(_redraw_panels, first_interval=0.0)
+        for item in unlocked:
+            unlocked[item] = False
         _initialize_progress(packet)
         _initialize_thresholds(packet)
         if _pending_checks:
@@ -254,7 +257,7 @@ def _unlock_item(item_id: int):
     if item == ids.Item.POP_UP:
         handlers.timer_popup("your model look like poop from a butt 💔💔💔")
         return
-
+    
     unlocked[item] = True
     unlock_text = item.name.replace("_", " ").title()
     bpy.app.timers.register(_redraw_panels, first_interval=0.0)
