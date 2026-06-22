@@ -135,7 +135,7 @@ def _modifiers_locked(scene = None, depsgraph = None):
 
 
 @persistent
-def _world_shaders_locked():
+def _world_shaders_locked(scene = None, depsgraph = None):
     if unlocked[ids.Item.WORLD_SHADERS]:
         return
     
@@ -152,15 +152,63 @@ def _clear_world_shaders(scene, depsgraph):
 
 
 @persistent
+def _import_disabled(scene, depsgraph):
+    bpy.ops.object.delete()
+    timer_popup("Importing is disabled.")
+
+
+_import_op_prefixes = (
+    "IMPORT_SCENE_OT_",
+    "IMPORT_MESH_OT_",
+    "IMPORT_CURVE_OT_",
+    "IMPORT_ANIM_OT_",
+    "WM_OT_obj_import",
+    "WM_OT_fbx_import",
+    "WM_OT_stl_import",
+    "WM_OT_usd_import",
+    "WM_OT_alembic_import",
+    "WM_OT_collada_import",
+    "WM_OT_gltf_import",
+)
+
+_last_handled_import_op = None
+
+@persistent
+def _file_import_disabled(scene, depsgraph):
+    global _last_handled_import_op
+
+    ops = bpy.context.window_manager.operators
+    if not ops:
+        return
+
+    last_op = ops[-1]
+    idname = last_op.bl_idname
+
+    if not idname.startswith(_import_op_prefixes):
+        return
+
+    if last_op == _last_handled_import_op:
+        return
+
+    _last_handled_import_op = last_op
+
+    for obj in bpy.context.selected_objects:
+        bpy.data.objects.remove(obj)
+
+    timer_popup("Importing is disabled.")
+
+
+_subscriptions = (
+    (bpy.types.Object, "mode",            _mode_locked),
+    (bpy.types.Object, "active_material", _materials_locked),
+    (bpy.types.Scene,  "world",           _world_shaders_locked),
+)
+
+
+@persistent
 def _subscribe(scene = None, depsgraph = None):
     bpy.msgbus.clear_by_owner(_msgbus_owner)
-    subscriptions = (
-        (bpy.types.Object, "mode",            _mode_locked),
-        (bpy.types.Object, "active_material", _materials_locked),
-        (bpy.types.Scene,  "world",           _world_shaders_locked),
-    )
-
-    for rna_struct, property, handler in subscriptions:
+    for rna_struct, property, handler in _subscriptions:
         bpy.msgbus.subscribe_rna(
             key=(rna_struct, property),
             owner=_msgbus_owner,
@@ -169,15 +217,18 @@ def _subscribe(scene = None, depsgraph = None):
         )
 
 
-_handlers = (
+_handlers = [
     (bpy.app.handlers.load_post, _subscribe),
     (bpy.app.handlers.load_post, _clear_materials),
     (bpy.app.handlers.load_post, _clear_world_shaders),
+    (bpy.app.handlers.depsgraph_update_post, _file_import_disabled),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
+    (bpy.app.handlers.blend_import_post, _import_disabled),
     (bpy.app.handlers.render_complete, _on_render_complete),
-    (bpy.app.handlers.undo_post, _mode_locked),
-    (bpy.app.handlers.redo_post, _mode_locked),
-)
+]
+for _, _, handler in _subscriptions:
+    _handlers.append((bpy.app.handlers.undo_post, handler))
+    _handlers.append((bpy.app.handlers.redo_post, handler))
 
 
 def register():
