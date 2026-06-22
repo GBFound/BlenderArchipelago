@@ -57,34 +57,34 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         box = layout.box()
-        for unlock, is_unlocked in unlocked.items():
-            unlock_text = unlock.replace("_", " ").title()
+        for item, is_unlocked in unlocked.items():
+            unlock_text = item.name.replace("_", " ").title()
             if is_unlocked:
                 box.label(text=f"{unlock_text}: UNLOCKED", icon="UNLOCKED")
             else:
                 box.label(text=f"{unlock_text}: LOCKED", icon="LOCKED")
 
 
-class VIEW3D_PT_AP_Thresholds(bpy.types.Panel):
-    bl_label       = "Thresholds (Debug)"
-    bl_idname      = "VIEW3D_PT_AP_Thresholds"
-    bl_space_type  = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category    = "Blender AP"
+# class VIEW3D_PT_AP_Thresholds(bpy.types.Panel):
+#     bl_label       = "Thresholds (Debug)"
+#     bl_idname      = "VIEW3D_PT_AP_Thresholds"
+#     bl_space_type  = "VIEW_3D"
+#     bl_region_type = "UI"
+#     bl_category    = "Blender AP"
 
-    @classmethod
-    def poll(cls, context):
-        return ap_client.is_connected()
+#     @classmethod
+#     def poll(cls, context):
+#         return ap_client.is_connected()
 
-    def draw(self, context):
-        layout = self.layout
-        box = layout.box()
+#     def draw(self, context):
+#         layout = self.layout
+#         box = layout.box()
 
-        for threshold, checked in thresholds.items():
-            if checked:
-                box.label(text=f"{threshold}%: CHECKED", icon="UNLOCKED")
-            else:
-                box.label(text=f"{threshold}%: NOT CHECKED", icon="LOCKED")
+#         for threshold, checked in thresholds.items():
+#             if checked:
+#                 box.label(text=f"{threshold}%: CHECKED", icon="UNLOCKED")
+#             else:
+#                 box.label(text=f"{threshold}%: NOT CHECKED", icon="LOCKED")
 
 
 class VIEW3D_PT_AP_Connection(bpy.types.Panel):
