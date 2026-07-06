@@ -14,6 +14,7 @@ class Item(IntEnum):
     WORLD_SHADERS       = 8
     # Put fillers and traps after POP_UP
     POP_UP              = 9
+    UNDO                = 10
 
 
 ITEMS     = tuple(item.name for item in Item)

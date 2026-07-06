@@ -5,7 +5,12 @@ import os
 import sys
 import threading
 import websockets
-from . import handlers, ids, progress, unlocked, thresholds
+from . import explosion, handlers, ids, progress, unlocked, thresholds
+
+import ssl
+import certifi
+
+
 
 _ws = None
 _connected = False
@@ -13,6 +18,8 @@ _loop = None
 _thread = None
 _pending_checks = []
 _pending_checks_lock = threading.Lock()
+# Use certifi's up-to-date CA bundle instead of Blender's outdated one
+_ssl_context = ssl.create_default_context(cafile=certifi.where())
 
 
 def connect(host: str, port: str, slot_name: str, password: str):
@@ -62,7 +69,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str):
 
     try:
         print(f"[AP Client] Connecting to {url}.")
-        async with websockets.connect(url, compression="deflate") as ws:
+        async with websockets.connect(url, compression="deflate", ssl=_ssl_context) as ws:
             _ws = ws
 
             await ws.send(json.dumps([{
@@ -86,7 +93,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str):
     finally:
         _ws = None
         _connected = False
-        bpy.app.timers.register(_redraw_panels, first_interval=0.0)
+        bpy.app.timers.register(_redraw_panels)
 
 
 # Copied from Archipelago/Utils.py
@@ -137,7 +144,7 @@ async def _handle_packet(packet: dict):
     elif cmd == "Connected":
         _connected = True
 
-        bpy.app.timers.register(_redraw_panels, first_interval=0.0)
+        bpy.app.timers.register(_redraw_panels)
         for item in unlocked:
             unlocked[item] = False
         _initialize_progress(packet)
@@ -254,14 +261,39 @@ def _unlock_item(item_id: int):
     if unlocked.get(item):
         return
     
-    if item == ids.Item.POP_UP:
-        handlers.timer_popup("your model look like poop from a butt 💔💔💔")
+    if _handle_filler(item):
         return
     
     unlocked[item] = True
     unlock_text = item.name.replace("_", " ").title()
-    bpy.app.timers.register(_redraw_panels, first_interval=0.0)
+    bpy.app.timers.register(_redraw_panels)
     handlers.timer_popup(f"{unlock_text} has been unlocked!")
+
+
+def _handle_filler(item: ids.Item) -> bool:
+    match item:
+        case ids.Item.POP_UP:
+            handlers.timer_popup("your model look like poop from a butt 💔💔💔")
+            return True
+        case ids.Item.UNDO:
+            # bpy.app.timers.register(_undo)
+            bpy.app.timers.register(explosion.spawn_animated_ref_image)
+            handlers.timer_popup("Undo trap.")
+            return True
+            
+    return False
+
+
+def _undo():
+    window = bpy.context.window
+    screen = bpy.context.screen
+    if not window or not screen:
+        return
+    area = next((a for a in screen.areas if a.type == "VIEW_3D"), None)
+    if not area:
+        return
+    with bpy.context.temp_override(window=window, screen=screen, area=area):
+        bpy.ops.ed.undo()
 
 
 async def _send_sync():

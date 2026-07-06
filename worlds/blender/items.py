@@ -18,11 +18,17 @@ ITEM_NAME_TO_CLASSIFICATION = {
     "Modifiers"           : ItemClassification.useful,
     "World Shaders"       : ItemClassification.useful,
     "Pop Up"              : ItemClassification.filler,
+    "Undo"                : ItemClassification.trap,
 }
 
 ITEM_NAME_TO_ID = {}
 for i, name in enumerate(ITEM_NAME_TO_CLASSIFICATION):
     ITEM_NAME_TO_ID[name] = BASE_ID + i
+
+FILLER_AND_TRAP_ITEMS = set()
+for name, classification in ITEM_NAME_TO_CLASSIFICATION.items():
+    if classification in (ItemClassification.filler, ItemClassification.trap):
+        FILLER_AND_TRAP_ITEMS.add(name)
 
 
 class BlenderItem(Item):
@@ -43,11 +49,7 @@ def create_item(world: BlenderWorld, name: str) -> None:
     return BlenderItem(name, classification, id, world.player)
 
 
-# 5 mins of random use of unlock
-# Undo trap
-# Subdiv modifier trap
-# Hide object in rendered view trap
-# Cube with random image trap
-# Explosion effect trap
+# 1 min of use of random unlock
 def get_filler_item_name(world: BlenderWorld) -> str:
-    return "Pop Up"
+    random_int = world.random.randint(0, len(FILLER_AND_TRAP_ITEMS) - 1)
+    return list(FILLER_AND_TRAP_ITEMS)[random_int]

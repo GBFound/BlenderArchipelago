@@ -12,7 +12,6 @@ def timer_popup(message: str):
         # Use a timer to defer the call until context is available.
         # Returning None stops the timer from repeating
         lambda: bpy.ops.wm.ap_popup("INVOKE_DEFAULT", message = message) and None,
-        first_interval = 0.0
     )
     print(f"[Blender AP] {message}")
 
@@ -71,7 +70,7 @@ def _on_render_complete(scene, depsgraph):
         _update_checks()
         _update_goal()
 
-    bpy.app.timers.register(_update_state, first_interval=0.0)
+    bpy.app.timers.register(_update_state)
 
 
 @persistent
