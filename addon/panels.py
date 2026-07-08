@@ -28,7 +28,8 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
         has_more_checks = False
         for i, (threshold, checked) in enumerate(thresholds.items()):
             if not checked:
-                box.label(text=f"Next Check: {threshold}% ({i + 1} / {len(thresholds)})")
+                box.label(text=f"Next Check: {threshold}%")
+                # box.label(text=f"Next Check: {threshold}% ({i + 1} / {len(thresholds)})")
                 has_more_checks = True
                 break
         if not has_more_checks:

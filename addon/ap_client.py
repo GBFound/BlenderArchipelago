@@ -98,7 +98,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str):
 
 # Copied from Archipelago/Utils.py
 def _get_uuid() -> str:
-    common_path = cache_path("common.json")
+    common_path = _cache_path("common.json")
     try:
         with open(common_path) as f:
             common_file = json.load(f)
@@ -122,7 +122,7 @@ def _get_uuid() -> str:
 
 
 # Adapted from Archipelago/Utils.py (Blender's Python does not have platformdirs)
-def cache_path(*path: str) -> str:
+def _cache_path(*path: str) -> str:
     """Returns path to a file in the user's Archipelago cache directory."""
     if sys.platform == "win32":
         base = os.path.join(os.environ.get("LOCALAPPDATA", os.path.expanduser("~")), "Archipelago")
@@ -261,7 +261,7 @@ def _unlock_item(item_id: int):
     if unlocked.get(item):
         return
     
-    if _handle_filler(item):
+    if _activate_filler_and_traps(item):
         return
     
     unlocked[item] = True
@@ -270,13 +270,13 @@ def _unlock_item(item_id: int):
     handlers.timer_popup(f"{unlock_text} has been unlocked!")
 
 
-def _handle_filler(item: ids.Item) -> bool:
+def _activate_filler_and_traps(item: ids.Item) -> bool:
     match item:
         case ids.Item.POP_UP:
             handlers.timer_popup("your model look like poop from a butt 💔💔💔")
             return True
         case ids.Item.UNDO:
-            # bpy.app.timers.register(_undo)
+            bpy.app.timers.register(_undo)
             bpy.app.timers.register(explosion.spawn_animated_ref_image)
             handlers.timer_popup("Undo trap.")
             return True
@@ -285,15 +285,12 @@ def _handle_filler(item: ids.Item) -> bool:
 
 
 def _undo():
-    window = bpy.context.window
-    screen = bpy.context.screen
-    if not window or not screen:
-        return
-    area = next((a for a in screen.areas if a.type == "VIEW_3D"), None)
-    if not area:
-        return
-    with bpy.context.temp_override(window=window, screen=screen, area=area):
-        bpy.ops.ed.undo()
+    """
+    bpy.ops.ed.undo() does not work because uhh.
+    Ideally this would only undo a few steps, but the undo stack size isn't readable until Blender 5.3.
+    Currently undos to the bottom of the undo history
+    """
+    bpy.ops.ed.undo_history(item=0)
 
 
 async def _send_sync():
