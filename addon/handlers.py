@@ -177,12 +177,14 @@ def _subscribe(scene = None, depsgraph = None):
 
 
 _handlers = [
-    (bpy.app.handlers.load_post, _subscribe),
-    (bpy.app.handlers.load_post, _clear_materials),
-    (bpy.app.handlers.load_post, _clear_world_shaders),
+    (bpy.app.handlers.load_post,             _subscribe),
+    (bpy.app.handlers.load_post,             _clear_materials),
+    (bpy.app.handlers.load_post,             _clear_world_shaders),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
-    (bpy.app.handlers.blend_import_post, _import_disabled),
-    (bpy.app.handlers.render_complete, _on_render_complete),
+    (bpy.app.handlers.blend_import_post,     _import_disabled),
+    (bpy.app.handlers.render_complete,       _on_render_complete),
+    (bpy.app.handlers.undo_post,             ap_client.send_deathlink("undo")),
+    (bpy.app.handlers.redo_post,             ap_client.send_deathlink("redo")),
 ]
 for _, _, handler in _subscriptions:
     _handlers.append((bpy.app.handlers.undo_post, handler))

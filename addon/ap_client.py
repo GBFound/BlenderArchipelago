@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import threading
+import time
 import websockets
 from . import explosion, handlers, ids, progress, unlocked, thresholds
 
@@ -80,7 +81,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str):
                 "uuid": _get_uuid(),
                 "version": {"major": 0, "minor": 6, "build": 7, "class": "Version"},
                 "items_handling": 0b111,
-                "tags": ["AP"], # TODO Add "DeathLink" when it is implemented
+                "tags": ["AP", "DeathLink"],
             }]))
             
             async for message in ws:
@@ -172,6 +173,14 @@ async def _handle_packet(packet: dict):
             text_parts.append(text)
         text = "".join(text_parts)
         print(f"[AP Client] {text}")
+
+    elif cmd == "Bounced":
+        tags = packet.get("tags")
+        if "DeathLink" in tags:
+            data = packet.get("data", {})
+            source = data.get("source")
+            cause = data.get("cause", f"{source} died.")
+            _receive_deathlink(cause)
 
 
 def _initialize_progress(packet: dict):
@@ -291,6 +300,27 @@ def _undo():
     Currently undos to the bottom of the undo history
     """
     bpy.ops.ed.undo_history(item=0)
+
+
+def _receive_deathlink(cause: str):
+    bpy.app.timers.register(_undo)
+    bpy.app.timers.register(explosion.spawn_animated_ref_image)
+    handlers.timer_popup(cause)
+    print("[AP Client] Received DeathLink.")
+
+
+async def send_deathlink(do: str):
+    if _ws:
+        await _ws.send(json.dumps([{
+            "cmd": "Bounce",
+            "tags": ["DeathLink"],
+            "data": {
+                "time": time.time(),
+                "source": bpy.types.Scene.ap_slot_name,
+                "cause": f"{bpy.types.Scene.ap_slot_name} hit {do}."
+            }
+        }]))
+        print("[AP Client] Sent DeathLink.")
 
 
 async def _send_sync():
