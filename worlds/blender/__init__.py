@@ -31,8 +31,6 @@ class BlenderWorld(World):
 
     def fill_slot_data(self) -> dict[str, Any]:
         return {
-            "min_percent":  self.options.min_percent.value,
-            "max_percent":  self.options.max_percent.value,
             "goal_percent": self.options.goal_percent.value,
             "thresholds":   locations.get_thresholds(self),
         }

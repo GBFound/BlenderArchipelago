@@ -21,6 +21,6 @@ ITEMS     = tuple(item.name for item in Item)
 LOCATIONS = tuple(f"similarity_check_{i}" for i in range(len(ITEMS)))
 
 ID_TO_ITEM     : dict[int, Item] = {BASE_ID + item.value: item for item in Item}
-ITEM_TO_ID     : dict[Item, int] = {item: BASE_ID + item.value for item in Item}
+# ITEM_TO_ID     : dict[Item, int] = {item: BASE_ID + item.value for item in Item}
 LOCATION_TO_ID : dict[str, int]  = {location: BASE_ID + i for i, location in enumerate(LOCATIONS)}
-ID_TO_LOCATION : dict[int, str]  = {BASE_ID + i: location for i, location in enumerate(LOCATIONS)}
+# ID_TO_LOCATION : dict[int, str]  = {BASE_ID + i: location for i, location in enumerate(LOCATIONS)}

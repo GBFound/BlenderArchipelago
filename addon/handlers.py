@@ -1,25 +1,17 @@
 import bpy
 import os
 import tempfile
-from . import ap_client, ids, similarity, progress, unlocked, thresholds
 from bpy.app.handlers import persistent
+from . import ap_client, ids, similarity, utils, progress, unlocks, thresholds
+
 
 _msgbus_owner = object()
-
-
-def timer_popup(message: str):
-    bpy.app.timers.register(
-        # Use a timer to defer the call until context is available.
-        # Returning None stops the timer from repeating
-        lambda: bpy.ops.wm.ap_popup("INVOKE_DEFAULT", message = message) and None,
-    )
-    print(f"[Blender AP] {message}")
 
 
 def _update_similarity_percent(target_name: str):
     target = bpy.data.images.get(target_name)
     if not target:
-        timer_popup(f"Target image \"{target_name}\" not found.")
+        utils.popup(f"Target image \"{target_name}\" not found.")
         return
 
     tmp_path = os.path.join(tempfile.gettempdir(), "ap_blender_render.png")
@@ -31,7 +23,7 @@ def _update_similarity_percent(target_name: str):
 
     try:
         score = similarity.compare_images(render, target)
-        progress.percent = score
+        progress.current_percent = score
         print(f"[Blender AP] Similarity: {score:.3f}%")
     finally:
         bpy.data.images.remove(render)
@@ -40,19 +32,19 @@ def _update_similarity_percent(target_name: str):
 
 
 def _update_checks():
-    for i, (threshold, checked) in enumerate(sorted(thresholds.items())):
-        if progress.percent >= threshold:
+    for i, (threshold, checked) in enumerate(sorted(thresholds.data.items())):
+        if progress.current_percent >= threshold:
             if not checked:
                 location_name = ids.LOCATIONS[i]
                 location_id = ids.LOCATION_TO_ID.get(location_name)
-                thresholds[threshold] = True
+                thresholds.data[threshold] = True
                 ap_client.send_check(location_id)
         else:
             break
 
 
 def _update_goal():
-    if progress.percent >= progress.goal_percent:
+    if progress.current_percent >= progress.goal_percent:
         ap_client.send_goal_complete()
 
 
@@ -60,7 +52,7 @@ def _update_goal():
 def _on_render_complete(scene, depsgraph):
     target_name = scene.ap_target_image
     if not target_name:
-        timer_popup("No target image selected.")
+        utils.popup("No target image selected.")
         return
     
     # A timer for each function does not guarantee they run in order,
@@ -90,31 +82,31 @@ def _mode_locked(scene = None, depsgraph = None):
     }
 
     for mode, item in modes.items():
-        if obj and obj.mode == mode and not unlocked[item]:
+        if obj and obj.mode == mode and not unlocks.data[item]:
             bpy.ops.object.mode_set(mode="OBJECT")
             unlock_text = item.name.replace("_", " ").title()
             if item == ids.Item.GREASE_PENCIL_MODES:
-                timer_popup(f"{unlock_text} are locked.")
+                utils.popup(f"{unlock_text} are locked.")
             else:
                 unlock_text = item.name.replace("_", " ").title()
-                timer_popup(f"{unlock_text} is locked.")
+                utils.popup(f"{unlock_text} is locked.")
             break
 
 
 @persistent
 def _materials_locked(scene = None, depsgraph = None):
-    if unlocked[ids.Item.MATERIALS]:
+    if unlocks.data[ids.Item.MATERIALS]:
         return
 
     obj = bpy.context.active_object
     if obj and hasattr(obj.data, "materials") and len(obj.data.materials) > 0:
         obj.data.materials.clear()
-        timer_popup("Materials are locked.")
+        utils.popup("Materials are locked.")
 
 
 @persistent
 def _clear_materials(scene, depsgraph):
-    if unlocked[ids.Item.MATERIALS]:
+    if unlocks.data[ids.Item.MATERIALS]:
         return
     
     for obj in bpy.data.objects:
@@ -124,28 +116,28 @@ def _clear_materials(scene, depsgraph):
 
 @persistent
 def _modifiers_locked(scene = None, depsgraph = None):
-    if unlocked[ids.Item.MODIFIERS]:
+    if unlocks.data[ids.Item.MODIFIERS]:
         return
     
     obj = bpy.context.active_object
     if obj and obj.modifiers:
         obj.modifiers.clear()
-        timer_popup("Modifiers are locked.")
+        utils.popup("Modifiers are locked.")
 
 
 @persistent
 def _world_shaders_locked(scene = None, depsgraph = None):
-    if unlocked[ids.Item.WORLD_SHADERS]:
+    if unlocks.data[ids.Item.WORLD_SHADERS]:
         return
     
     if bpy.context.scene.world:
         bpy.context.scene.world = None
-        timer_popup("World Shaders are locked.")
+        utils.popup("World Shaders are locked.")
 
 
 @persistent
 def _clear_world_shaders(scene, depsgraph):
-    if unlocked[ids.Item.WORLD_SHADERS]:
+    if unlocks.data[ids.Item.WORLD_SHADERS]:
         return
     
     bpy.context.scene.world = None
@@ -154,7 +146,7 @@ def _clear_world_shaders(scene, depsgraph):
 @persistent
 def _import_disabled(scene, depsgraph):
     bpy.ops.object.delete()
-    timer_popup("Importing is disabled.")
+    utils.popup("Importing is disabled in Archipelago.")
 
 
 _subscriptions = (
@@ -183,8 +175,8 @@ _handlers = [
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     (bpy.app.handlers.blend_import_post,     _import_disabled),
     (bpy.app.handlers.render_complete,       _on_render_complete),
-    (bpy.app.handlers.undo_post,             ap_client.send_deathlink("undo")),
-    (bpy.app.handlers.redo_post,             ap_client.send_deathlink("redo")),
+    (bpy.app.handlers.undo_post,             lambda scene, depsgraph: ap_client.send_deathlink("undo")),
+    (bpy.app.handlers.redo_post,             lambda scene, depsgraph: ap_client.send_deathlink("redo")),
 ]
 for _, _, handler in _subscriptions:
     _handlers.append((bpy.app.handlers.undo_post, handler))

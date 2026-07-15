@@ -1,6 +1,6 @@
 import bpy
 import numpy
-
+from . import utils
 
 def _get_image_pixels(image: bpy.types.Image) -> numpy.ndarray:
     image.update()
@@ -17,18 +17,17 @@ def compare_images(img_a: bpy.types.Image, img_b: bpy.types.Image) -> float:
     Compare two images using a similar algorithm as Archipelago Paint
     Returns 0.0 if either image has no data.
     """
-    from . import handlers
 
     if img_a.size[0] != img_b.size[0] or img_a.size[1] != img_b.size[1]:
-        handlers.timer_popup("Image resolutions do not match.")
+        utils.popup("Image resolutions do not match.")
         return 0.0
 
     if img_a.size[0] == 0 or img_b.size[0] == 0:
-        handlers.timer_popup("One or both images have no size.")
+        utils.popup("One or both images have no size.")
         return 0.0
 
     if len(img_a.pixels) == 0 or len(img_b.pixels) == 0:
-        handlers.timer_popup("One or both images have no pixel data.")
+        utils.popup("One or both images have no pixel data.")
         return 0.0
 
     pixels_a = _get_image_pixels(img_a)

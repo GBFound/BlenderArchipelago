@@ -19,6 +19,10 @@ def get_images():
 
 # --- Animation function ---
 def spawn_animated_ref_image():
+    bpy.app.timers.register(spawn_animated_ref_image)
+
+
+def _spawn_animated_ref_image():
     images = get_images()
     if not images:
         print(f"[Explosion] No images found in {IMAGE_FOLDER}")

@@ -1,6 +1,6 @@
 import bpy
 from . import ap_client
-from . import progress, unlocked, thresholds, ids
+from . import progress, unlocks, thresholds, ids
 
 
 class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
@@ -18,7 +18,7 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
         layout = self.layout
 
         box = layout.box()
-        percent = progress.percent
+        percent = progress.current_percent
         goal = progress.goal_percent
         if percent is not None:
             box.label(text=f"Current Similarity: {percent:.3f}%")
@@ -26,16 +26,16 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
             box.label(text="Similarity not yet found. Render first.")
 
         has_more_checks = False
-        for i, (threshold, checked) in enumerate(thresholds.items()):
+        for i, (threshold, checked) in enumerate(thresholds.data.items()):
             if not checked:
                 box.label(text=f"Next Check: {threshold}%")
-                # box.label(text=f"Next Check: {threshold}% ({i + 1} / {len(thresholds)})")
                 has_more_checks = True
                 break
         if not has_more_checks:
             box.label(text=f"No more checks.")
         
         box.label(text=f"Goal: {goal:.1f}%")
+        box.label(text=f"{i} / {len(thresholds.data)} checks completed.")
 
         box = layout.box()
         box.label(text="Target Image:")
@@ -58,7 +58,7 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         box = layout.box()
-        for item, is_unlocked in unlocked.items():
+        for item, is_unlocked in unlocks.data.items():
             if item == ids.Item.POP_UP:
                 break
 
@@ -84,7 +84,7 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
 #         layout = self.layout
 #         box = layout.box()
 
-#         for threshold, checked in thresholds.items():
+#         for threshold, checked in thresholds.data.items():
 #             if checked:
 #                 box.label(text=f"{threshold}%: CHECKED", icon="UNLOCKED")
 #             else:
@@ -117,8 +117,21 @@ class VIEW3D_PT_AP_Connection(bpy.types.Panel):
 
         if ap_client.is_connected():
             box.operator("wm.ap_disconnect", icon="PANEL_CLOSE")
+        elif ap_client.is_connecting():
+            box.operator("wm.ap_connecting", icon="SORTTIME")
         else:
             box.operator("wm.ap_connect", icon="LINKED")
+
+
+def redraw_panels():
+    bpy.app.timers.register(_redraw_panels)
+
+
+def _redraw_panels():
+    for screen in bpy.data.screens:
+        for area in screen.areas:
+            if area.type == "VIEW_3D":
+                area.tag_redraw()
 
 
 def register():

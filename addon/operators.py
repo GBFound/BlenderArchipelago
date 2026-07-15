@@ -3,8 +3,8 @@ from . import ap_client
 
 
 class WM_OT_AP_Popup(bpy.types.Operator):
-    bl_label   = "AP Popup"
-    bl_idname  = "wm.ap_popup"
+    bl_label  = "Blender AP"
+    bl_idname = "wm.ap_popup"
 
     message: bpy.props.StringProperty(default="")
 
@@ -12,7 +12,8 @@ class WM_OT_AP_Popup(bpy.types.Operator):
         return {"FINISHED"}
 
     def invoke(self, context, event):
-        return context.window_manager.invoke_popup(self, width=280)
+        width = max(100, len(self.message) * 6)
+        return context.window_manager.invoke_popup(self, width=width)
 
     def draw(self, context):
         layout = self.layout
@@ -21,8 +22,8 @@ class WM_OT_AP_Popup(bpy.types.Operator):
 
 
 class WM_OT_AP_LoadTargetImage(bpy.types.Operator):
-    bl_label   = "AP Load Target Image"
-    bl_idname  = "wm.ap_load_target_image"
+    bl_label  = "Load Target Image"
+    bl_idname = "wm.ap_load_target_image"
 
     filepath: bpy.props.StringProperty(subtype="FILE_PATH")
     directory: bpy.props.StringProperty(subtype="DIR_PATH")
@@ -69,3 +70,26 @@ class WM_OT_AP_Disconnect(bpy.types.Operator):
     def execute(self, context):
         ap_client.disconnect()
         return {"FINISHED"}
+
+
+class WM_OT_AP_Connecting(bpy.types.Operator):
+    bl_label  = "Connecting..."
+    bl_idname = "wm.ap_connecting"
+
+    def execute(self, context):
+        return {"FINISHED"}
+
+
+"""
+Does not work unless invoked by the user.
+Was to be used for less obtrusive popups.
+class WM_OT_AP_Report(bpy.types.Operator):
+    bl_label  = "Blender AP"
+    bl_idname = "wm.ap_report"
+
+    message: bpy.props.StringProperty()
+
+    def execute(self, context):
+        self.report({"INFO"}, self.message)
+        return {"FINISHED"}
+"""
