@@ -9,6 +9,7 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
+    bl_order = 0
 
     @classmethod
     def poll(cls, context):
@@ -32,10 +33,10 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
                 has_more_checks = True
                 break
         if not has_more_checks:
-            box.label(text=f"No more checks.")
+            i += 1
+        box.label(text=f"{i} / {len(thresholds.data)} checks completed.")
         
         box.label(text=f"Goal: {goal:.1f}%")
-        box.label(text=f"{i} / {len(thresholds.data)} checks completed.")
 
         box = layout.box()
         box.label(text="Target Image:")
@@ -50,6 +51,7 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
+    bl_order = 1
 
     @classmethod
     def poll(cls, context):
@@ -97,6 +99,7 @@ class VIEW3D_PT_AP_Connection(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
+    bl_order = 2
 
     def draw(self, context):
         layout = self.layout
@@ -123,7 +126,7 @@ class VIEW3D_PT_AP_Connection(bpy.types.Panel):
             box.operator("wm.ap_connect", icon="LINKED")
 
 
-def redraw_panels():
+def schedule_redraw_panels():
     bpy.app.timers.register(_redraw_panels)
 
 

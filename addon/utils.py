@@ -1,6 +1,31 @@
 import bpy
+import collections
+from . import explosion
 
-def popup(message: str):
+_popup_queue = collections.deque()
+_show_next_popup = True
+
+
+def queue_popup(message: str):
+    _popup_queue.append(message)
+
+    if _show_next_popup:
+        _schedule_popup()
+
+
+def show_next_popup():
+    global _show_next_popup
+    _show_next_popup = True
+    
+    if _popup_queue:
+        _schedule_popup()
+
+
+def _schedule_popup():
+    global _show_next_popup
+    _show_next_popup = False
+
+    message = _popup_queue.popleft()
     bpy.app.timers.register(
         # Use a timer to defer the call until context is available.
         # Returning None stops the timer from repeating
@@ -9,7 +34,8 @@ def popup(message: str):
     print(f"[Blender AP] {message}")
 
 
-def undo():
+
+def schedule_undo():
     bpy.app.timers.register(_undo)
 
 
@@ -21,5 +47,11 @@ def _undo():
     """
     from . import ap_client
     ap_client.suppress_deathlink = True
-    bpy.ops.ed.undo_history(item=0)
+
+    try:
+        bpy.ops.ed.undo_history(item=0)
+    except Exception as e:
+        print(f"[Blender AP] Undo failed: {e}")
+        
     ap_client.suppress_deathlink = False
+    explosion.spawn_animated_ref_image()

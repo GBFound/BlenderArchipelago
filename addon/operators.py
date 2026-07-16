@@ -1,5 +1,5 @@
 import bpy
-from . import ap_client
+from . import ap_client, utils
 
 
 class WM_OT_AP_Popup(bpy.types.Operator):
@@ -10,9 +10,12 @@ class WM_OT_AP_Popup(bpy.types.Operator):
 
     def execute(self, context):
         return {"FINISHED"}
+    
+    def cancel(self, context):
+        utils.show_next_popup()
 
     def invoke(self, context, event):
-        width = max(100, len(self.message) * 6)
+        width = len(self.message) * 6
         return context.window_manager.invoke_popup(self, width=width)
 
     def draw(self, context):

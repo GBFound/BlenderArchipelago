@@ -1,7 +1,6 @@
 # Adapted from Andrei Davydov
 
 import bpy
-from bpy.app.handlers import persistent
 import os
 
 # --- Config ---
@@ -19,7 +18,7 @@ def get_images():
 
 # --- Animation function ---
 def spawn_animated_ref_image():
-    bpy.app.timers.register(spawn_animated_ref_image)
+    bpy.app.timers.register(_spawn_animated_ref_image)
 
 
 def _spawn_animated_ref_image():
@@ -65,7 +64,12 @@ def _spawn_animated_ref_image():
         # Load next frame
         img_path = bpy.path.abspath(images[frame_index])
         img = bpy.data.images.load(img_path)
-        ref_obj.data = img
+
+        try:
+            ref_obj.data = img
+        except ReferenceError:
+            return None # stops Blender from crashing if undo is spammed
+        
         return 1 / FPS  # run again in 1/30 sec
 
     bpy.app.timers.register(update_frame)

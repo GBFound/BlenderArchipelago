@@ -2,7 +2,7 @@ import bpy
 import os
 import tempfile
 from bpy.app.handlers import persistent
-from . import ap_client, ids, similarity, utils, progress, unlocks, thresholds
+from . import ap_client, explosion, ids, similarity, utils, progress, unlocks, thresholds
 
 
 _msgbus_owner = object()
@@ -11,7 +11,7 @@ _msgbus_owner = object()
 def _update_similarity_percent(target_name: str):
     target = bpy.data.images.get(target_name)
     if not target:
-        utils.popup(f"Target image \"{target_name}\" not found.")
+        utils.queue_popup(f"Target image \"{target_name}\" not found.")
         return
 
     tmp_path = os.path.join(tempfile.gettempdir(), "ap_blender_render.png")
@@ -45,6 +45,8 @@ def _update_checks():
 
 def _update_goal():
     if progress.current_percent >= progress.goal_percent:
+        for threshold in thresholds.data:
+            thresholds.data[threshold] = True
         ap_client.send_goal_complete()
 
 
@@ -52,7 +54,7 @@ def _update_goal():
 def _on_render_complete(scene, depsgraph):
     target_name = scene.ap_target_image
     if not target_name:
-        utils.popup("No target image selected.")
+        utils.queue_popup("No target image selected.")
         return
     
     # A timer for each function does not guarantee they run in order,
@@ -63,6 +65,18 @@ def _on_render_complete(scene, depsgraph):
         _update_goal()
 
     bpy.app.timers.register(_update_state)
+
+
+@persistent
+def _on_undo(scene, depsgraph):
+    ap_client.send_deathlink("undo")
+    explosion.spawn_animated_ref_image()
+
+
+@persistent
+def _on_redo(scene, depsgraph):
+    ap_client.send_deathlink("redo")
+    explosion.spawn_animated_ref_image()
 
 
 @persistent
@@ -86,10 +100,10 @@ def _mode_locked(scene = None, depsgraph = None):
             bpy.ops.object.mode_set(mode="OBJECT")
             unlock_text = item.name.replace("_", " ").title()
             if item == ids.Item.GREASE_PENCIL_MODES:
-                utils.popup(f"{unlock_text} are locked.")
+                utils.queue_popup(f"{unlock_text} are locked.")
             else:
                 unlock_text = item.name.replace("_", " ").title()
-                utils.popup(f"{unlock_text} is locked.")
+                utils.queue_popup(f"{unlock_text} is locked.")
             break
 
 
@@ -101,7 +115,7 @@ def _materials_locked(scene = None, depsgraph = None):
     obj = bpy.context.active_object
     if obj and hasattr(obj.data, "materials") and len(obj.data.materials) > 0:
         obj.data.materials.clear()
-        utils.popup("Materials are locked.")
+        utils.queue_popup("Materials are locked.")
 
 
 @persistent
@@ -115,14 +129,14 @@ def _clear_materials(scene, depsgraph):
 
 
 @persistent
-def _modifiers_locked(scene = None, depsgraph = None):
+def _modifiers_locked(scene, depsgraph):
     if unlocks.data[ids.Item.MODIFIERS]:
         return
     
     obj = bpy.context.active_object
     if obj and obj.modifiers:
         obj.modifiers.clear()
-        utils.popup("Modifiers are locked.")
+        utils.queue_popup("Modifiers are locked.")
 
 
 @persistent
@@ -132,7 +146,7 @@ def _world_shaders_locked(scene = None, depsgraph = None):
     
     if bpy.context.scene.world:
         bpy.context.scene.world = None
-        utils.popup("World Shaders are locked.")
+        utils.queue_popup("World Shaders are locked.")
 
 
 @persistent
@@ -146,7 +160,7 @@ def _clear_world_shaders(scene, depsgraph):
 @persistent
 def _import_disabled(scene, depsgraph):
     bpy.ops.object.delete()
-    utils.popup("Importing is disabled in Archipelago.")
+    utils.queue_popup("Importing is disabled in Archipelago.")
 
 
 _subscriptions = (
@@ -175,8 +189,8 @@ _handlers = [
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     (bpy.app.handlers.blend_import_post,     _import_disabled),
     (bpy.app.handlers.render_complete,       _on_render_complete),
-    (bpy.app.handlers.undo_post,             lambda scene, depsgraph: ap_client.send_deathlink("undo")),
-    (bpy.app.handlers.redo_post,             lambda scene, depsgraph: ap_client.send_deathlink("redo")),
+    (bpy.app.handlers.undo_post,             _on_undo),
+    (bpy.app.handlers.redo_post,             _on_redo),
 ]
 for _, _, handler in _subscriptions:
     _handlers.append((bpy.app.handlers.undo_post, handler))

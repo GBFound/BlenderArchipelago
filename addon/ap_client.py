@@ -6,16 +6,22 @@ import websockets
 import time
 import ssl
 import certifi
-from . import cache, explosion, ids, panels, utils, progress, unlocks, thresholds
+from . import ap_data_package, cache, ids, panels, utils, progress, unlocks, thresholds
 
 suppress_deathlink:   bool                                      = False
+
+# _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
+_pending_checks:      list[int]                                 = []
+_pending_checks_lock: threading.Lock                            = threading.Lock()
+
+_slot_info:           dict                                      = None
+_slot_id:             int                                       = None
+
 _thread:              threading.Thread | None                   = None
 _loop:                asyncio.AbstractEventLoop | None          = None
 _ws:                  websockets.WebSocketClientProtocol | None = None
 _connected:           bool                                      = False
-_pending_checks:      list[int]                                 = []
-# _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
-_pending_checks_lock: threading.Lock                            = threading.Lock()
+
 # Use certifi's up-to-date CA bundle instead of Blender's outdated one
 _ssl_context:         ssl.SSLContext                            = ssl.create_default_context(cafile=certifi.where())
 
@@ -23,7 +29,7 @@ _ssl_context:         ssl.SSLContext                            = ssl.create_def
 def connect(host: str, port: str, slot_name: str, password: str):
     global _thread
     if _thread and _thread.is_alive():
-        print("[Blender AP] Already connected.")
+        utils.queue_popup("Already connected.")
         return
 
     _thread = threading.Thread(
@@ -32,7 +38,6 @@ def connect(host: str, port: str, slot_name: str, password: str):
         daemon=True
     )
     _thread.start()
-    panels.redraw_panels()
 
 
 def disconnect():
@@ -65,7 +70,7 @@ def is_connected() -> bool:
 def send_deathlink(do: str):
     if _connected and not suppress_deathlink:
         asyncio.run_coroutine_threadsafe(_send_deathlink(do), _loop)
-        utils.popup("Sent DeathLink.")
+        utils.queue_popup("Sent DeathLink.")
 
 
 async def _send_deathlink(do: str):
@@ -83,9 +88,8 @@ async def _send_deathlink(do: str):
 
 
 def _receive_deathlink(cause: str):
-    utils.undo()
-    explosion.spawn_animated_ref_image()
-    utils.popup(cause)
+    utils.schedule_undo()
+    utils.queue_popup(cause)
 
 
 async def _connect(host: str, port: str, slot_name: str, password: str):
@@ -120,30 +124,38 @@ async def _connect(host: str, port: str, slot_name: str, password: str):
     except Exception as e:
         import traceback
         traceback.print_exc()
-        utils.popup(f"Connection error: {e}")
+        utils.queue_popup(f"Connection error: {e}")
     finally:
         _ws = None
         _connected = False
-        panels.redraw_panels()
+        panels.schedule_redraw_panels()
 
 
 async def _handle_packet(packet: dict):
-    global _connected
+    global _connected, _slot_info, _slot_id
 
     cmd = packet.get("cmd")
 
     if cmd == "RoomInfo":
         print("[Blender AP] Connected to room.")
+        data_package_checksums = packet.get("datapackage_checksums")
+        data_package_checksum = data_package_checksums.get("Blender")
+        if not ap_data_package.is_cached() or ap_data_package.is_outdated(data_package_checksum):
+            await _send_get_data_package()
+
+    elif cmd == "DataPackage":
+        print("[Blender AP] Received data package.")
+        ap_data_package.save_data_package(packet.get("data"))
 
     elif cmd == "Connected":
         _connected = True
-
-        panels.redraw_panels()
+        _slot_info = packet.get("slot_info")
+        _slot_id = packet.get("slot")
+        panels.schedule_redraw_panels()
         progress.initialize_progress(packet)
         thresholds.initialize_thresholds(packet)
         if _pending_checks:
             # Shallow copy to avoid mutation during send
-            await _send_checks(_pending_checks.copy())
             with _pending_checks_lock:
                 checks = _pending_checks.copy()
                 _pending_checks.clear()
@@ -151,19 +163,28 @@ async def _handle_packet(packet: dict):
 
     elif cmd == "ConnectionRefused":
         await _ws.close()
-        print(f"[Blender AP] Connection refused: {packet.get("errors")}")
+        utils.queue_popup(f"Connection refused: {packet.get("errors")}")
 
     elif cmd == "ReceivedItems":
         await _handle_received_items(packet)
 
     elif cmd == "PrintJSON":
-        parts = packet.get("data")
-        text_parts = []
-        for part in parts:
-            text = part.get("text", "")
-            text_parts.append(text)
-        text = "".join(text_parts)
-        print(f"[Blender AP] {text}")
+        if packet.get("type") == "ItemSend":
+            item = packet.get("item")
+            item_id = item.get("item")
+            sender_id = item.get("player")
+            sender_name = _player_id_to_name(sender_id)
+            receiving_id = packet.get("receiving")
+            receiving_name = _player_id_to_name(receiving_id)
+            if _slot_id == sender_id and _slot_id == receiving_id:
+                item_name = _external_item_id_to_name(item_id, sender_id)
+                utils.queue_popup(f"Unlocked {item_name}.")
+            elif _slot_id == sender_id:
+                item_name = _external_item_id_to_name(item_id, receiving_id)
+                utils.queue_popup(f"Found {item_name} for {receiving_name}.")
+            elif _slot_id == receiving_id:
+                item_name = _external_item_id_to_name(item_id, receiving_id)
+                utils.queue_popup(f"Unlocked {item_name} from {sender_name}.")
 
     elif cmd == "Bounced":
         tags = packet.get("tags")
@@ -177,6 +198,26 @@ async def _handle_packet(packet: dict):
             _receive_deathlink(cause)
 
 
+def _player_id_to_name(player_id: str) -> str:
+    network_slot = _slot_info.get(str(player_id))
+    player_name = network_slot.get("name")
+    return player_name
+
+
+def _external_item_id_to_name(item_id: str, player_id: str) -> str:
+    game = _slot_info.get(str(player_id)).get("game")
+    data_package = ap_data_package.load_data_package()
+    game_data = data_package.get("games").get(game)
+    item_name_to_id = game_data.get("item_name_to_id")
+    item_id_to_name = {v: k for k, v in item_name_to_id.items()}
+    item_name = item_id_to_name.get(item_id)
+    return item_name
+
+
+async def _send_get_data_package():
+    await _ws.send(json.dumps([{"cmd": "GetDataPackage"}]))
+
+
 async def _handle_received_items(packet: dict):
     packet_index = packet.get("index")
     items = packet.get("items")
@@ -185,7 +226,6 @@ async def _handle_received_items(packet: dict):
         return
 
     last_index = bpy.context.scene.ap_last_item_index
-    print(last_index)
 
     if packet_index == 0:
         unlocks.clear_unlocks()
@@ -201,19 +241,19 @@ async def _handle_received_items(packet: dict):
         item = ids.ID_TO_ITEM.get(item_id)
         unlocks.unlock_item(item)
 
-    _set_last_index(packet_index + len(items))
+    _schedule_last_index(packet_index + len(items))
     unlocks.resyncing = False
 
 
-def _set_last_index(index: int):
-    def _do():
-        bpy.context.scene.ap_last_item_index = index
+def _schedule_last_index(index: int):
+    bpy.app.timers.register(lambda: _set_last_index(index))
 
-    bpy.app.timers.register(_do)
+
+def _set_last_index(index: int):
+    bpy.context.scene.ap_last_item_index = index
 
 
 async def _resync():
-    print(f"[Blender AP] Resyncing.")
     await _send_sync()
 
     checks = []
@@ -229,7 +269,6 @@ async def _resync():
 async def _send_sync():
     if _ws:
         await _ws.send(json.dumps([{"cmd": "Sync"}]))
-        print("[Blender AP] Sent sync.")
 
 
 async def _send_checks(location_ids: list[int]):
@@ -238,7 +277,6 @@ async def _send_checks(location_ids: list[int]):
             "cmd": "LocationChecks",
             "locations": location_ids,
         }]))
-        print(f"[Blender AP] Sent checks: {location_ids}")
 
 
 async def _send_goal_complete():
@@ -247,7 +285,6 @@ async def _send_goal_complete():
             "cmd": "StatusUpdate",
             "status": 30  # 30 = ClientStatus.CLIENT_GOAL
         }]))
-        print("[Blender AP] Sent goal complete.")
 
 
 def _run_loop(host: str, port: str, slot_name: str, password: str):
