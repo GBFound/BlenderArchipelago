@@ -1,6 +1,6 @@
 # BlenderArchipelago
 
-![Logo](readme_images/ModLogo.png)
+![Logo](readme_images/modLogo.png)
 
 A [Blender](https://www.blender.org) add-on for [Archipelago](https://archipelago.gg), a multiworld, multi-game randomizer.
 
