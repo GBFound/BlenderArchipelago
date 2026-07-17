@@ -143,7 +143,7 @@ def register():
     )
     bpy.types.Scene.ap_host      = bpy.props.StringProperty(default="archipelago.gg")
     bpy.types.Scene.ap_port      = bpy.props.StringProperty(default="38281")
-    bpy.types.Scene.ap_slot_name = bpy.props.StringProperty(default="GBFound")
+    bpy.types.Scene.ap_slot_name = bpy.props.StringProperty(default="Player")
     bpy.types.Scene.ap_password  = bpy.props.StringProperty(default="", subtype="PASSWORD")
 
 
