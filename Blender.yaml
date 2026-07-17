@@ -2,6 +2,6 @@ name: GBFound
 game: Blender
 description: Blender Archipelago
 Blender:
-  min_percent: 30   # Checks will generate at and above this percent. (Must be less than max_percent.)
+  min_percent: 15   # Checks will generate at and above this percent. (Must be less than max_percent.)
   max_percent: 75   # Checks will generate at and below this percent. (Must be greater than min_percent.)
   goal_percent: 80  # The similarity percentage required to reach the goal.
