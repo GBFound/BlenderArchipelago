@@ -61,9 +61,8 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
         layout = self.layout
         box = layout.box()
         for item, is_unlocked in unlocks.data.items():
-            if item == ids.Item.POP_UP:
-                break
-
+            if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
+                continue
             unlock_text = item.name.replace("_", " ").title()
             if is_unlocked:
                 box.label(text=f"{unlock_text}: UNLOCKED", icon="UNLOCKED")
@@ -101,22 +100,22 @@ class VIEW3D_PT_AP_Connection(bpy.types.Panel):
     bl_category    = "Blender AP"
     bl_order = 2
 
-    def draw(self, context):
-        layout = self.layout
 
-        box = layout.box() 
-        split = box.split(factor=0.15)
-        split.label(text="Host:")
-        split.prop(context.scene, "ap_host", text="")
-        split = box.split(factor=0.15)
-        split.label(text="Port:")
-        split.prop(context.scene, "ap_port", text="")
-        split = box.split(factor=0.15)
-        split.label(text="Slot:")
-        split.prop(context.scene, "ap_slot_name", text="")
-        split = box.split(factor=0.3)
-        split.label(text="Password:")
-        split.prop(context.scene, "ap_password", text="")
+    def draw(self, context):
+        connected = ap_client.is_connected() or ap_client.is_connecting()
+        layout = self.layout
+        box = layout.box()
+
+        for label, prop in (("Host:", "ap_host"), ("Port:", "ap_port"), ("Slot:", "ap_slot_name"), ("Password:", "ap_password")):
+            factor = 0.15
+            if prop == "ap_password":
+                factor = 0.3
+            split = box.split(factor=factor)
+            split.label(text=label)
+            if connected:
+                split.label(text=str(getattr(context.scene, prop)))
+            else:
+                split.prop(context.scene, prop, text="")
 
         if ap_client.is_connected():
             box.operator("wm.ap_disconnect", icon="PANEL_CLOSE")

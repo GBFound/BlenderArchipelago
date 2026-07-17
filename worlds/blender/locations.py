@@ -8,11 +8,16 @@ from . import items
 
 BASE_ID = 7897897890
 
-LOCATION_NAME_TO_ID = {}
 # Location IDs need to be unique and greater than 0.
-total = len(items.ITEM_NAME_TO_CLASSIFICATION)
-padding = len(str(total))
-for i in range(total):
+LOCATION_NAME_TO_ID = {}
+total_items = 0
+for item_name in items.ITEM_NAME_TO_CLASSIFICATION:
+    if item_name == "Progressive Render Width" or item_name == "Progressive Render Height":
+        total_items += 3  # TODO Let YAML customize the number of progressive items
+    else:
+        total_items += 1
+padding = len(str(total_items))
+for i in range(total_items):
     id = BASE_ID + i
     name = f"Similarity Check {str(i).zfill(padding)}"
     LOCATION_NAME_TO_ID[name] = id
@@ -31,11 +36,10 @@ def create_locations(world: BlenderWorld) -> None:
 def get_thresholds(world: BlenderWorld) -> list[float]:
     min_percent = world.options.min_percent.value
     max_percent = world.options.max_percent.value
-    count = len(items.ITEM_NAME_TO_CLASSIFICATION)
-    interval = (max_percent - min_percent) / (count - 1)
+    interval = (max_percent - min_percent) / (total_items - 1)
 
     thresholds = []
-    for i in range(count):
+    for i in range(total_items):
         thresholds.append(round(min_percent + interval * i, 3))
 
     return thresholds

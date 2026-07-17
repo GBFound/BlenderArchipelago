@@ -3,6 +3,7 @@ from . import ap_client, utils
 
 
 class WM_OT_AP_Popup(bpy.types.Operator):
+    """Pop-Up"""
     bl_label  = "Blender AP"
     bl_idname = "wm.ap_popup"
 
@@ -25,6 +26,7 @@ class WM_OT_AP_Popup(bpy.types.Operator):
 
 
 class WM_OT_AP_LoadTargetImage(bpy.types.Operator):
+    """Load Target Image"""
     bl_label  = "Load Target Image"
     bl_idname = "wm.ap_load_target_image"
 
@@ -52,6 +54,7 @@ class WM_OT_AP_LoadTargetImage(bpy.types.Operator):
 
 
 class WM_OT_AP_Connect(bpy.types.Operator):
+    """Connect to Archipelago"""
     bl_label  = "Connect to Archipelago"
     bl_idname = "wm.ap_connect"
 
@@ -67,6 +70,7 @@ class WM_OT_AP_Connect(bpy.types.Operator):
 
 
 class WM_OT_AP_Disconnect(bpy.types.Operator):
+    """Disconnect from Archipelago"""
     bl_label  = "Disconnect from Archipelago"
     bl_idname = "wm.ap_disconnect"
 
@@ -76,6 +80,7 @@ class WM_OT_AP_Disconnect(bpy.types.Operator):
 
 
 class WM_OT_AP_Connecting(bpy.types.Operator):
+    """Connecting..."""
     bl_label  = "Connecting..."
     bl_idname = "wm.ap_connecting"
 

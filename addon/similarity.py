@@ -11,10 +11,9 @@ def _get_image_pixels(image: bpy.types.Image) -> numpy.ndarray:
     return pixels.reshape(h, w, 4)
 
 
-# TODO Maybe change similarity algorithm to account for noise better such as scanning a 3x3?
 def compare_images(img_a: bpy.types.Image, img_b: bpy.types.Image) -> float:
     """
-    Compare two images using a similar algorithm as Archipelago Paint
+    Compare two images using a similar algorithm as Paint AP
     Returns 0.0 if either image has no data.
     """
 
@@ -39,6 +38,10 @@ def compare_images(img_a: bpy.types.Image, img_b: bpy.types.Image) -> float:
     # :3 removes alpha channel
     a_rgb = pixels_a[:h, :w, :3]
     b_rgb = pixels_b[:h, :w, :3]
+    
+    # Only alpha
+    a_alpha = pixels_a[:h, :w, 3]
+    b_alpha = pixels_b[:h, :w, 3]
 
     # Per-pixel euclidean distance across RGB channels
     difference_squared_pixels = (a_rgb - b_rgb) ** 2
@@ -46,7 +49,11 @@ def compare_images(img_a: bpy.types.Image, img_b: bpy.types.Image) -> float:
 
     # Shifts range from [0,1] to [-1,1]
     similarity_pixels = 2 * similarity_pixels - 1
-    
+
+    # Zero out any pixel where either image was transparent to treat them as a neutral match because of the progressive render sizes
+    transparent_mask = (a_alpha == 0) | (b_alpha == 0)
+    similarity_pixels[transparent_mask] = 0
+
     similarity = similarity_pixels.mean() * 100
 
     return round(similarity, 3)

@@ -1,36 +1,32 @@
 import bpy
 from . import ids, panels, utils
 
-data = {item: False for item in ids.Item if item < ids.Item.POP_UP}
+data = {item: 0 for item in ids.Item if item < ids.Item.POPUP}
 resyncing = False
 
 def unlock_item(item: ids.Item):
-    if data.get(item):
-        return
-    
     if _is_trap_or_filler(item):
         if not resyncing:
             _activate_filler_and_traps(item)
         return
     
-    data[item] = True
+    data[item] += 1
     panels.schedule_redraw_panels()
 
 
 def clear_unlocks():
     for item in data:
-        data[item] = False
+        data[item] = 0
 
 
 def _is_trap_or_filler(item: ids.Item) -> bool:
-    return item >= ids.Item.POP_UP
+    return item >= ids.Item.POPUP
 
 
 def _activate_filler_and_traps(item: ids.Item):
-    match item:
-        case ids.Item.POP_UP:
-            utils.queue_popup("your model look like poop from a butt 💔💔💔")
-        case ids.Item.UNDO:
+    if item == ids.Item.POPUP:
+        utils.queue_popup("your model look like poop from a butt 💔💔💔")
+    elif item == ids.Item.UNDO or item == ids.Item.DESPAIR:  # TODO Currently placeholder for DESPAIR
             utils.schedule_undo()
             utils.queue_popup("Undo trap.")
 

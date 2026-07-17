@@ -1,5 +1,6 @@
 import bpy
 import os
+import random
 import tempfile
 from bpy.app.handlers import persistent
 from . import ap_client, explosion, ids, similarity, utils, progress, unlocks, thresholds
@@ -35,8 +36,7 @@ def _update_checks():
     for i, (threshold, checked) in enumerate(sorted(thresholds.data.items())):
         if progress.current_percent >= threshold:
             if not checked:
-                location_name = ids.LOCATIONS[i]
-                location_id = ids.LOCATION_TO_ID.get(location_name)
+                location_id = ids.BASE_ID + i
                 thresholds.data[threshold] = True
                 ap_client.send_check(location_id)
         else:
@@ -51,7 +51,7 @@ def _update_goal():
 
 
 @persistent
-def _on_render_complete(scene, depsgraph):
+def _update_state(scene, depsgraph):
     target_name = scene.ap_target_image
     if not target_name:
         utils.queue_popup("No target image selected.")
@@ -59,22 +59,22 @@ def _on_render_complete(scene, depsgraph):
     
     # A timer for each function does not guarantee they run in order,
     # so they are put into one function so that they are guaranteed to run in this order
-    def _update_state():
+    def _update():
         _update_similarity_percent(target_name)
         _update_checks()
         _update_goal()
 
-    bpy.app.timers.register(_update_state)
+    bpy.app.timers.register(_update)
 
 
 @persistent
-def _on_undo(scene, depsgraph):
+def _deathlink_undo(scene, depsgraph):
     ap_client.send_deathlink("undo")
     explosion.spawn_animated_ref_image()
 
 
 @persistent
-def _on_redo(scene, depsgraph):
+def _deathlink_redo(scene, depsgraph):
     ap_client.send_deathlink("redo")
     explosion.spawn_animated_ref_image()
 
@@ -163,6 +163,18 @@ def _import_disabled(scene, depsgraph):
     utils.queue_popup("Importing is disabled in Archipelago.")
 
 
+@persistent
+def _use_render_border(scene = None, depsgraph = None):
+    scene.render.use_border = True
+    scene.render.border_min_x = 0
+    scene.render.border_min_y = 0
+    progressive_render_width_value = unlocks.data.get(ids.Item.PROGRESSIVE_RENDER_WIDTH)
+    progressive_render_height_value = unlocks.data.get(ids.Item.PROGRESSIVE_RENDER_HEIGHT)
+    # TODO Currently / 3 to allow redundant progressive items because there is no logic to ensure they spawn early enough
+    scene.render.border_max_x = (1 + progressive_render_width_value) / 3  # TODO Use YAML values once implemented
+    scene.render.border_max_y = (1 + progressive_render_height_value) / 3  # TODO Use YAML values once implemented
+
+
 _subscriptions = (
     (bpy.types.Object, "mode",            _mode_locked),
     (bpy.types.Object, "active_material", _materials_locked),
@@ -188,9 +200,10 @@ _handlers = [
     (bpy.app.handlers.load_post,             _clear_world_shaders),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     (bpy.app.handlers.blend_import_post,     _import_disabled),
-    (bpy.app.handlers.render_complete,       _on_render_complete),
-    (bpy.app.handlers.undo_post,             _on_undo),
-    (bpy.app.handlers.redo_post,             _on_redo),
+    (bpy.app.handlers.render_init,           _use_render_border),
+    (bpy.app.handlers.render_complete,       _update_state),
+    (bpy.app.handlers.undo_post,             _deathlink_undo),
+    (bpy.app.handlers.redo_post,             _deathlink_redo),
 ]
 for _, _, handler in _subscriptions:
     _handlers.append((bpy.app.handlers.undo_post, handler))

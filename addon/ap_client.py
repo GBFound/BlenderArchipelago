@@ -6,6 +6,7 @@ import websockets
 import time
 import ssl
 import certifi
+import random
 from . import ap_data_package, cache, ids, panels, utils, progress, unlocks, thresholds
 
 suppress_deathlink:   bool                                      = False
@@ -69,11 +70,20 @@ def is_connected() -> bool:
 
 def send_deathlink(do: str):
     if _connected and not suppress_deathlink:
-        asyncio.run_coroutine_threadsafe(_send_deathlink(do), _loop)
+        message = _choose_deathlink_message(do)
+        asyncio.run_coroutine_threadsafe(_send_deathlink(message), _loop)
         utils.queue_popup("Sent DeathLink.")
 
 
-async def _send_deathlink(do: str):
+def _choose_deathlink_message(do: str) -> str:
+    message = f" hit {do}."
+    message_choice = random.randint(0, 2)
+    if message_choice == 2:
+        message = "'s model look like poop from a butt 💔💔💔"
+    return message
+
+
+async def _send_deathlink(message: str):
     if _ws:
         slot_name = bpy.context.scene.ap_slot_name
         await _ws.send(json.dumps([{
@@ -82,7 +92,7 @@ async def _send_deathlink(do: str):
             "data": {
                 "time": time.time(),
                 "source": slot_name,
-                "cause": f"{slot_name} hit {do}."
+                "cause": f"{slot_name}{message}"
             }
         }]))
 
@@ -177,13 +187,13 @@ async def _handle_packet(packet: dict):
             receiving_id = packet.get("receiving")
             receiving_name = _player_id_to_name(receiving_id)
             if _slot_id == sender_id and _slot_id == receiving_id:
-                item_name = _external_item_id_to_name(item_id, sender_id)
+                item_name = _item_id_to_name(item_id, sender_id)
                 utils.queue_popup(f"Unlocked {item_name}.")
             elif _slot_id == sender_id:
-                item_name = _external_item_id_to_name(item_id, receiving_id)
+                item_name = _item_id_to_name(item_id, receiving_id)
                 utils.queue_popup(f"Found {item_name} for {receiving_name}.")
             elif _slot_id == receiving_id:
-                item_name = _external_item_id_to_name(item_id, receiving_id)
+                item_name = _item_id_to_name(item_id, receiving_id)
                 utils.queue_popup(f"Unlocked {item_name} from {sender_name}.")
 
     elif cmd == "Bounced":
@@ -204,7 +214,7 @@ def _player_id_to_name(player_id: str) -> str:
     return player_name
 
 
-def _external_item_id_to_name(item_id: str, player_id: str) -> str:
+def _item_id_to_name(item_id: str, player_id: str) -> str:
     game = _slot_info.get(str(player_id)).get("game")
     data_package = ap_data_package.load_data_package()
     game_data = data_package.get("games").get(game)
@@ -259,7 +269,7 @@ async def _resync():
     checks = []
     for i, (_, checked) in enumerate(sorted(thresholds.data.items())):
         if checked:
-            location_id = ids.LOCATION_TO_ID[ids.LOCATIONS[i]]
+            location_id = ids.BASE_ID + i
             checks.append(location_id)
 
     if checks:
