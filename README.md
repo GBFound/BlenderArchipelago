@@ -1,7 +1,10 @@
 # BlenderArchipelago
-## What is this?
 
-[Archipelago](https://archipelago.gg) is a multiworld, multi-game randomizer. By connecting to an Archipelago server, any of the [supported games](https://archipelago.gg/games) can play together in a multiworld.
+![Logo](readme_images/ModLogo.png)
+
+A [Blender](https://www.blender.org) add-on for [Archipelago](https://archipelago.gg), a multiworld, multi-game randomizer.
+
+## What is this?
 
 Let's say I'm playing Blender, and my friend is playing Ocarina of Time. When I create a render that is similar enough to a target image, I find my friend's Hookshot, allowing them to reach several OoT chests they couldn't before. In one of those chests they find my Edit Mode, allowing me to make models with better precision. I create a more similar-looking render to a target image, and find my friend's Ocarina. This continues until we both find enough of our items to finish our games.
 
