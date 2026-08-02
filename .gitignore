@@ -19,7 +19,6 @@ lib64/
 parts/
 sdist/
 var/
-wheels/
 share/python-wheels/
 *.egg-info/
 .installed.cfg
@@ -219,6 +218,3 @@ __marimo__/
 
 # Blender VSCode development extension
 blender_vscode_development/
-
-# Wheels
-wheels/
