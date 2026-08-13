@@ -7,6 +7,7 @@ import time
 import ssl
 import certifi
 import random
+import traceback
 from . import ap_data_package, cache, ids, panels, utils, progress, unlocks, thresholds
 
 suppress_deathlink:   bool                                      = False
@@ -102,17 +103,16 @@ def _receive_deathlink(cause: str):
     utils.queue_popup(cause)
 
 
-async def _connect(host: str, port: str, slot_name: str, password: str):
+async def _connect(host: str, port: str, slot_name: str, password: str, secure: bool = False):
     global _ws, _connected
 
-    if host in ("localhost", "127.0.0.1"):
-        url = f"ws://{host}:{port}"
-    else:
-        url = f"wss://{host}:{port}"
+    scheme = "wss" if secure else "ws"
+    url = f"{scheme}://{host}:{port}"
 
     try:
         print(f"[Blender AP] Connecting to {url}.")
-        async with websockets.connect(url, compression="deflate", ssl=_ssl_context) as ws:
+        ssl_context = _ssl_context if scheme == "wss" else None
+        async with websockets.connect(url, compression="deflate", ssl=ssl_context) as ws:
             _ws = ws
 
             await ws.send(json.dumps([{
@@ -130,11 +130,18 @@ async def _connect(host: str, port: str, slot_name: str, password: str):
                 packets = json.loads(message)
                 for packet in packets:
                     await _handle_packet(packet)
-                    
+
+    except websockets.InvalidMessage:
+        if not secure:
+            print(f"[Blender AP] {url} appears to require TLS, retrying as wss://.")
+            await _connect(host, port, slot_name, password, secure=True)
+        else:
+            utils.queue_popup(f"Connection error: {e}")
+
     except Exception as e:
-        import traceback
         traceback.print_exc()
         utils.queue_popup(f"Connection error: {e}")
+
     finally:
         _ws = None
         _connected = False
