@@ -96,7 +96,7 @@ def _mode_locked(scene = None, depsgraph = None):
     }
 
     for mode, item in modes.items():
-        if obj and obj.mode == mode and not unlocks.data[item]:
+        if obj and obj.mode == mode and not unlocks.get_item_count(item):
             bpy.ops.object.mode_set(mode="OBJECT")
             unlock_text = item.name.replace("_", " ").title()
             if item == ids.Item.GREASE_PENCIL_MODES:
@@ -109,7 +109,7 @@ def _mode_locked(scene = None, depsgraph = None):
 
 @persistent
 def _materials_locked(scene = None, depsgraph = None):
-    if unlocks.data[ids.Item.MATERIALS]:
+    if unlocks.get_item_count(ids.Item.MATERIALS):
         return
 
     obj = bpy.context.active_object
@@ -120,7 +120,7 @@ def _materials_locked(scene = None, depsgraph = None):
 
 @persistent
 def _clear_materials(scene, depsgraph):
-    if unlocks.data[ids.Item.MATERIALS]:
+    if unlocks.get_item_count(ids.Item.MATERIALS):
         return
     
     for obj in bpy.data.objects:
@@ -130,7 +130,7 @@ def _clear_materials(scene, depsgraph):
 
 @persistent
 def _modifiers_locked(scene, depsgraph):
-    if unlocks.data[ids.Item.MODIFIERS]:
+    if unlocks.get_item_count(ids.Item.MODIFIERS):
         return
     
     obj = bpy.context.active_object
@@ -141,7 +141,7 @@ def _modifiers_locked(scene, depsgraph):
 
 @persistent
 def _world_shaders_locked(scene = None, depsgraph = None):
-    if unlocks.data[ids.Item.WORLD_SHADERS]:
+    if unlocks.get_item_count(ids.Item.WORLD_SHADERS):
         return
     
     if bpy.context.scene.world:
@@ -151,7 +151,7 @@ def _world_shaders_locked(scene = None, depsgraph = None):
 
 @persistent
 def _clear_world_shaders(scene, depsgraph):
-    if unlocks.data[ids.Item.WORLD_SHADERS]:
+    if unlocks.get_item_count(ids.Item.WORLD_SHADERS):
         return
     
     bpy.context.scene.world = None
@@ -168,8 +168,8 @@ def _use_render_border(scene = None, depsgraph = None):
     scene.render.use_border = True
     scene.render.border_min_x = 0
     scene.render.border_min_y = 0
-    progressive_render_width_value = unlocks.data.get(ids.Item.PROGRESSIVE_RENDER_WIDTH)
-    progressive_render_height_value = unlocks.data.get(ids.Item.PROGRESSIVE_RENDER_HEIGHT)
+    progressive_render_width_value = unlocks.get_item_count(ids.Item.PROGRESSIVE_RENDER_WIDTH)
+    progressive_render_height_value = unlocks.get_item_count(ids.Item.PROGRESSIVE_RENDER_HEIGHT)
     # TODO Currently / 3 to allow redundant progressive items because there is no logic to ensure they spawn early enough
     scene.render.border_max_x = (1 + progressive_render_width_value) / 3  # TODO Use YAML values once implemented
     scene.render.border_max_y = (1 + progressive_render_height_value) / 3  # TODO Use YAML values once implemented

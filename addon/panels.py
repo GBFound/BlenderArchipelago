@@ -60,9 +60,13 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         box = layout.box()
-        for item, is_unlocked in unlocks.data.items():
+        for item in ids.Item:
+            if unlocks.is_trap_or_filler(item):
+                break
             if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
                 continue
+
+            is_unlocked = unlocks.get_item_count(item)
             unlock_text = item.name.replace("_", " ").title()
             if is_unlocked:
                 box.label(text=f"{unlock_text}: UNLOCKED", icon="UNLOCKED")

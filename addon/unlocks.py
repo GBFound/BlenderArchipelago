@@ -1,25 +1,49 @@
 import bpy
 from . import ids, panels, utils
 
-data = {item: 0 for item in ids.Item if item < ids.Item.POPUP}
 resyncing = False
 
+
+class ItemCounts(bpy.types.PropertyGroup):
+    pass
+
+annotations = {}
+for item in ids.Item:
+    if item >= ids.Item.POPUP:
+        break
+    annotations[item.name] = bpy.props.IntProperty(name=item.name, default=0)
+
+ItemCounts.__annotations__ = annotations
+
+
+def get_item_count(item: ids.Item) -> int:
+    counts = bpy.data.scenes[0].item_counts
+    return getattr(counts, item.name)
+
+
+def set_item_count(item: ids.Item, value: int):
+    counts = bpy.data.scenes[0].item_counts
+    setattr(counts, item.name, value)
+
+
 def unlock_item(item: ids.Item):
-    if _is_trap_or_filler(item):
+    if is_trap_or_filler(item):
         if not resyncing:
             _activate_filler_and_traps(item)
         return
-    
-    data[item] += 1
+
+    set_item_count(item, get_item_count(item) + 1)
     panels.schedule_redraw_panels()
 
 
 def clear_unlocks():
-    for item in data:
-        data[item] = 0
+    for item in ids.Item:
+        if is_trap_or_filler(item):
+            break
+        set_item_count(item, 0)
 
 
-def _is_trap_or_filler(item: ids.Item) -> bool:
+def is_trap_or_filler(item: ids.Item) -> bool:
     return item >= ids.Item.POPUP
 
 
@@ -32,6 +56,7 @@ def _activate_filler_and_traps(item: ids.Item):
 
 
 def register():
+    bpy.types.Scene.item_counts = bpy.props.PointerProperty(type=ItemCounts)
     bpy.types.Scene.ap_last_item_index = bpy.props.IntProperty()
 
 
