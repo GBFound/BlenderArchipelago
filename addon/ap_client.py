@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import ap_data_package, deathlink, explosion, handlers, ids, panels, popup, uuid, progress, unlocks, thresholds
+from . import ap_data_package, ap_uuid, deathlink, explosion, handlers, ids, panels, popup, progress, unlocks, thresholds
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []
@@ -96,7 +96,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
                 "password": password,
                 "game": "Blender",
                 "name": slot_name,
-                "uuid": uuid.get_uuid(),
+                "uuid": ap_uuid.get_uuid(),
                 "version": {"major": 0, "minor": 6, "build": 7, "class": "Version"},
                 "items_handling": 0b111,
                 "tags": ["AP"],
