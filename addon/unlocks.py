@@ -17,12 +17,12 @@ ItemCounts.__annotations__ = annotations
 
 
 def get_item_count(item: ids.Item) -> int:
-    counts = bpy.data.scenes[0].item_counts
+    counts = bpy.data.scenes[0].item_counts  # TODO bpy.data.scenes[0] is unsafe
     return getattr(counts, item.name)
 
 
 def set_item_count(item: ids.Item, value: int):
-    counts = bpy.data.scenes[0].item_counts
+    counts = bpy.data.scenes[0].item_counts  # TODO bpy.data.scenes[0] is unsafe
     setattr(counts, item.name, value)
 
 

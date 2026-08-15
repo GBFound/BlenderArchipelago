@@ -1,5 +1,5 @@
 import bpy
-from . import ap_client, utils
+from . import ap_client, deathlink, utils
 
 
 class WM_OT_AP_Popup(bpy.types.Operator):
@@ -86,6 +86,16 @@ class WM_OT_AP_Connecting(bpy.types.Operator):
 
     def execute(self, context):
         return {"FINISHED"}
+
+
+class AP_OT_deathlink_toggle(bpy.types.Operator):
+    bl_idname = "ap.deathlink_toggle"
+    bl_label = "Deathlink"
+
+    def execute(self, context):
+        deathlink.enabled = not deathlink.enabled
+        # panels.schedule_redraw_panels()
+        return {'FINISHED'}
 
 
 """
