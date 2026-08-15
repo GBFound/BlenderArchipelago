@@ -68,10 +68,12 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
 
             is_unlocked = unlocks.get_item_count(item)
             unlock_text = item.name.replace("_", " ").title()
+            row = box.row()
             if is_unlocked:
-                box.label(text=f"{unlock_text}: UNLOCKED", icon="UNLOCKED")
+                row.label(text=f"{unlock_text}", icon="UNLOCKED")
             else:
-                box.label(text=f"{unlock_text}: LOCKED", icon="LOCKED")
+                row.enabled = False
+                row.label(text=f"{unlock_text}", icon="LOCKED")
 
 
 class VIEW3D_PT_AP_Connection(bpy.types.Panel):
