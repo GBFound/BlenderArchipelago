@@ -1,4 +1,5 @@
 import bpy
+import json
 from . import deathlink, ids, panels, popup
 
 resyncing = False
@@ -16,14 +17,31 @@ for item in ids.Item:
 ItemCounts.__annotations__ = annotations
 
 
-def get_item_count(item: ids.Item) -> int:
-    counts = bpy.data.scenes[0].item_counts  # TODO bpy.data.scenes[0] is unsafe
-    return getattr(counts, item.name)
+_TEXT_NAME = "ap_item_counts.json"
 
+def _get_counts_text():
+    text = bpy.data.texts.get(_TEXT_NAME)
+    if text is None:
+        text = bpy.data.texts.new(_TEXT_NAME)
+        initial_counts = {}
+        for item in ids.Item:
+            if item >= ids.Item.POPUP:
+                break
+            initial_counts[item.name] = 0
+        initial_json = json.dumps(initial_counts)
+        text.write(initial_json)
+    return text
+
+def get_item_count(item: ids.Item) -> int:
+    data = json.loads(_get_counts_text().as_string())
+    return data.get(item.name, 0)
 
 def set_item_count(item: ids.Item, value: int):
-    counts = bpy.data.scenes[0].item_counts  # TODO bpy.data.scenes[0] is unsafe
-    setattr(counts, item.name, value)
+    text = _get_counts_text()
+    data = json.loads(text.as_string())
+    data[item.name] = value
+    text.clear()
+    text.write(json.dumps(data))
 
 
 def unlock_item(item: ids.Item):
