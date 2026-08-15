@@ -21,7 +21,7 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
         box = layout.box()
         percent = progress.current_percent
         goal = progress.goal_percent
-        if percent is not None:
+        if percent != 0:
             box.label(text=f"Current Similarity: {percent:.3f}%")
         else:
             box.label(text="Similarity not yet found. Render first.")
