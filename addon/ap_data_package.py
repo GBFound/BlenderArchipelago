@@ -25,5 +25,7 @@ def is_cached() -> bool:
 def is_outdated(data_package_checksum: str) -> bool:
     local_data_package = load_data_package()
     game_data = local_data_package.get("games").get("Blender")
+    if game_data is None:
+        return True
     local_data_package_checksum = game_data.get("checksum")
     return data_package_checksum != local_data_package_checksum
