@@ -8,7 +8,7 @@ import ssl
 import certifi
 import random
 import traceback
-from . import ap_data_package, cache, ids, panels, utils, progress, unlocks, thresholds
+from . import ap_data_package, cache, handlers, ids, panels, utils, progress, unlocks, thresholds
 
 suppress_deathlink:   bool                                      = False
 
@@ -171,6 +171,7 @@ async def _handle_packet(packet: dict):
         panels.schedule_redraw_panels()
         progress.initialize_progress(packet)
         thresholds.initialize_thresholds(packet)
+        unlocks.clear_unlocks()
         if _pending_checks:
             # Shallow copy to avoid mutation during send
             with _pending_checks_lock:
@@ -260,6 +261,7 @@ async def _handle_received_items(packet: dict):
 
     _schedule_last_index(packet_index + len(items))
     unlocks.resyncing = False
+    handlers.clear_shaders()
 
 
 def _schedule_last_index(index: int):

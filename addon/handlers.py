@@ -119,7 +119,7 @@ def _materials_locked(scene = None, depsgraph = None):
 
 
 @persistent
-def _clear_materials(scene, depsgraph):
+def _clear_materials(scene = None, depsgraph = None):
     if unlocks.get_item_count(ids.Item.MATERIALS):
         return
     
@@ -150,7 +150,7 @@ def _world_shaders_locked(scene = None, depsgraph = None):
 
 
 @persistent
-def _clear_world_shaders(scene, depsgraph):
+def _clear_world_shaders(scene = None, depsgraph = None):
     if unlocks.get_item_count(ids.Item.WORLD_SHADERS):
         return
     
@@ -159,8 +159,15 @@ def _clear_world_shaders(scene, depsgraph):
 
 @persistent
 def _import_disabled(scene, depsgraph):
-    bpy.ops.object.delete()
+    for obj in bpy.context.selected_objects:
+        bpy.data.objects.remove(obj, do_unlink=True)
     utils.queue_popup("Importing is disabled in Archipelago.")
+
+
+@persistent
+def clear_shaders():
+    _clear_materials()
+    _clear_world_shaders()
 
 
 @persistent
