@@ -1,5 +1,5 @@
 import bpy
-from . import ap_client, deathlink, handlers, popup
+from . import ap_client, deathlink, handlers, persist, popup
 
 
 class AP_OT_Popup(bpy.types.Operator):
@@ -38,6 +38,7 @@ class AP_OT_LoadTargetImage(bpy.types.Operator):
     def execute(self, context):
         image = bpy.data.images.load(self.filepath)
         context.scene.ap_target_image = image.name
+        persist.ap_target_image = image.name
         context.scene.render.resolution_x = image.size[0]
         context.scene.render.resolution_y = image.size[1]
         handlers.use_render_border(context.scene)
@@ -67,6 +68,10 @@ class AP_OT_Connect(bpy.types.Operator):
             slot_name=scene.ap_slot_name,
             password=scene.ap_password,
         )
+        persist.ap_host = scene.ap_host
+        persist.ap_port = scene.ap_port
+        persist.ap_slot_name = scene.ap_slot_name
+        persist.ap_password = scene.ap_password
         return {"FINISHED"}
 
 

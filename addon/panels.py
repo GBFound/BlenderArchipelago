@@ -1,6 +1,6 @@
 import bpy
 from . import ap_client
-from . import deathlink, progress, unlocks, thresholds, ids
+from . import deathlink, ids, progress, thresholds, unlocks
 
 
 class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
@@ -19,7 +19,7 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
         layout = self.layout
 
         box = layout.box()
-        percent = progress.current_percent
+        percent = bpy.context.scene.current_percent
         goal = progress.goal_percent
         if percent != 0:
             box.label(text=f"Current Similarity: {percent:.3f}%")
@@ -139,12 +139,12 @@ def register():
 
 
 def unregister():
-    del bpy.types.Scene.ap_target_image
-    del bpy.types.Scene.ap_deathlink_enabled
-    del bpy.types.Scene.ap_host
-    del bpy.types.Scene.ap_port
-    del bpy.types.Scene.ap_slot_name
     del bpy.types.Scene.ap_password
+    del bpy.types.Scene.ap_slot_name
+    del bpy.types.Scene.ap_port
+    del bpy.types.Scene.ap_host
+    del bpy.types.Scene.ap_deathlink_enabled
+    del bpy.types.Scene.ap_target_image
 
 
 """

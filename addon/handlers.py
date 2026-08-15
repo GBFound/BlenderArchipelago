@@ -2,7 +2,7 @@ import bpy
 import os
 import tempfile
 from bpy.app.handlers import persistent
-from . import ap_client, ids, popup, similarity, progress, unlocks, thresholds
+from . import ap_client, ap_data_package, ids, persist, popup, progress, similarity, thresholds, unlocks
 
 
 _msgbus_owner = object()
@@ -23,7 +23,8 @@ def _update_similarity_percent(target_name: str):
 
     try:
         score = similarity.compare_images(render, target)
-        progress.current_percent = score
+        bpy.context.scene.current_percent = score
+        persist.current_percent = score
         print(f"[Blender AP] Similarity: {score:.3f}%")
     finally:
         bpy.data.images.remove(render)
@@ -33,7 +34,7 @@ def _update_similarity_percent(target_name: str):
 
 def _update_checks():
     for i, (threshold, checked) in enumerate(sorted(thresholds.data.items())):
-        if progress.current_percent >= threshold:
+        if bpy.context.scene.current_percent >= threshold:
             if not checked:
                 location_id = ids.BASE_ID + i
                 thresholds.data[threshold] = True
@@ -43,7 +44,7 @@ def _update_checks():
 
 
 def _update_goal():
-    if progress.current_percent >= progress.goal_percent:
+    if bpy.context.scene.current_percent >= progress.goal_percent:
         for threshold in thresholds.data:
             thresholds.data[threshold] = True
         ap_client.send_goal_complete()
@@ -155,6 +156,30 @@ def _clear_world_shaders(scene = None, depsgraph = None):
 
 
 @persistent
+def _persist_to_blender_properties(scene, depsgraph):
+    for item, count in persist.item_counts.items():
+        unlocks.set_item_count(item, count)
+
+    ap_data_package.save_data_package(persist.ap_data_package)
+
+    for field in persist.SIMPLE_SCENE_FIELDS:
+        value = getattr(persist, field)
+        setattr(bpy.context.scene, field, value)
+
+
+@persistent
+def _blender_properties_to_persist(scene, depsgraph):
+    for item in persist.item_counts:
+        persist.item_counts[item] = unlocks.get_item_count(item)
+
+    persist.ap_data_package = ap_data_package.load_data_package()
+    
+    for field in persist.SIMPLE_SCENE_FIELDS:
+        value = getattr(bpy.context.scene, field)
+        setattr(persist, field, value)
+
+
+@persistent
 def _import_disabled(scene, depsgraph):
     for obj in bpy.context.selected_objects:
         bpy.data.objects.remove(obj, do_unlink=True)
@@ -200,6 +225,7 @@ def _subscribe(scene = None, depsgraph = None):
 
 _handlers = [
     (bpy.app.handlers.load_post,             _subscribe),
+    (bpy.app.handlers.load_post,             _blender_properties_to_persist),
     (bpy.app.handlers.load_post,             clear_shaders),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     # (bpy.app.handlers.blend_import_post,     _import_disabled),  Too annoying
@@ -207,6 +233,8 @@ _handlers = [
     (bpy.app.handlers.render_complete,       _update_state),
     (bpy.app.handlers.undo_post,             _deathlink_undo),
     (bpy.app.handlers.redo_post,             _deathlink_redo),
+    (bpy.app.handlers.undo_post,             _persist_to_blender_properties),
+    (bpy.app.handlers.redo_post,             _persist_to_blender_properties),
 ]
 for _, _, handler in _subscriptions:
     _handlers.append((bpy.app.handlers.undo_post, handler))

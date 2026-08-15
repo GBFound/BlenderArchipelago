@@ -56,4 +56,4 @@ def compare_images(img_a: bpy.types.Image, img_b: bpy.types.Image) -> float:
 
     similarity = similarity_pixels.mean() * 100
 
-    return round(similarity, 3)
+    return float(round(similarity, 3))

@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import ap_data_package, ap_uuid, deathlink, explosion, handlers, ids, panels, popup, progress, unlocks, thresholds
+from . import ap_data_package, ap_uuid, deathlink, explosion, handlers, ids, panels, persist, popup, progress, thresholds, unlocks
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []
@@ -246,6 +246,7 @@ def _schedule_last_index(index: int):
 
 def _set_last_index(index: int):
     bpy.context.scene.ap_last_item_index = index
+    persist.ap_last_item_index = index
 
 
 async def _resync():

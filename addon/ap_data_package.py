@@ -1,5 +1,6 @@
 import bpy
 import json
+from . import persist
 
 
 def save_data_package(data):
@@ -8,10 +9,13 @@ def save_data_package(data):
         text = bpy.data.texts.new("ap_data_package")
     text.clear()
     text.write(json.dumps(data))
+    persist.ap_data_package = data
 
 
 def load_data_package() -> dict:
     text = bpy.data.texts.get("ap_data_package")
+    if not text:
+        return {}
     return json.loads(text.as_string())
 
 
