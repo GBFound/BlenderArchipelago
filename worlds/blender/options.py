@@ -9,7 +9,7 @@ class MinPercent(Range):
     display_name = "Minimum Similarity Percent"
     range_start = 0
     range_end = 100
-    default = 15
+    default = 5
 
 
 class MaxPercent(Range):
