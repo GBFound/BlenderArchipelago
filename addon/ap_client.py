@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import ap_data_package, cache, deathlink, explosion, handlers, ids, panels, utils, progress, unlocks, thresholds
+from . import ap_data_package, cache, deathlink, explosion, handlers, ids, panels, popup, progress, unlocks, thresholds
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []
@@ -28,7 +28,7 @@ _ssl_context:         ssl.SSLContext                            = ssl.create_def
 def connect(host: str, port: str, slot_name: str, password: str):
     global _thread
     if _thread and _thread.is_alive():
-        utils.queue_popup("Already connected.")
+        popup.queue("Already connected.")
         return
 
     _thread = threading.Thread(
@@ -71,7 +71,7 @@ def send_deathlink(do: str):
         message = deathlink.choose_message(do)
         asyncio.run_coroutine_threadsafe(_send_deathlink(message), _loop)
         explosion.spawn_animated_ref_image()
-        utils.queue_popup("Sent DeathLink.")
+        popup.queue("Sent DeathLink.")
 
 
 def _receive_deathlink(cause: str):
@@ -112,11 +112,11 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
             print(f"[Blender AP] {url} appears to require TLS, retrying as wss://.")
             await _connect(host, port, slot_name, password, secure=True)
         else:
-            utils.queue_popup(f"Connection error: {e}")
+            popup.queue(f"Connection error: {e}")
 
     except Exception as e:
         traceback.print_exc()
-        utils.queue_popup(f"Connection error: {e}")
+        popup.queue(f"Connection error: {e}")
 
     finally:
         _ws = None
@@ -161,7 +161,7 @@ async def _handle_packet(packet: dict):
 
     elif cmd == "ConnectionRefused":
         await _ws.close()
-        utils.queue_popup(f"Connection refused: {packet.get('errors')}")
+        popup.queue(f"Connection refused: {packet.get('errors')}")
 
     elif cmd == "ReceivedItems":
         await _handle_received_items(packet)
@@ -176,13 +176,13 @@ async def _handle_packet(packet: dict):
             receiving_name = _player_id_to_name(receiving_id)
             if _slot_id == sender_id and _slot_id == receiving_id:
                 item_name = _item_id_to_name(item_id, sender_id)
-                utils.queue_popup(f"Unlocked {item_name}.")
+                popup.queue(f"Unlocked {item_name}.")
             elif _slot_id == sender_id:
                 item_name = _item_id_to_name(item_id, receiving_id)
-                utils.queue_popup(f"Found {item_name} for {receiving_name}.")
+                popup.queue(f"Found {item_name} for {receiving_name}.")
             elif _slot_id == receiving_id:
                 item_name = _item_id_to_name(item_id, receiving_id)
-                utils.queue_popup(f"Unlocked {item_name} from {sender_name}.")
+                popup.queue(f"Unlocked {item_name} from {sender_name}.")
 
     elif cmd == "Bounced":
         tags = packet.get("tags")

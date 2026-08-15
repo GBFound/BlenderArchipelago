@@ -1,5 +1,5 @@
 import bpy
-from . import ap_client, deathlink, utils
+from . import ap_client, deathlink, popup
 
 
 class AP_OT_Popup(bpy.types.Operator):
@@ -13,7 +13,7 @@ class AP_OT_Popup(bpy.types.Operator):
         return {"FINISHED"}
     
     def cancel(self, context):
-        utils.show_next_popup()
+        popup.show_next()
 
     def invoke(self, context, event):
         width = len(self.message) * 6

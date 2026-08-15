@@ -2,7 +2,7 @@ import bpy
 import os
 import tempfile
 from bpy.app.handlers import persistent
-from . import ap_client, ids, similarity, utils, progress, unlocks, thresholds
+from . import ap_client, ids, popup, similarity, progress, unlocks, thresholds
 
 
 _msgbus_owner = object()
@@ -11,7 +11,7 @@ _msgbus_owner = object()
 def _update_similarity_percent(target_name: str):
     target = bpy.data.images.get(target_name)
     if not target:
-        utils.queue_popup(f"Target image \"{target_name}\" not found.")
+        popup.queue(f"Target image \"{target_name}\" not found.")
         return
 
     tmp_path = os.path.join(tempfile.gettempdir(), "ap_blender_render.png")
@@ -53,7 +53,7 @@ def _update_goal():
 def _update_state(scene, depsgraph):
     target_name = scene.ap_target_image
     if not target_name:
-        utils.queue_popup("No target image selected.")
+        popup.queue("No target image selected.")
         return
     
     # A timer for each function does not guarantee they run in order,
@@ -97,10 +97,10 @@ def _mode_locked(scene = None, depsgraph = None):
             bpy.ops.object.mode_set(mode="OBJECT")
             unlock_text = item.name.replace("_", " ").title()
             if item == ids.Item.GREASE_PENCIL_MODES:
-                utils.queue_popup(f"{unlock_text} are locked.")
+                popup.queue(f"{unlock_text} are locked.")
             else:
                 unlock_text = item.name.replace("_", " ").title()
-                utils.queue_popup(f"{unlock_text} is locked.")
+                popup.queue(f"{unlock_text} is locked.")
             break
 
 
@@ -112,7 +112,7 @@ def _materials_locked(scene = None, depsgraph = None):
     obj = bpy.context.active_object
     if obj and hasattr(obj.data, "materials") and len(obj.data.materials) > 0:
         obj.data.materials.clear()
-        utils.queue_popup("Materials are locked.")
+        popup.queue("Materials are locked.")
 
 
 @persistent
@@ -133,7 +133,7 @@ def _modifiers_locked(scene, depsgraph):
     obj = bpy.context.active_object
     if obj and obj.modifiers:
         obj.modifiers.clear()
-        utils.queue_popup("Modifiers are locked.")
+        popup.queue("Modifiers are locked.")
 
 
 @persistent
@@ -143,7 +143,7 @@ def _world_shaders_locked(scene = None, depsgraph = None):
     
     if bpy.context.scene.world:
         bpy.context.scene.world = None
-        utils.queue_popup("World Shaders are locked.")
+        popup.queue("World Shaders are locked.")
 
 
 @persistent
@@ -158,7 +158,7 @@ def _clear_world_shaders(scene = None, depsgraph = None):
 def _import_disabled(scene, depsgraph):
     for obj in bpy.context.selected_objects:
         bpy.data.objects.remove(obj, do_unlink=True)
-    utils.queue_popup("Importing is disabled in Archipelago.")
+    popup.queue("Importing is disabled in Archipelago.")
 
 
 @persistent

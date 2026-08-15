@@ -1,5 +1,5 @@
 import bpy
-from . import deathlink, ids, panels, utils
+from . import deathlink, ids, panels, popup
 
 resyncing = False
 
@@ -49,10 +49,10 @@ def is_trap_or_filler(item: ids.Item) -> bool:
 
 def _activate_filler_and_traps(item: ids.Item):
     if item == ids.Item.POPUP:
-        utils.queue_popup("your model look like poop from a butt 💔💔💔")
+        popup.queue("your model look like poop from a butt 💔💔💔")
     elif item == ids.Item.UNDO or item == ids.Item.DESPAIR:  # TODO Currently placeholder for DESPAIR
             deathlink.schedule_undo()
-            utils.queue_popup("Undo trap.")
+            popup.queue("Undo trap.")
 
 
 def register():
