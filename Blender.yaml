@@ -5,4 +5,4 @@ Blender:
   min_percent: 5    # Checks will generate at and above this percent. (Must be less than max_percent.)
   max_percent: 75   # Checks will generate at and below this percent. (Must be greater than min_percent.)
   goal_percent: 80  # The similarity percentage required to reach the goal.
-  death_link: true  # When you die, everyone with deathlink dies. The reverse is also true.
+  death_link: True  # When you undo/redo, everyone with deathlink dies. When someone with deathlink dies, you will undo to the furthest undo step. (Blender's default max undo steps is 32.)
