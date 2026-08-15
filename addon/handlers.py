@@ -168,7 +168,7 @@ def clear_shaders():
 
 
 @persistent
-def _use_render_border(scene = None, depsgraph = None):
+def use_render_border(scene = None, depsgraph = None):
     scene.render.use_border = True
     scene.render.border_min_x = 0
     scene.render.border_min_y = 0
@@ -200,11 +200,10 @@ def _subscribe(scene = None, depsgraph = None):
 
 _handlers = [
     (bpy.app.handlers.load_post,             _subscribe),
-    (bpy.app.handlers.load_post,             _clear_materials),
-    (bpy.app.handlers.load_post,             _clear_world_shaders),
+    (bpy.app.handlers.load_post,             clear_shaders),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     # (bpy.app.handlers.blend_import_post,     _import_disabled),  Too annoying
-    (bpy.app.handlers.render_init,           _use_render_border),
+    (bpy.app.handlers.render_init,           use_render_border),
     (bpy.app.handlers.render_complete,       _update_state),
     (bpy.app.handlers.undo_post,             _deathlink_undo),
     (bpy.app.handlers.redo_post,             _deathlink_redo),
