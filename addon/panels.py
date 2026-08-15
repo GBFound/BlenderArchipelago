@@ -80,8 +80,7 @@ class VIEW3D_PT_AP_Connection(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
-    bl_order = 3
-
+    bl_order = 2
 
     def draw(self, context):
         connected = ap_client.is_connected() or ap_client.is_connecting()
@@ -101,6 +100,7 @@ class VIEW3D_PT_AP_Connection(bpy.types.Panel):
 
         if ap_client.is_connected():
             box.operator("wm.ap_disconnect", icon="PANEL_CLOSE")
+            box.prop(context.scene, "ap_deathlink_enabled")
         elif ap_client.is_connecting():
             box.operator("wm.ap_connecting", icon="SORTTIME")
         else:
@@ -123,6 +123,12 @@ def register():
         name="Target Image",
         description="The target image to compare renders against",
     )
+    bpy.types.Scene.ap_deathlink_enabled = bpy.props.BoolProperty(
+        name="Deathlink",
+        description="When you die, everyone with deathlink dies. The reverse is also true.",
+        default=False,
+        options={'SKIP_SAVE'},
+    )
     bpy.types.Scene.ap_host      = bpy.props.StringProperty(default="archipelago.gg")
     bpy.types.Scene.ap_port      = bpy.props.StringProperty(default="38281")
     bpy.types.Scene.ap_slot_name = bpy.props.StringProperty(default="Blenderer")
@@ -131,6 +137,7 @@ def register():
 
 def unregister():
     del bpy.types.Scene.ap_target_image
+    del bpy.types.Scene.ap_deathlink_enabled
     del bpy.types.Scene.ap_host
     del bpy.types.Scene.ap_port
     del bpy.types.Scene.ap_slot_name
