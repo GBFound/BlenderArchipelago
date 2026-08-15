@@ -206,7 +206,7 @@ _handlers = [
     (bpy.app.handlers.load_post,             _clear_materials),
     (bpy.app.handlers.load_post,             _clear_world_shaders),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
-    (bpy.app.handlers.blend_import_post,     _import_disabled),
+    # (bpy.app.handlers.blend_import_post,     _import_disabled),  Too annoying
     (bpy.app.handlers.render_init,           _use_render_border),
     (bpy.app.handlers.render_complete,       _update_state),
     (bpy.app.handlers.undo_post,             _deathlink_undo),
