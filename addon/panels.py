@@ -42,7 +42,7 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
         box.label(text="Target Image:")
         row = box.row(align=True)
         row.prop_search(context.scene, "ap_target_image", bpy.data, "images", text="")
-        row.operator("wm.ap_load_target_image", text="", icon="FILEBROWSER")
+        row.operator("ap.load_target_image", text="", icon="FILEBROWSER")
 
 
 class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
@@ -99,15 +99,15 @@ class VIEW3D_PT_AP_Connection(bpy.types.Panel):
                 split.prop(context.scene, prop, text="")
 
         if ap_client.is_connected():
-            box.operator("wm.ap_disconnect", icon="PANEL_CLOSE")
+            box.operator("ap.disconnect", icon="PANEL_CLOSE")
             icon = "GHOST_DISABLED"
             if deathlink.enabled:
                 icon = "GHOST_ENABLED"
             box.operator("ap.deathlink_toggle", icon=icon, depress=deathlink.enabled)
         elif ap_client.is_connecting():
-            box.operator("wm.ap_connecting", icon="SORTTIME")
+            box.operator("ap.connecting", icon="SORTTIME")
         else:
-            box.operator("wm.ap_connect", icon="LINKED")
+            box.operator("ap.connect", icon="LINKED")
 
 
 def schedule_redraw_panels():

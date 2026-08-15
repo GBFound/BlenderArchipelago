@@ -2,10 +2,10 @@ import bpy
 from . import ap_client, deathlink, utils
 
 
-class WM_OT_AP_Popup(bpy.types.Operator):
+class AP_OT_Popup(bpy.types.Operator):
     """Pop-Up"""
     bl_label  = "Blender AP"
-    bl_idname = "wm.ap_popup"
+    bl_idname = "ap.popup"
 
     message: bpy.props.StringProperty(default="")
 
@@ -25,10 +25,10 @@ class WM_OT_AP_Popup(bpy.types.Operator):
         layout.label(text=self.message)
 
 
-class WM_OT_AP_LoadTargetImage(bpy.types.Operator):
+class AP_OT_LoadTargetImage(bpy.types.Operator):
     """Load Target Image"""
     bl_label  = "Load Target Image"
-    bl_idname = "wm.ap_load_target_image"
+    bl_idname = "ap.load_target_image"
 
     filepath: bpy.props.StringProperty(subtype="FILE_PATH")
     directory: bpy.props.StringProperty(subtype="DIR_PATH")
@@ -53,10 +53,10 @@ class WM_OT_AP_LoadTargetImage(bpy.types.Operator):
         return {"RUNNING_MODAL"}
 
 
-class WM_OT_AP_Connect(bpy.types.Operator):
+class AP_OT_Connect(bpy.types.Operator):
     """Connect to Archipelago"""
     bl_label  = "Connect to Archipelago"
-    bl_idname = "wm.ap_connect"
+    bl_idname = "ap.connect"
 
     def execute(self, context):
         scene = context.scene
@@ -69,41 +69,40 @@ class WM_OT_AP_Connect(bpy.types.Operator):
         return {"FINISHED"}
 
 
-class WM_OT_AP_Disconnect(bpy.types.Operator):
+class AP_OT_Disconnect(bpy.types.Operator):
     """Disconnect from Archipelago"""
     bl_label  = "Disconnect from Archipelago"
-    bl_idname = "wm.ap_disconnect"
+    bl_idname = "ap.disconnect"
 
     def execute(self, context):
         ap_client.disconnect()
         return {"FINISHED"}
 
 
-class WM_OT_AP_Connecting(bpy.types.Operator):
+class AP_OT_Connecting(bpy.types.Operator):
     """Connecting..."""
     bl_label  = "Connecting..."
-    bl_idname = "wm.ap_connecting"
+    bl_idname = "ap.connecting"
 
     def execute(self, context):
         return {"FINISHED"}
 
 
-class AP_OT_deathlink_toggle(bpy.types.Operator):
+class AP_OT_Deathlink_Toggle(bpy.types.Operator):
     bl_idname = "ap.deathlink_toggle"
     bl_label = "Deathlink"
 
     def execute(self, context):
         deathlink.enabled = not deathlink.enabled
-        # panels.schedule_redraw_panels()
         return {'FINISHED'}
 
 
 """
 Does not work unless invoked by the user.
 Was to be used for less obtrusive popups.
-class WM_OT_AP_Report(bpy.types.Operator):
+class AP_OT_Report(bpy.types.Operator):
     bl_label  = "Blender AP"
-    bl_idname = "wm.ap_report"
+    bl_idname = "ap.report"
 
     message: bpy.props.StringProperty()
 

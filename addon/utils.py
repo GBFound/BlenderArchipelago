@@ -28,6 +28,6 @@ def _schedule_popup():
     bpy.app.timers.register(
         # Use a timer to defer the call until context is available.
         # Returning None stops the timer from repeating
-        lambda: bpy.ops.wm.ap_popup("INVOKE_DEFAULT", message=message) and None,
+        lambda: bpy.ops.ap.popup("INVOKE_DEFAULT", message=message) and None,
     )
     print(f"[Blender AP] {message}")
