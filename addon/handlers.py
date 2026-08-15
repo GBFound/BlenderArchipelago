@@ -11,7 +11,7 @@ _msgbus_owner = object()
 def _update_similarity_percent(target_name: str):
     target = bpy.data.images.get(target_name)
     if not target:
-        popup.queue(f"Target image \"{target_name}\" not found.")
+        popup.enqueue(f"Target image \"{target_name}\" not found.")
         return
 
     tmp_path = os.path.join(tempfile.gettempdir(), "ap_blender_render.png")
@@ -53,7 +53,7 @@ def _update_goal():
 def _update_state(scene, depsgraph):
     target_name = scene.ap_target_image
     if not target_name:
-        popup.queue("No target image selected.")
+        popup.enqueue("No target image selected.")
         return
     
     # A timer for each function does not guarantee they run in order,
@@ -97,10 +97,10 @@ def _mode_locked(scene = None, depsgraph = None):
             bpy.ops.object.mode_set(mode="OBJECT")
             unlock_text = item.name.replace("_", " ").title()
             if item == ids.Item.GREASE_PENCIL_MODES:
-                popup.queue(f"{unlock_text} are locked.")
+                popup.enqueue(f"{unlock_text} are locked.")
             else:
                 unlock_text = item.name.replace("_", " ").title()
-                popup.queue(f"{unlock_text} is locked.")
+                popup.enqueue(f"{unlock_text} is locked.")
             break
 
 
@@ -112,7 +112,7 @@ def _materials_locked(scene = None, depsgraph = None):
     obj = bpy.context.active_object
     if obj and hasattr(obj.data, "materials") and len(obj.data.materials) > 0:
         obj.data.materials.clear()
-        popup.queue("Materials are locked.")
+        popup.enqueue("Materials are locked.")
 
 
 @persistent
@@ -133,7 +133,7 @@ def _modifiers_locked(scene, depsgraph):
     obj = bpy.context.active_object
     if obj and obj.modifiers:
         obj.modifiers.clear()
-        popup.queue("Modifiers are locked.")
+        popup.enqueue("Modifiers are locked.")
 
 
 @persistent
@@ -143,7 +143,7 @@ def _world_shaders_locked(scene = None, depsgraph = None):
     
     if bpy.context.scene.world:
         bpy.context.scene.world = None
-        popup.queue("World Shaders are locked.")
+        popup.enqueue("World Shaders are locked.")
 
 
 @persistent
@@ -158,7 +158,7 @@ def _clear_world_shaders(scene = None, depsgraph = None):
 def _import_disabled(scene, depsgraph):
     for obj in bpy.context.selected_objects:
         bpy.data.objects.remove(obj, do_unlink=True)
-    popup.queue("Importing is disabled in Archipelago.")
+    popup.enqueue("Importing is disabled in Archipelago.")
 
 
 @persistent

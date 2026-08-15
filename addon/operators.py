@@ -38,10 +38,10 @@ class AP_OT_LoadTargetImage(bpy.types.Operator):
     def execute(self, context):
         image = bpy.data.images.load(self.filepath)
         context.scene.ap_target_image = image.name
-        bpy.context.scene.render.resolution_x = image.size[0]
-        bpy.context.scene.render.resolution_y = image.size[1]
+        context.scene.render.resolution_x = image.size[0]
+        context.scene.render.resolution_y = image.size[1]
         
-        camera = bpy.context.scene.camera
+        camera = context.scene.camera
         bg = camera.data.background_images.new()
         bg.image = image
         camera.data.show_background_images = True

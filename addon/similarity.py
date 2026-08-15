@@ -18,15 +18,15 @@ def compare_images(img_a: bpy.types.Image, img_b: bpy.types.Image) -> float:
     """
 
     if img_a.size[0] != img_b.size[0] or img_a.size[1] != img_b.size[1]:
-        popup.queue("Image resolutions do not match.")
+        popup.enqueue("Image resolutions do not match.")
         return 0.0
 
     if img_a.size[0] == 0 or img_b.size[0] == 0:
-        popup.queue("One or both images have no size.")
+        popup.enqueue("One or both images have no size.")
         return 0.0
 
     if len(img_a.pixels) == 0 or len(img_b.pixels) == 0:
-        popup.queue("One or both images have no pixel data.")
+        popup.enqueue("One or both images have no pixel data.")
         return 0.0
 
     pixels_a = _get_image_pixels(img_a)

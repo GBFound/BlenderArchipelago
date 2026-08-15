@@ -28,7 +28,7 @@ _ssl_context:         ssl.SSLContext                            = ssl.create_def
 def connect(host: str, port: str, slot_name: str, password: str):
     global _thread
     if _thread and _thread.is_alive():
-        popup.queue("Already connected.")
+        popup.enqueue("Already connected.")
         return
 
     _thread = threading.Thread(
@@ -71,12 +71,12 @@ def send_deathlink(do: str):
         message = deathlink.choose_message(do)
         asyncio.run_coroutine_threadsafe(_send_deathlink(message), _loop)
         explosion.spawn_animated_ref_image()
-        popup.queue("Sent DeathLink.")
+        popup.enqueue("Sent DeathLink.")
 
 
 def _receive_deathlink(cause: str):
     deathlink.schedule_undo()
-    deathlink.queue_popup(cause)
+    deathlink.enqueue_popup(cause)
 
 
 async def _connect(host: str, port: str, slot_name: str, password: str, secure: bool = False):
@@ -112,11 +112,11 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
             print(f"[Blender AP] {url} appears to require TLS, retrying as wss://.")
             await _connect(host, port, slot_name, password, secure=True)
         else:
-            popup.queue(f"Connection error: {e}")
+            popup.enqueue(f"Connection error: {e}")
 
     except Exception as e:
         traceback.print_exc()
-        popup.queue(f"Connection error: {e}")
+        popup.enqueue(f"Connection error: {e}")
 
     finally:
         _ws = None
@@ -161,7 +161,7 @@ async def _handle_packet(packet: dict):
 
     elif cmd == "ConnectionRefused":
         await _ws.close()
-        popup.queue(f"Connection refused: {packet.get('errors')}")
+        popup.enqueue(f"Connection refused: {packet.get('errors')}")
 
     elif cmd == "ReceivedItems":
         await _handle_received_items(packet)
@@ -176,13 +176,13 @@ async def _handle_packet(packet: dict):
             receiving_name = _player_id_to_name(receiving_id)
             if _slot_id == sender_id and _slot_id == receiving_id:
                 item_name = _item_id_to_name(item_id, sender_id)
-                popup.queue(f"Unlocked {item_name}.")
+                popup.enqueue(f"Unlocked {item_name}.")
             elif _slot_id == sender_id:
                 item_name = _item_id_to_name(item_id, receiving_id)
-                popup.queue(f"Found {item_name} for {receiving_name}.")
+                popup.enqueue(f"Found {item_name} for {receiving_name}.")
             elif _slot_id == receiving_id:
                 item_name = _item_id_to_name(item_id, receiving_id)
-                popup.queue(f"Unlocked {item_name} from {sender_name}.")
+                popup.enqueue(f"Unlocked {item_name} from {sender_name}.")
 
     elif cmd == "Bounced":
         tags = packet.get("tags")
