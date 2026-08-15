@@ -1,5 +1,5 @@
 import bpy
-from . import ids, panels, utils
+from . import deathlink, ids, panels, utils
 
 resyncing = False
 
@@ -51,7 +51,7 @@ def _activate_filler_and_traps(item: ids.Item):
     if item == ids.Item.POPUP:
         utils.queue_popup("your model look like poop from a butt 💔💔💔")
     elif item == ids.Item.UNDO or item == ids.Item.DESPAIR:  # TODO Currently placeholder for DESPAIR
-            utils.schedule_undo()
+            deathlink.schedule_undo()
             utils.queue_popup("Undo trap.")
 
 

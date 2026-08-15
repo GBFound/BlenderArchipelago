@@ -1,9 +1,8 @@
 import bpy
 import os
-import random
 import tempfile
 from bpy.app.handlers import persistent
-from . import ap_client, explosion, ids, similarity, utils, progress, unlocks, thresholds
+from . import ap_client, ids, similarity, utils, progress, unlocks, thresholds
 
 
 _msgbus_owner = object()
@@ -70,13 +69,11 @@ def _update_state(scene, depsgraph):
 @persistent
 def _deathlink_undo(scene, depsgraph):
     ap_client.send_deathlink("undo")
-    explosion.spawn_animated_ref_image()
 
 
 @persistent
 def _deathlink_redo(scene, depsgraph):
     ap_client.send_deathlink("redo")
-    explosion.spawn_animated_ref_image()
 
 
 @persistent

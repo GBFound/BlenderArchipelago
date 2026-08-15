@@ -33,6 +33,7 @@ class BlenderWorld(World):
         return {
             "goal_percent": self.options.goal_percent.value,
             "thresholds":   locations.get_thresholds(self),
+            "death_link": bool(self.options.death_link),
         }
         
 

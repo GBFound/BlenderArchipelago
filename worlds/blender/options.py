@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import PerGameCommonOptions, Range
+from Options import DeathLink, PerGameCommonOptions, Range
 
 
 class MinPercent(Range):
@@ -9,7 +9,7 @@ class MinPercent(Range):
     display_name = "Minimum Similarity Percent"
     range_start = 0
     range_end = 100
-    default = 20
+    default = 15
 
 
 class MaxPercent(Range):
@@ -19,7 +19,7 @@ class MaxPercent(Range):
     display_name = "Maximum Similarity Percent"
     range_start = 0
     range_end = 100
-    default = 50
+    default = 75
 
 
 class GoalPercent(Range):
@@ -29,7 +29,7 @@ class GoalPercent(Range):
     display_name = "Goal Similarity Percent"
     range_start = 0
     range_end = 100
-    default = 50
+    default = 80
 
 
 @dataclass
@@ -37,3 +37,4 @@ class BlenderOptions(PerGameCommonOptions):
     min_percent: MinPercent
     max_percent: MaxPercent
     goal_percent: GoalPercent
+    death_link: DeathLink

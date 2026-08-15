@@ -6,11 +6,8 @@ import websockets
 import time
 import ssl
 import certifi
-import random
 import traceback
-from . import ap_data_package, cache, handlers, ids, panels, utils, progress, unlocks, thresholds
-
-suppress_deathlink:   bool                                      = False
+from . import ap_data_package, cache, deathlink, explosion, handlers, ids, panels, utils, progress, unlocks, thresholds
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []
@@ -70,37 +67,16 @@ def is_connected() -> bool:
 
 
 def send_deathlink(do: str):
-    if _connected and not suppress_deathlink:
-        message = _choose_deathlink_message(do)
+    if _connected and deathlink.enabled and not deathlink.suppressed:
+        message = deathlink.choose_message(do)
         asyncio.run_coroutine_threadsafe(_send_deathlink(message), _loop)
+        explosion.spawn_animated_ref_image()
         utils.queue_popup("Sent DeathLink.")
 
 
-def _choose_deathlink_message(do: str) -> str:
-    message = f" hit {do}."
-    message_choice = random.randint(0, 2)
-    if message_choice == 2:
-        message = "'s model look like poop from a butt 💔💔💔"
-    return message
-
-
-async def _send_deathlink(message: str):
-    if _ws:
-        slot_name = bpy.context.scene.ap_slot_name
-        await _ws.send(json.dumps([{
-            "cmd": "Bounce",
-            "tags": ["DeathLink"],
-            "data": {
-                "time": time.time(),
-                "source": slot_name,
-                "cause": f"{slot_name}{message}"
-            }
-        }]))
-
-
 def _receive_deathlink(cause: str):
-    utils.schedule_undo()
-    utils.queue_popup(cause)
+    deathlink.schedule_undo()
+    deathlink.queue_popup(cause)
 
 
 async def _connect(host: str, port: str, slot_name: str, password: str, secure: bool = False):
@@ -123,7 +99,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
                 "uuid": cache.get_uuid(),
                 "version": {"major": 0, "minor": 6, "build": 7, "class": "Version"},
                 "items_handling": 0b111,
-                "tags": ["AP", "DeathLink"],
+                "tags": ["AP"],
             }]))
             
             async for message in ws:
@@ -131,7 +107,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
                 for packet in packets:
                     await _handle_packet(packet)
 
-    except websockets.InvalidMessage:
+    except websockets.InvalidMessage as e:
         if not secure:
             print(f"[Blender AP] {url} appears to require TLS, retrying as wss://.")
             await _connect(host, port, slot_name, password, secure=True)
@@ -178,10 +154,14 @@ async def _handle_packet(packet: dict):
                 checks = _pending_checks.copy()
                 _pending_checks.clear()
             await _send_checks(checks)
+        slot_data = packet.get("slot_data")
+        deathlink.enabled = slot_data.get("death_link")
+        if deathlink.enabled:
+            await _send_connect_update()
 
     elif cmd == "ConnectionRefused":
         await _ws.close()
-        utils.queue_popup(f"Connection refused: {packet.get("errors")}")
+        utils.queue_popup(f"Connection refused: {packet.get('errors')}")
 
     elif cmd == "ReceivedItems":
         await _handle_received_items(packet)
@@ -210,8 +190,8 @@ async def _handle_packet(packet: dict):
             data = packet.get("data", {})
             source = data.get("source")
             slot_name = bpy.context.scene.ap_slot_name
-            if source == slot_name:
-                return  # Ignore our own deathlink
+            if source == slot_name or not deathlink.enabled:
+                return  # Ignore if our own deathlink or deathlink is disabled
             cause = data.get("cause", f"{source} died.")
             _receive_deathlink(cause)
 
@@ -230,10 +210,6 @@ def _item_id_to_name(item_id: str, player_id: str) -> str:
     item_id_to_name = {v: k for k, v in item_name_to_id.items()}
     item_name = item_id_to_name.get(item_id)
     return item_name
-
-
-async def _send_get_data_package():
-    await _ws.send(json.dumps([{"cmd": "GetDataPackage"}]))
 
 
 async def _handle_received_items(packet: dict):
@@ -285,9 +261,37 @@ async def _resync():
         await _send_checks(checks)
 
 
+async def _send_get_data_package():
+    if _ws:
+        await _ws.send(json.dumps([{"cmd": "GetDataPackage"}]))
+
+
 async def _send_sync():
     if _ws:
         await _ws.send(json.dumps([{"cmd": "Sync"}]))
+
+
+async def _send_connect_update():
+    if _ws:
+        await _ws.send(json.dumps([{
+            "cmd": "ConnectUpdate",
+            "tags": ["AP", "DeathLink"],
+            "items_handling": 0b111,
+        }]))
+
+
+async def _send_deathlink(message: str):
+    if _ws:
+        slot_name = bpy.context.scene.ap_slot_name
+        await _ws.send(json.dumps([{
+            "cmd": "Bounce",
+            "tags": ["DeathLink"],
+            "data": {
+                "time": time.time(),
+                "source": slot_name,
+                "cause": f"{slot_name}{message}"
+            }
+        }]))
 
 
 async def _send_checks(location_ids: list[int]):

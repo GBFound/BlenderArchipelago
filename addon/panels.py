@@ -74,35 +74,13 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
                 box.label(text=f"{unlock_text}: LOCKED", icon="LOCKED")
 
 
-# class VIEW3D_PT_AP_Thresholds(bpy.types.Panel):
-#     bl_label       = "Thresholds (Debug)"
-#     bl_idname      = "VIEW3D_PT_AP_Thresholds"
-#     bl_space_type  = "VIEW_3D"
-#     bl_region_type = "UI"
-#     bl_category    = "Blender AP"
-
-#     @classmethod
-#     def poll(cls, context):
-#         return ap_client.is_connected()
-
-#     def draw(self, context):
-#         layout = self.layout
-#         box = layout.box()
-
-#         for threshold, checked in thresholds.data.items():
-#             if checked:
-#                 box.label(text=f"{threshold}%: CHECKED", icon="UNLOCKED")
-#             else:
-#                 box.label(text=f"{threshold}%: NOT CHECKED", icon="LOCKED")
-
-
 class VIEW3D_PT_AP_Connection(bpy.types.Panel):
     bl_label       = "Connection"
     bl_idname      = "VIEW3D_PT_AP_Connection"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
-    bl_order = 2
+    bl_order = 3
 
 
     def draw(self, context):
@@ -157,3 +135,24 @@ def unregister():
     del bpy.types.Scene.ap_port
     del bpy.types.Scene.ap_slot_name
     del bpy.types.Scene.ap_password
+
+# class VIEW3D_PT_AP_Thresholds(bpy.types.Panel):
+#     bl_label       = "Thresholds (Debug)"
+#     bl_idname      = "VIEW3D_PT_AP_Thresholds"
+#     bl_space_type  = "VIEW_3D"
+#     bl_region_type = "UI"
+#     bl_category    = "Blender AP"
+
+#     @classmethod
+#     def poll(cls, context):
+#         return ap_client.is_connected()
+
+#     def draw(self, context):
+#         layout = self.layout
+#         box = layout.box()
+
+#         for threshold, checked in thresholds.data.items():
+#             if checked:
+#                 box.label(text=f"{threshold}%: CHECKED", icon="UNLOCKED")
+#             else:
+#                 box.label(text=f"{threshold}%: NOT CHECKED", icon="LOCKED")

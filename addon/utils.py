@@ -1,6 +1,5 @@
 import bpy
 import collections
-from . import explosion
 
 _popup_queue = collections.deque()
 _show_next_popup = True
@@ -32,26 +31,3 @@ def _schedule_popup():
         lambda: bpy.ops.wm.ap_popup("INVOKE_DEFAULT", message=message) and None,
     )
     print(f"[Blender AP] {message}")
-
-
-
-def schedule_undo():
-    bpy.app.timers.register(_undo)
-
-
-def _undo():
-    """
-    bpy.ops.ed.undo() does not work because uhh.
-    Ideally this would only undo a few steps, but the undo stack size isn't readable until Blender 5.3.
-    Currently undos to the bottom of the undo history
-    """
-    from . import ap_client
-    ap_client.suppress_deathlink = True
-
-    try:
-        bpy.ops.ed.undo_history(item=0)
-    except Exception as e:
-        print(f"[Blender AP] Undo failed: {e}")
-        
-    ap_client.suppress_deathlink = False
-    explosion.spawn_animated_ref_image()
