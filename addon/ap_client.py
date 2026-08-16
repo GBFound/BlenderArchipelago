@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import ap_data_package, ap_uuid, deathlink, explosion, handlers, ids, panels, persist, popup, progress, thresholds, unlocks
+from . import ap_data_package, ap_uuid, deathlink, explosion, handlers, ids, panels, popup, progress, thresholds, unlocks
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []
@@ -171,17 +171,17 @@ async def _handle_packet(packet: dict):
             item = packet.get("item")
             item_id = item.get("item")
             sender_id = item.get("player")
-            sender_name = _player_id_to_name(sender_id)
+            sender_name = ap_data_package.player_id_to_name(sender_id)
             receiving_id = packet.get("receiving")
-            receiving_name = _player_id_to_name(receiving_id)
+            receiving_name = ap_data_package.player_id_to_name(receiving_id)
             if _slot_id == sender_id and _slot_id == receiving_id:
-                item_name = _item_id_to_name(item_id, sender_id)
+                item_name = ap_data_package.item_id_to_name(item_id, sender_id)
                 popup.enqueue(f"Unlocked {item_name}.")
             elif _slot_id == sender_id:
-                item_name = _item_id_to_name(item_id, receiving_id)
+                item_name = ap_data_package.item_id_to_name(item_id, receiving_id)
                 popup.enqueue(f"Found {item_name} for {receiving_name}.")
             elif _slot_id == receiving_id:
-                item_name = _item_id_to_name(item_id, receiving_id)
+                item_name = ap_data_package.item_id_to_name(item_id, receiving_id)
                 popup.enqueue(f"Unlocked {item_name} from {sender_name}.")
 
     elif cmd == "Bounced":
@@ -194,22 +194,6 @@ async def _handle_packet(packet: dict):
                 return  # Ignore if our own deathlink or deathlink is disabled
             cause = data.get("cause", f"{source} died.")
             _receive_deathlink(cause)
-
-
-def _player_id_to_name(player_id: str) -> str:
-    network_slot = _slot_info.get(str(player_id))
-    player_name = network_slot.get("name")
-    return player_name
-
-
-def _item_id_to_name(item_id: str, player_id: str) -> str:
-    game = _slot_info.get(str(player_id)).get("game")
-    data_package = ap_data_package.load_data_package()
-    game_data = data_package.get("games").get(game)
-    item_name_to_id = game_data.get("item_name_to_id")
-    item_id_to_name = {v: k for k, v in item_name_to_id.items()}
-    item_name = item_id_to_name.get(item_id)
-    return item_name
 
 
 async def _handle_received_items(packet: dict):
