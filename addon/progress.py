@@ -11,7 +11,9 @@ def initialize_progress(packet: dict):
 
 def register():
     bpy.types.Scene.current_percent = bpy.props.FloatProperty()
+    bpy.types.Scene.difference = bpy.props.FloatProperty()
 
 
 def unregister():
+    del bpy.types.Scene.difference
     del bpy.types.Scene.current_percent

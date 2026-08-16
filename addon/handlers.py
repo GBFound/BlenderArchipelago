@@ -23,6 +23,7 @@ def _update_similarity_percent(target_name: str):
 
     try:
         score = similarity.compare_images(render, target)
+        bpy.context.scene.difference = score - bpy.context.scene.current_percent
         bpy.context.scene.current_percent = score
         persist.current_percent = score
         print(f"[Blender AP] Similarity: {score:.3f}%")

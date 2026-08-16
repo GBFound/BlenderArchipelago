@@ -21,8 +21,18 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
         box = layout.box()
         percent = bpy.context.scene.current_percent
         goal = progress.goal_percent
+
+        difference = bpy.context.scene.difference
+        icon = "ARROW_LEFTRIGHT"
+        if difference > 0:
+            icon = "SORT_DESC"
+        elif difference < 0:
+            icon = "SORT_ASC"
+        
         if percent != 0:
-            box.label(text=f"Current Similarity: {percent:.3f}%")
+            row = box.row()
+            row.label(text=f"Current Similarity: {percent:.3f}%")
+            row.label(text="", icon=icon)
         else:
             box.label(text="Similarity not yet found. Render first.")
 
