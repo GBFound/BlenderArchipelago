@@ -13,7 +13,7 @@ ap_password:        str                 = ""
 
 SIMPLE_SCENE_FIELDS = [
     "current_percent",
-    "difference"
+    "difference",
     "ap_last_item_index",
     "ap_target_image",
     "ap_host",
