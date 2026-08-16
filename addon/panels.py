@@ -138,14 +138,35 @@ def register():
         name="Target Image",
         description="The target image to compare renders against",
     )
+
     bpy.types.Scene.ap_deathlink_enabled = bpy.props.BoolProperty(
         name="Deathlink",
         description="When you die, everyone with deathlink dies. The reverse is also true.",
     )
-    bpy.types.Scene.ap_host      = bpy.props.StringProperty(default="archipelago.gg")
-    bpy.types.Scene.ap_port      = bpy.props.StringProperty(default="38281")
-    bpy.types.Scene.ap_slot_name = bpy.props.StringProperty(default="Blenderer")
-    bpy.types.Scene.ap_password  = bpy.props.StringProperty(default="", subtype="PASSWORD")
+
+    bpy.types.Scene.ap_host = bpy.props.StringProperty(
+        default="archipelago.gg",
+        name="Host",
+        description="The host server to which to connect.",
+    )
+
+    bpy.types.Scene.ap_port = bpy.props.StringProperty(
+        default="38281",
+        name="Port",
+        description="The port to which to connect.",
+    )
+
+    bpy.types.Scene.ap_slot_name = bpy.props.StringProperty(
+        default="Blenderer",
+        name="Slot",
+        description="The slot name to use for this game. This is required, and must match the name provided on your YAML file.",
+    )
+    
+    bpy.types.Scene.ap_password = bpy.props.StringProperty(
+        default="", subtype="PASSWORD",
+        name="Password",
+        description="The password to use for this game, if any.",
+    )
 
 
 def unregister():

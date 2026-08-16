@@ -95,6 +95,7 @@ class AP_OT_Connecting(bpy.types.Operator):
 
 
 class AP_OT_Deathlink_Toggle(bpy.types.Operator):
+    """Deathlink Toggle"""
     bl_idname = "ap.deathlink_toggle"
     bl_label = "Deathlink"
 
