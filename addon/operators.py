@@ -86,8 +86,8 @@ class AP_OT_Disconnect(bpy.types.Operator):
 
 
 class AP_OT_Connecting(bpy.types.Operator):
-    """Connecting..."""
-    bl_label  = "Connecting..."
+    """King Crimson - Matte Kudasai"""
+    bl_label  = "Please wait..."  # Covers connecting and disconnecting
     bl_idname = "ap.connecting"
 
     def execute(self, context):
