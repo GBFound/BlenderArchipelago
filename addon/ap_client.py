@@ -66,6 +66,11 @@ def is_connected() -> bool:
     return _connected
 
 
+def send_deathlink_tag_update():
+    if _connected:
+        asyncio.run_coroutine_threadsafe(_send_deathlink_tag_update(), _loop)
+
+
 def send_deathlink(do: str):
     if _connected and deathlink.enabled and not deathlink.suppressed:
         message = deathlink.choose_message(do)
@@ -157,7 +162,7 @@ async def _handle_packet(packet: dict):
         slot_data = packet.get("slot_data")
         deathlink.enabled = slot_data.get("death_link")
         if deathlink.enabled:
-            await _send_connect_update()
+            await _send_deathlink_tag_update()
 
     elif cmd == "ConnectionRefused":
         await _ws.close()
@@ -247,11 +252,15 @@ async def _send_sync():
         await _ws.send(json.dumps([{"cmd": "Sync"}]))
 
 
-async def _send_connect_update():
+async def _send_deathlink_tag_update():
     if _ws:
+        tags = ["AP"]
+        if deathlink.enabled:
+            tags.append("DeathLink")
+
         await _ws.send(json.dumps([{
             "cmd": "ConnectUpdate",
-            "tags": ["AP", "DeathLink"],
+            "tags": tags,
             "items_handling": 0b111,
         }]))
 
