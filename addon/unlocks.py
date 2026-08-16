@@ -18,12 +18,12 @@ ItemCounts.__annotations__ = annotations
 
 
 def get_item_count(item: ids.Item) -> int:
-    counts = bpy.data.scenes[0].item_counts  # TODO Unsafe to scene movement
+    counts = bpy.context.scene.item_counts
     return getattr(counts, item.name)
 
 
 def set_item_count(item: ids.Item, value: int):
-    counts = bpy.data.scenes[0].item_counts  # TODO Unsafe to scene movement
+    counts = bpy.context.scene.item_counts
     setattr(counts, item.name, value)
     persist.item_counts[item] = value
 
