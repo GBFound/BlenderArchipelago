@@ -49,6 +49,15 @@ def is_trap_or_filler(item: ids.Item) -> bool:
     return item >= ids.Item.POPUP
 
 
+def schedule_last_index(index: int):
+    bpy.app.timers.register(lambda: _set_last_index(index))
+
+
+def _set_last_index(index: int):
+    bpy.context.scene.ap_last_item_index = index
+    persist.ap_last_item_index = index
+
+
 def _activate_filler_and_traps(item: ids.Item):
     if item == ids.Item.POPUP:
         popup.enqueue("your model look like poop from a butt 💔💔💔")

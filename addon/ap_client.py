@@ -235,18 +235,9 @@ async def _handle_received_items(packet: dict):
         item = ids.ID_TO_ITEM.get(item_id)
         unlocks.unlock_item(item)
 
-    _schedule_last_index(packet_index + len(items))
+    unlocks.schedule_last_index(packet_index + len(items))
     unlocks.resyncing = False
     handlers.clear_shaders()
-
-
-def _schedule_last_index(index: int):
-    bpy.app.timers.register(lambda: _set_last_index(index))
-
-
-def _set_last_index(index: int):
-    bpy.context.scene.ap_last_item_index = index
-    persist.ap_last_item_index = index
 
 
 async def _resync():
