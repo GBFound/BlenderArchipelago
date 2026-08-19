@@ -33,6 +33,6 @@ def _undo():
         bpy.ops.ed.undo_history(item=0)
     except Exception as e:
         print(f"[Blender AP] Undo failed: {e}")
-        
+
     suppressed = False
     explosion.spawn_animated_ref_image()

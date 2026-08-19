@@ -72,11 +72,20 @@ def send_deathlink_tag_update():
 
 
 def send_deathlink(do: str):
-    if _connected and deathlink.enabled and not deathlink.suppressed:
-        message = deathlink.choose_message(do)
-        asyncio.run_coroutine_threadsafe(_send_deathlink(message), _loop)
-        explosion.spawn_animated_ref_image()
-        popup.enqueue("Sent DeathLink.")
+    if not _connected:
+        return
+    if not deathlink.enabled:
+        return
+    if deathlink.suppressed:
+        return
+    if bpy.context.active_operator is not None:
+        return  # Adjust last operation should not send a deathlink
+                # TODO Having adjust last operation on screen but using undo history should still send deathlink
+
+    message = deathlink.choose_message(do)
+    asyncio.run_coroutine_threadsafe(_send_deathlink(message), _loop)
+    explosion.spawn_animated_ref_image()
+    popup.enqueue("Sent DeathLink.")
 
 
 def _receive_deathlink(cause: str):
