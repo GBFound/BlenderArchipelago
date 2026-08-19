@@ -188,7 +188,7 @@ def _import_disabled(scene, depsgraph):
 
 
 @persistent
-def clear_shaders():
+def clear_shaders(scene, depsgraph):
     _clear_materials()
     _clear_world_shaders()
 

@@ -34,6 +34,7 @@ def is_outdated(data_package_checksum: str) -> bool:
     local_data_package_checksum = game_data.get("checksum")
     return data_package_checksum != local_data_package_checksum
 
+
 def player_id_to_name(slot_info: dict, player_id: str) -> str:
     network_slot = slot_info.get(str(player_id))
     player_name = network_slot.get("name")
