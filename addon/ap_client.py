@@ -149,9 +149,9 @@ async def _handle_packet(packet: dict):
         _connected = True
         _slot_info = packet.get("slot_info")
         _slot_id = packet.get("slot")
+        handlers.schedule_use_render_border()
         panels.schedule_redraw_panels()
-        progress.initialize_progress(packet)
-        thresholds.initialize_thresholds(packet)
+        initialize_from_slot_data(packet)
         unlocks.clear_unlocks()
         if _pending_checks:
             # Shallow copy to avoid mutation during send
@@ -176,17 +176,17 @@ async def _handle_packet(packet: dict):
             item = packet.get("item")
             item_id = item.get("item")
             sender_id = item.get("player")
-            sender_name = ap_data_package.player_id_to_name(sender_id)
+            sender_name = ap_data_package.player_id_to_name(_slot_info, sender_id)
             receiving_id = packet.get("receiving")
-            receiving_name = ap_data_package.player_id_to_name(receiving_id)
+            receiving_name = ap_data_package.player_id_to_name(_slot_info, receiving_id)
             if _slot_id == sender_id and _slot_id == receiving_id:
-                item_name = ap_data_package.item_id_to_name(item_id, sender_id)
+                item_name = ap_data_package.item_id_to_name(_slot_info, item_id, sender_id)
                 popup.enqueue(f"Unlocked {item_name}.")
             elif _slot_id == sender_id:
-                item_name = ap_data_package.item_id_to_name(item_id, receiving_id)
+                item_name = ap_data_package.item_id_to_name(_slot_info, item_id, receiving_id)
                 popup.enqueue(f"Found {item_name} for {receiving_name}.")
             elif _slot_id == receiving_id:
-                item_name = ap_data_package.item_id_to_name(item_id, receiving_id)
+                item_name = ap_data_package.item_id_to_name(_slot_info, item_id, receiving_id)
                 popup.enqueue(f"Unlocked {item_name} from {sender_name}.")
 
     elif cmd == "Bounced":
@@ -199,6 +199,18 @@ async def _handle_packet(packet: dict):
                 return  # Ignore if our own deathlink or deathlink is disabled
             cause = data.get("cause", f"{source} died.")
             _receive_deathlink(cause)
+
+
+def initialize_from_slot_data(packet: dict):
+    slot_data = packet.get("slot_data")
+    checked_locations = packet.get("checked_locations")
+    goal_percent = slot_data.get("goal_percent")
+    new_thresholds = slot_data.get("thresholds", [])
+    new_width_max = slot_data.get("progressive_render_width_max", [])
+    new_height_max = slot_data.get("progressive_render_height_max", [])
+    progress.initialize_progress(goal_percent)
+    thresholds.initialize_thresholds(new_thresholds, checked_locations)
+    unlocks.initialize_progressive_render_borders(new_width_max, new_height_max)
 
 
 async def _handle_received_items(packet: dict):

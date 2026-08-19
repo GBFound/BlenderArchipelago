@@ -193,16 +193,23 @@ def clear_shaders():
     _clear_world_shaders()
 
 
+def schedule_use_render_border():
+    bpy.app.timers.register(use_render_border)
+
+
 @persistent
 def use_render_border(scene = None, depsgraph = None):
+    if scene is None:
+        scene = bpy.context.scene
     scene.render.use_border = True
     scene.render.border_min_x = 0
     scene.render.border_min_y = 0
     progressive_render_width_value = unlocks.get_item_count(ids.Item.PROGRESSIVE_RENDER_WIDTH)
     progressive_render_height_value = unlocks.get_item_count(ids.Item.PROGRESSIVE_RENDER_HEIGHT)
-    # TODO Currently / 3 to allow redundant progressive items because there is no logic to ensure they spawn early enough
-    scene.render.border_max_x = (1 + progressive_render_width_value) / 3  # TODO Use YAML values once implemented
-    scene.render.border_max_y = (1 + progressive_render_height_value) / 3  # TODO Use YAML values once implemented
+    progressive_render_width_max = unlocks.progressive_render_width_max
+    progressive_render_height_max = unlocks.progressive_render_height_max
+    scene.render.border_max_x = (1 + progressive_render_width_value) / (1 + progressive_render_width_max)
+    scene.render.border_max_y = (1 + progressive_render_height_value) / (1 + progressive_render_height_max)
 
 
 _subscriptions = (

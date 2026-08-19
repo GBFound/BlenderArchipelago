@@ -1,12 +1,11 @@
 import bpy
 
-goal_percent:    int = 50
+goal_percent: int = 50
 
 
-def initialize_progress(packet: dict):
+def initialize_progress(new_goal_percent: int):
     global goal_percent
-    slot_data = packet.get("slot_data")
-    goal_percent = slot_data.get("goal_percent")
+    goal_percent = new_goal_percent
 
 
 def register():

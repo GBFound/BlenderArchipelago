@@ -32,9 +32,35 @@ class GoalPercent(Range):
     default = 80
 
 
+# TODO progressive_render_width_max * progressive_render_height_max being too high could be bad
+class ProgressiveRenderWidthMax(Range):
+    """
+    The number of Progressive Render Width items in the item pool.
+    More items means each one expands your render border by a smaller amount, making it more difficult.
+    """
+    display_name = "Progressive Render Width Count"
+    range_start = 0
+    range_end = 3
+    default = 2
+
+
+# TODO progressive_render_width_max * progressive_render_height_max being too high could be bad
+class ProgressiveRenderHeightMax(Range):
+    """
+    The number of Progressive Render Height items in the item pool.
+    More items means each one expands your render border by a smaller amount, making it more difficult.
+    """
+    display_name = "Progressive Render Height Count"
+    range_start = 0
+    range_end = 3
+    default = 2
+
+
 @dataclass
 class BlenderOptions(PerGameCommonOptions):
-    min_percent: MinPercent
-    max_percent: MaxPercent
-    goal_percent: GoalPercent
-    death_link: DeathLink
+    min_percent                     : MinPercent
+    max_percent                     : MaxPercent
+    goal_percent                    : GoalPercent
+    progressive_render_width_max  : ProgressiveRenderWidthMax
+    progressive_render_height_max : ProgressiveRenderHeightMax
+    death_link                      : DeathLink

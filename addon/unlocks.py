@@ -1,7 +1,9 @@
 import bpy
-from . import deathlink, ids, panels, persist, popup
+from . import deathlink, ids, persist, popup
 
 resyncing = False
+progressive_render_width_max = 0
+progressive_render_height_max = 0
 
 
 class ItemCounts(bpy.types.PropertyGroup):
@@ -35,7 +37,6 @@ def unlock_item(item: ids.Item):
         return
 
     set_item_count(item, get_item_count(item) + 1)
-    panels.schedule_redraw_panels()
 
 
 def clear_unlocks():
@@ -43,6 +44,7 @@ def clear_unlocks():
         if is_trap_or_filler(item):
             break
         set_item_count(item, 0)
+    
 
 
 def is_trap_or_filler(item: ids.Item) -> bool:
@@ -51,6 +53,12 @@ def is_trap_or_filler(item: ids.Item) -> bool:
 
 def schedule_last_index(index: int):
     bpy.app.timers.register(lambda: _set_last_index(index))
+
+
+def initialize_progressive_render_borders(new_width_max: int, new_height_max: int):
+    global progressive_render_width_max, progressive_render_height_max
+    progressive_render_width_max = new_width_max
+    progressive_render_height_max = new_height_max
 
 
 def _set_last_index(index: int):

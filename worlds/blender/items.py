@@ -41,8 +41,11 @@ class BlenderItem(Item):
 def create_items(world: BlenderWorld) -> None:
     itempool: list[Item] = []
     for name in ITEM_NAME_TO_CLASSIFICATION:
-        if name == "Progressive Render Width" or name == "Progressive Render Height":
-            for _ in range(3):  # TODO Let YAML customize the number of progressive items
+        if name == "Progressive Render Width":
+            for _ in range(world.options.progressive_render_width_max):
+                itempool.append(world.create_item(name))
+        elif name == "Progressive Render Height":
+            for _ in range(world.options.progressive_render_height_max):
                 itempool.append(world.create_item(name))
         else:
             itempool.append(world.create_item(name))
