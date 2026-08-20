@@ -51,7 +51,7 @@ class BlenderWorld(World):
         return {
             "thresholds"                      : self.thresholds,
             "goal_percent"                    : self.options.goal_percent.value,
-            "progressive_render_width_max"  : self.options.progressive_render_width_max.value,
-            "progressive_render_height_max" : self.options.progressive_render_height_max.value,
+            "progressive_render_width_max"    : self.options.progressive_render_width_max.value,
+            "progressive_render_height_max"   : self.options.progressive_render_height_max.value,
             "death_link"                      : bool(self.options.death_link),
         }

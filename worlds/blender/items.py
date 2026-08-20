@@ -7,6 +7,7 @@ from BaseClasses import Item, ItemClassification
 
 BASE_ID = 7897897890
 
+# TODO 1 min of use of random unlock
 ITEM_NAME_TO_CLASSIFICATION = {
     "Progressive Render Width"  : ItemClassification.progression,
     "Progressive Render Height" : ItemClassification.progression,
@@ -28,10 +29,15 @@ ITEM_NAME_TO_ID = {}
 for i, name in enumerate(ITEM_NAME_TO_CLASSIFICATION):
     ITEM_NAME_TO_ID[name] = BASE_ID + i
 
-FILLER_AND_TRAP_ITEMS = set()
+FILLER = []
 for name, classification in ITEM_NAME_TO_CLASSIFICATION.items():
-    if classification in (ItemClassification.filler, ItemClassification.trap):
-        FILLER_AND_TRAP_ITEMS.add(name)
+    if classification in (ItemClassification.filler):
+        FILLER.append(name)
+
+TRAPS = []
+for name, classification in ITEM_NAME_TO_CLASSIFICATION.items():
+    if classification in (ItemClassification.trap):
+        TRAPS.append(name)
 
 
 class BlenderItem(Item):
@@ -40,15 +46,21 @@ class BlenderItem(Item):
 
 def create_items(world: BlenderWorld) -> None:
     itempool: list[Item] = []
-    for name in ITEM_NAME_TO_CLASSIFICATION:
+
+    for name, classification in ITEM_NAME_TO_CLASSIFICATION.items():
         if name == "Progressive Render Width":
             for _ in range(world.options.progressive_render_width_max):
                 itempool.append(world.create_item(name))
         elif name == "Progressive Render Height":
             for _ in range(world.options.progressive_render_height_max):
                 itempool.append(world.create_item(name))
-        else:
+        elif classification != ItemClassification.filler or classification != ItemClassification.trap:
             itempool.append(world.create_item(name))
+
+    while len(itempool) != world.options.check_count:
+        name = get_filler_item_name(world)
+        itempool.append(world.create_item(name))
+
     world.multiworld.itempool += itempool
 
 
@@ -59,7 +71,8 @@ def create_item(world: BlenderWorld, name: str) -> BlenderItem:
     return BlenderItem(name, classification, id, world.player)
 
 
-# TODO 1 min of use of random unlock
 def get_filler_item_name(world: BlenderWorld) -> str:
-    random_int = world.random.randint(0, len(FILLER_AND_TRAP_ITEMS) - 1)
-    return list(FILLER_AND_TRAP_ITEMS)[random_int]
+    if world.random.randint(0, 99) >= world.options.trap_count:
+        return world.random.choice(FILLER)
+    else:
+        return world.random.choice(TRAPS)
