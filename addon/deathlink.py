@@ -22,9 +22,10 @@ def schedule_undo():
 
 def _undo():
     """
-    bpy.ops.ed.undo() does not work because uhh.
-    Ideally this would only undo a few steps, but the undo stack size isn't readable until Blender 5.3.
-    Currently undos to the bottom of the undo history
+    Undos to the bottom of the undo history.
+    Fun facts:
+    1. bpy.ops.ed.undo() does not work because uhh.
+    2. Undo stack size isn't readable until Blender 5.3.
     """
     global suppressed
     suppressed = True

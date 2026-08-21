@@ -76,6 +76,15 @@ class TrapCount(Range):
     default = 50
 
 
+class BlenderDeathLink(DeathLink):
+    """
+    When you undo/redo, everyone with deathlink dies.
+    When someone with deathlink dies, you will undo to the furthest undo in history.
+    Blender's default setting is 32 undos max in history.
+    Setting is in Edit -> Preferences -> System -> Memory & Limits -> Undo Steps
+    """
+
+
 @dataclass
 class BlenderOptions(PerGameCommonOptions):
     min_percent                     : MinPercent
@@ -85,4 +94,4 @@ class BlenderOptions(PerGameCommonOptions):
     progressive_render_height_max   : ProgressiveRenderHeightMax
     check_count                     : CheckCount
     trap_count                      : TrapCount
-    death_link                      : DeathLink
+    death_link                      : BlenderDeathLink
