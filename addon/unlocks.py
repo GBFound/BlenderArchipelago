@@ -59,6 +59,8 @@ def initialize_progressive_render_borders(new_width_max: int, new_height_max: in
     global progressive_render_width_max, progressive_render_height_max
     progressive_render_width_max = new_width_max
     progressive_render_height_max = new_height_max
+    persist.progressive_render_width = new_width_max
+    persist.progressive_render_height = new_height_max
 
 
 def _set_last_index(index: int):
