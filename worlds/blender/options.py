@@ -67,7 +67,9 @@ class CheckCount(Range):
 
 
 class TrapCount(Range):
-    """Sets the percentage of filler items to be replaced by random traps."""
+    """
+    Sets the percentage of filler items to be replaced by random traps.
+    """
     display_name = "Trap Fill Percent"
     range_start = 0
     range_end = 100
