@@ -46,7 +46,6 @@ def clear_unlocks():
         set_item_count(item, 0)
     
 
-
 def is_trap_or_filler(item: ids.Item) -> bool:
     return item >= ids.Item.POPUP
 
