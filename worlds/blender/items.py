@@ -20,6 +20,7 @@ ITEM_NAME_TO_CLASSIFICATION = {
     "Materials"                 : ItemClassification.progression,
     "Modifiers"                 : ItemClassification.useful,
     "World Shaders"             : ItemClassification.useful,
+    "Compositor"                : ItemClassification.useful,
     "Pop Up"                    : ItemClassification.filler,
     "Undo"                      : ItemClassification.trap,
     "Despair"                   : ItemClassification.trap,

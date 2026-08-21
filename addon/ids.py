@@ -17,6 +17,7 @@ class Item(IntEnum):
     MATERIALS                 = auto()
     MODIFIERS                 = auto()
     WORLD_SHADERS             = auto()
+    COMPOSITOR                = auto()
 
     # Put fillers and traps after POPUP
     POPUP                     = auto()

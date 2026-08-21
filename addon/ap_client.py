@@ -247,7 +247,7 @@ async def _handle_received_items(packet: dict):
 
     unlocks.schedule_last_index(packet_index + len(items))
     unlocks.resyncing = False
-    handlers.clear_shaders()
+    handlers.clear_locked_features()
 
 
 async def _resync():

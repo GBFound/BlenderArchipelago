@@ -158,6 +158,24 @@ def _clear_world_shaders(scene = None, depsgraph = None):
 
 
 @persistent
+def _compositor_locked(scene = None, depsgraph = None):
+    if unlocks.get_item_count(ids.Item.COMPOSITOR):
+        return
+
+    if bpy.context.scene.compositing_node_group:
+        bpy.context.scene.compositing_node_group = None
+        popup.enqueue("Compositor is locked.")
+
+
+@persistent
+def _clear_compositor(scene = None, depsgraph = None):
+    if unlocks.get_item_count(ids.Item.COMPOSITOR):
+        return
+
+    bpy.context.scene.compositing_node_group = None
+
+
+@persistent
 def _persist_to_blender_properties(scene, depsgraph):
     for item, count in persist.item_counts.items():
         unlocks.set_item_count(item, count)
@@ -189,9 +207,10 @@ def _import_disabled(scene, depsgraph):
 
 
 @persistent
-def clear_shaders(scene, depsgraph):
+def clear_locked_features(scene, depsgraph):
     _clear_materials()
     _clear_world_shaders()
+    _clear_compositor()
 
 
 def schedule_use_render_border():
@@ -214,9 +233,10 @@ def use_render_border(scene = None, depsgraph = None):
 
 
 _subscriptions = (
-    (bpy.types.Object, "mode",            _mode_locked),
-    (bpy.types.Object, "active_material", _materials_locked),
-    (bpy.types.Scene,  "world",           _world_shaders_locked),
+    (bpy.types.Object, "mode",                   _mode_locked),
+    (bpy.types.Object, "active_material",        _materials_locked),
+    (bpy.types.Scene,  "world",                  _world_shaders_locked),
+    (bpy.types.Scene,  "compositing_node_group", _compositor_locked),
 )
 
 
@@ -235,7 +255,7 @@ def _subscribe(scene = None, depsgraph = None):
 _handlers = [
     (bpy.app.handlers.load_post,             _subscribe),
     (bpy.app.handlers.load_post,             _blender_properties_to_persist),
-    (bpy.app.handlers.load_post,             clear_shaders),
+    (bpy.app.handlers.load_post,             clear_locked_features),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     # (bpy.app.handlers.blend_import_post,     _import_disabled),  Too annoying
     (bpy.app.handlers.render_init,           use_render_border),
