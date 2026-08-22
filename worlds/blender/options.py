@@ -1,13 +1,5 @@
 from dataclasses import dataclass
-from Options import Accessibility, DeathLink, PerGameCommonOptions, ProgressionBalancing, Range, Visibility
-
-
-class BlenderAccessibility(Accessibility):
-    visibility = Visibility.none
-
-
-class BlenderProgressionBalancing(ProgressionBalancing):
-    visibility = Visibility.none
+from Options import DeathLink, PerGameCommonOptions, Range
 
 
 class MinPercent(Range):
@@ -95,8 +87,6 @@ class BlenderDeathLink(DeathLink):
 
 @dataclass
 class BlenderOptions(PerGameCommonOptions):
-    accessibility                 : BlenderAccessibility
-    progression_balancing         : BlenderProgressionBalancing
     min_percent                   : MinPercent
     max_percent                   : MaxPercent
     goal_percent                  : GoalPercent
