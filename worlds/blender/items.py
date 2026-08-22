@@ -19,6 +19,7 @@ ITEM_NAME_TO_CLASSIFICATION = {
     "Grease Pencil Modes"       : ItemClassification.useful,
     "Materials"                 : ItemClassification.progression,
     "Modifiers"                 : ItemClassification.useful,
+    "Geometry Nodes"            : ItemClassification.useful,
     "World Shaders"             : ItemClassification.useful,
     "Compositor"                : ItemClassification.useful,
     "Pop Up"                    : ItemClassification.filler,

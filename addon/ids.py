@@ -15,6 +15,7 @@ class Item(IntEnum):
     TEXTURE_PAINT_MODE        = auto()
     GREASE_PENCIL_MODES       = auto()
     MATERIALS                 = auto()
+    GEOMETRY_NODES            = auto()
     MODIFIERS                 = auto()
     WORLD_SHADERS             = auto()
     COMPOSITOR                = auto()

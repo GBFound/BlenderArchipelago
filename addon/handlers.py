@@ -135,8 +135,39 @@ def _modifiers_locked(scene, depsgraph):
     
     obj = bpy.context.active_object
     if obj and obj.modifiers:
-        obj.modifiers.clear()
-        popup.enqueue("Modifiers are locked.")
+        if (_clear_other_modifiers(obj)):
+            popup.enqueue("Modifiers are locked.")
+
+
+def _clear_other_modifiers(obj) -> bool:
+    did_clear = False
+    for mod in list(obj.modifiers):  # list() to avoid mutating while iterating
+        if mod.type != 'NODES':
+            obj.modifiers.remove(mod)
+            did_clear = True
+
+    return did_clear
+
+
+@persistent
+def _geometry_nodes_locked(scene, depsgraph):
+    if unlocks.get_item_count(ids.Item.GEOMETRY_NODES):
+        return
+    
+    obj = bpy.context.active_object
+    if obj and obj.modifiers:
+        if (_clear_geometry_nodes(obj)):
+            popup.enqueue("Geometry Nodes are locked.")
+
+
+def _clear_geometry_nodes(obj):
+    did_clear = False
+    for mod in list(obj.modifiers):  # list() to avoid mutating while iterating
+        if mod.type == 'NODES':
+            obj.modifiers.remove(mod)
+            did_clear = True
+
+    return did_clear
 
 
 @persistent
@@ -257,6 +288,7 @@ _handlers = [
     (bpy.app.handlers.load_post,             _blender_properties_to_persist),
     (bpy.app.handlers.load_post,             clear_locked_features),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
+    (bpy.app.handlers.depsgraph_update_post, _geometry_nodes_locked),
     # (bpy.app.handlers.blend_import_post,     _import_disabled),  Too annoying
     (bpy.app.handlers.render_init,           use_render_border),
     (bpy.app.handlers.render_complete,       _update_state),
