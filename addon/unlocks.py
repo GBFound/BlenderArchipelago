@@ -1,9 +1,15 @@
 import bpy
-from . import deathlink, ids, persist, popup
+from . import deathlink, ids, panels, persist, popup
 
 resyncing = False
 progressive_render_width_max = 0
 progressive_render_height_max = 0
+
+_MATERIALS_DEPENDENTS = (
+    ids.Item.VERTEX_PAINT_MODE,
+    ids.Item.TEXTURE_PAINT_MODE,
+    ids.Item.GREASE_PENCIL_MODES,
+)
 
 
 class ItemCounts(bpy.types.PropertyGroup):
@@ -36,7 +42,9 @@ def unlock_item(item: ids.Item):
             _activate_filler_and_traps(item)
         return
 
+    item = _resolve_materials_redirect(item)
     set_item_count(item, get_item_count(item) + 1)
+    panels.schedule_redraw_panels()
 
 
 def clear_unlocks():
@@ -44,6 +52,8 @@ def clear_unlocks():
         if is_trap_or_filler(item):
             break
         set_item_count(item, 0)
+
+    bpy.context.scene.materials_unlocked_by = ""
     
 
 def is_trap_or_filler(item: ids.Item) -> bool:
@@ -75,9 +85,22 @@ def _activate_filler_and_traps(item: ids.Item):
         popup.enqueue("Undo trap.")
 
 
+def _resolve_materials_redirect(item: ids.Item) -> ids.Item:
+    materials_unlocked_by = bpy.context.scene.materials_unlocked_by
+    if item in _MATERIALS_DEPENDENTS and not materials_unlocked_by:
+        bpy.context.scene.materials_unlocked_by = item.name
+        persist.materials_unlocked_by = item.name
+        item = ids.Item.MATERIALS
+    elif item == ids.Item.MATERIALS and materials_unlocked_by:
+        item = ids.Item[materials_unlocked_by]
+        bpy.context.scene.materials_unlocked_by = ""
+        persist.materials_unlocked_by = ""
+    return item
+
 def register():
     bpy.types.Scene.item_counts = bpy.props.PointerProperty(type=ItemCounts)
     bpy.types.Scene.ap_last_item_index = bpy.props.IntProperty()
+    bpy.types.Scene.materials_unlocked_by = bpy.props.StringProperty()
 
 
 def unregister():

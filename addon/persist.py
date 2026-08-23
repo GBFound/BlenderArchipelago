@@ -12,6 +12,7 @@ ap_host                   : str                 = ""
 ap_port                   : str                 = ""
 ap_slot_name              : str                 = ""
 ap_password               : str                 = ""
+materials_unlocked_by     : str                 = ""
 
 SIMPLE_SCENE_FIELDS = [
     "current_percent",

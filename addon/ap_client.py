@@ -180,7 +180,7 @@ async def _handle_packet(packet: dict):
     elif cmd == "ReceivedItems":
         await _handle_received_items(packet)
 
-    elif cmd == "PrintJSON":
+    elif cmd == "PrintJSON":  # TODO Make work with cheats
         if packet.get("type") == "ItemSend":
             item = packet.get("item")
             item_id = item.get("item")
