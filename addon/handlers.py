@@ -238,7 +238,7 @@ def _import_disabled(scene, depsgraph):
 
 
 @persistent
-def clear_locked_features(scene, depsgraph):
+def clear_locked_features(scene = None, depsgraph = None):
     _clear_materials()
     _clear_world_shaders()
     _clear_compositor()
