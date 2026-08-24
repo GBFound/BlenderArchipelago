@@ -107,27 +107,6 @@ def _mode_locked(scene = None, depsgraph = None):
 
 
 @persistent
-def _materials_locked(scene = None, depsgraph = None):
-    if unlocks.get_item_count(ids.Item.MATERIALS):
-        return
-
-    obj = bpy.context.active_object
-    if obj and hasattr(obj.data, "materials") and len(obj.data.materials) > 0:
-        obj.data.materials.clear()
-        popup.enqueue("Materials are locked.")
-
-
-@persistent
-def _clear_materials(scene = None, depsgraph = None):
-    if unlocks.get_item_count(ids.Item.MATERIALS):
-        return
-    
-    for obj in bpy.data.objects:
-        if hasattr(obj.data, "materials"):
-            obj.data.materials.clear()
-
-
-@persistent
 def _modifiers_locked(scene, depsgraph):
     if unlocks.get_item_count(ids.Item.MODIFIERS):
         return
@@ -167,6 +146,26 @@ def _clear_geometry_nodes(obj):
             did_clear = True
 
     return did_clear
+
+@persistent
+def _materials_locked(scene = None, depsgraph = None):
+    if unlocks.unlock_all or unlocks.get_item_count(ids.Item.MATERIALS):
+        return
+
+    obj = bpy.context.active_object
+    if obj and hasattr(obj.data, "materials") and len(obj.data.materials) > 0:
+        obj.data.materials.clear()
+        popup.enqueue("Materials are locked.")
+
+
+@persistent
+def _clear_materials(scene = None, depsgraph = None):
+    if unlocks.get_item_count(ids.Item.MATERIALS):
+        return
+    
+    for obj in bpy.data.objects:
+        if hasattr(obj.data, "materials"):
+            obj.data.materials.clear()
 
 
 @persistent
