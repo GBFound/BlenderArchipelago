@@ -233,7 +233,7 @@ async def _handle_received_items(packet: dict):
 
     if packet_index == 0:
         unlocks.clear_unlocks()
-    elif packet_index != last_index + 1:
+    elif packet_index != last_index:
         await _resync()
         return
 
