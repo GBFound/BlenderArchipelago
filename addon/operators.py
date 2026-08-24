@@ -102,7 +102,7 @@ class AP_OT_Deathlink_Toggle(bpy.types.Operator):
     def execute(self, context):
         deathlink.enabled = not deathlink.enabled
         ap_client.send_deathlink_tag_update()
-        return {'FINISHED'}
+        return {"FINISHED"}
 
 
 """

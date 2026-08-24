@@ -70,6 +70,12 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         box = layout.box()
+
+        if unlocks.temp_unlock_countdown_timer:
+            box.label(text=f"Temporarily unlocked all tools.")
+            box.label(text=f"{unlocks.temp_unlock_countdown_timer} seconds left.")
+            box = layout.box()
+
         for item in ids.Item:
             if unlocks.is_trap_or_filler(item):
                 break
@@ -79,7 +85,7 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
             is_unlocked = unlocks.get_item_count(item)
             unlock_text = popup.item_to_unlock_text(item)
             row = box.row()
-            if is_unlocked:
+            if is_unlocked or unlocks.unlock_all:
                 row.label(text=f"{unlock_text}", icon="UNLOCKED")
             else:
                 row.enabled = False

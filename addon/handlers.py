@@ -81,6 +81,9 @@ def _deathlink_redo(scene, depsgraph):
 
 @persistent
 def _mode_locked(scene = None, depsgraph = None):
+    if unlocks.unlock_all:
+        return
+
     obj = bpy.context.active_object
     modes = {
         "EDIT"          : ids.Item.EDIT_MODE,
@@ -108,7 +111,7 @@ def _mode_locked(scene = None, depsgraph = None):
 
 @persistent
 def _modifiers_locked(scene, depsgraph):
-    if unlocks.get_item_count(ids.Item.MODIFIERS):
+    if unlocks.unlock_all or unlocks.get_item_count(ids.Item.MODIFIERS):
         return
     
     obj = bpy.context.active_object
@@ -129,7 +132,7 @@ def _clear_other_modifiers(obj) -> bool:
 
 @persistent
 def _geometry_nodes_locked(scene, depsgraph):
-    if unlocks.get_item_count(ids.Item.GEOMETRY_NODES):
+    if unlocks.unlock_all or unlocks.get_item_count(ids.Item.GEOMETRY_NODES):
         return
     
     obj = bpy.context.active_object
@@ -170,7 +173,7 @@ def _clear_materials(scene = None, depsgraph = None):
 
 @persistent
 def _world_shaders_locked(scene = None, depsgraph = None):
-    if unlocks.get_item_count(ids.Item.WORLD_SHADERS):
+    if unlocks.unlock_all or unlocks.get_item_count(ids.Item.WORLD_SHADERS):
         return
     
     if bpy.context.scene.world:
@@ -188,7 +191,7 @@ def _clear_world_shaders(scene = None, depsgraph = None):
 
 @persistent
 def _compositor_locked(scene = None, depsgraph = None):
-    if unlocks.get_item_count(ids.Item.COMPOSITOR):
+    if unlocks.unlock_all or unlocks.get_item_count(ids.Item.COMPOSITOR):
         return
 
     if bpy.context.scene.compositing_node_group:

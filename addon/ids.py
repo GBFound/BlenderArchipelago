@@ -22,6 +22,7 @@ class Item(IntEnum):
 
     # Put fillers and traps after POPUP
     POPUP                     = auto()
+    FULL_ARSENAL              = auto()
     UNDO                      = auto()
     DESPAIR                   = auto()
 

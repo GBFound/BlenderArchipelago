@@ -23,6 +23,7 @@ ITEM_NAME_TO_CLASSIFICATION = {
     "World Shaders"             : ItemClassification.useful,
     "Compositor"                : ItemClassification.useful,
     "Pop Up"                    : ItemClassification.filler,
+    "Full Arsenal"              : ItemClassification.filler,
     "Undo"                      : ItemClassification.trap,
     "Despair"                   : ItemClassification.trap,
 }

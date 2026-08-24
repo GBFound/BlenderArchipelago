@@ -2,9 +2,13 @@ import bpy
 import random
 from . import deathlink, ids, panels, persist, popup
 
-resyncing = False
 progressive_render_width_max = 0
 progressive_render_height_max = 0
+resyncing = False
+unlock_all = False
+temp_unlock_countdown_timer = 0
+
+TEMP_UNLOCK_DURATION_SECONDS = 60  # TODO Increase this to 60 as default but allow user to set this in YAML
 
 _MATERIALS_DEPENDENTS = (
     ids.Item.VERTEX_PAINT_MODE,
@@ -73,6 +77,36 @@ def initialize_progressive_render_borders(new_width_max: int, new_height_max: in
     persist.progressive_render_height = new_height_max
 
 
+def temp_unlock_all_tools():
+    global temp_unlock_countdown_timer, unlock_all
+
+    unlock_all = True
+    temp_unlock_countdown_timer += TEMP_UNLOCK_DURATION_SECONDS
+    if temp_unlock_countdown_timer == TEMP_UNLOCK_DURATION_SECONDS:
+        bpy.app.timers.register(_temp_unlock_countdown_timer)
+    popup.enqueue(f"Temporarily unlocked all tools for +{TEMP_UNLOCK_DURATION_SECONDS} seconds.")
+
+
+def _temp_unlock_countdown_timer() -> int:
+    global temp_unlock_countdown_timer
+
+    panels.schedule_redraw_panels()
+    if popup.can_show_next:  # Pause timer when there is a popup to be nice
+        temp_unlock_countdown_timer -= 1
+    if not temp_unlock_countdown_timer:
+        _relock_all_tools()
+        return None
+    
+    return 1
+
+
+def _relock_all_tools():
+    global unlock_all
+    unlock_all = False
+    panels.schedule_redraw_panels()
+    popup.enqueue("Temporary unlocks have ended.")
+
+
 def _set_last_index(index: int):
     bpy.context.scene.ap_last_item_index = index
     persist.ap_last_item_index = index
@@ -88,6 +122,8 @@ def _activate_filler_and_traps(item: ids.Item):
         ]
         message = random.choice(messages)
         popup.enqueue(message)
+    elif item == ids.Item.FULL_ARSENAL:
+        temp_unlock_all_tools()
     elif item == ids.Item.UNDO or item == ids.Item.DESPAIR:  # TODO Currently placeholder for DESPAIR
         deathlink.schedule_undo()
         popup.enqueue("Undo trap.")
