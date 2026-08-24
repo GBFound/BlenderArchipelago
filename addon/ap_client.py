@@ -159,9 +159,10 @@ async def _handle_packet(packet: dict):
         _slot_info = packet.get("slot_info")
         _slot_id = packet.get("slot")
         handlers.schedule_use_render_border()
-        panels.schedule_redraw_panels()
         initialize_from_slot_data(packet)
         unlocks.clear_unlocks()
+        unlocks.schedule_last_index(0)
+        panels.schedule_redraw_panels()
         if _pending_checks:
             # Shallow copy to avoid mutation during send
             with _pending_checks_lock:
