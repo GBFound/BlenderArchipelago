@@ -21,7 +21,7 @@ def set_all_location_rules(world: BlenderWorld) -> None:
         world.set_rule(
             loc,
             lambda state, threshold=threshold: _calculate_render_percent_available(world, world.player, state) * safety_margin >= threshold
-            # TODO Use rule builder instead of lambda?
+            # Use rule builder instead of lambda?
         )
 
 
