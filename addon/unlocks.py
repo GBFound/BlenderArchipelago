@@ -4,11 +4,11 @@ from . import deathlink, ids, panels, persist, popup
 
 progressive_render_width_max = 0
 progressive_render_height_max = 0
-resyncing = False
-unlock_all = False
+temp_unlock_duration_seconds = 60
 temp_unlock_countdown_timer = 0
+unlock_all = False
+resyncing = False
 
-TEMP_UNLOCK_DURATION_SECONDS = 60  # TODO Increase this to 60 as default but allow user to set this in YAML
 
 _MATERIALS_DEPENDENTS = (
     ids.Item.VERTEX_PAINT_MODE,
@@ -69,22 +69,24 @@ def schedule_last_index(index: int):
     bpy.app.timers.register(lambda: _set_last_index(index))
 
 
-def initialize_progressive_render_borders(new_width_max: int, new_height_max: int):
-    global progressive_render_width_max, progressive_render_height_max
+def initialize_unlocks(new_width_max: int, new_height_max: int, new_temp_unlock_duration_seconds: int):
+    global progressive_render_width_max, progressive_render_height_max, temp_unlock_duration_seconds
+
     progressive_render_width_max = new_width_max
     progressive_render_height_max = new_height_max
     persist.progressive_render_width = new_width_max
     persist.progressive_render_height = new_height_max
+    temp_unlock_duration_seconds = new_temp_unlock_duration_seconds
 
 
 def temp_unlock_all_tools():
     global temp_unlock_countdown_timer, unlock_all
 
     unlock_all = True
-    temp_unlock_countdown_timer += TEMP_UNLOCK_DURATION_SECONDS
-    if temp_unlock_countdown_timer == TEMP_UNLOCK_DURATION_SECONDS:
+    temp_unlock_countdown_timer += temp_unlock_duration_seconds
+    if temp_unlock_countdown_timer == temp_unlock_duration_seconds:
         bpy.app.timers.register(_temp_unlock_countdown_timer)
-    popup.enqueue(f"Temporarily unlocked all tools for +{TEMP_UNLOCK_DURATION_SECONDS} seconds.")
+    popup.enqueue(f"Temporarily unlocked all tools for +{temp_unlock_duration_seconds} seconds.")
 
 
 def _temp_unlock_countdown_timer() -> int:

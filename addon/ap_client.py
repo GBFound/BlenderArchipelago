@@ -215,12 +215,13 @@ def initialize_from_slot_data(packet: dict):
     slot_data = packet.get("slot_data")
     checked_locations = packet.get("checked_locations")
     goal_percent = slot_data.get("goal_percent")
-    new_thresholds = slot_data.get("thresholds", [])
-    new_width_max = slot_data.get("progressive_render_width_max", [])
-    new_height_max = slot_data.get("progressive_render_height_max", [])
+    new_thresholds = slot_data.get("thresholds")
+    new_width_max = slot_data.get("progressive_render_width_max")
+    new_height_max = slot_data.get("progressive_render_height_max")
+    new_temp_unlock_duration_seconds = slot_data.get("full_arsenal_duration")
     progress.initialize_progress(goal_percent)
     thresholds.initialize_thresholds(new_thresholds, checked_locations)
-    unlocks.initialize_progressive_render_borders(new_width_max, new_height_max)
+    unlocks.initialize_unlocks(new_width_max, new_height_max, new_temp_unlock_duration_seconds)
 
 
 async def _handle_received_items(packet: dict):

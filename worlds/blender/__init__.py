@@ -53,5 +53,6 @@ class BlenderWorld(World):
             "goal_percent"                    : self.options.goal_percent.value,
             "progressive_render_width_max"    : self.options.progressive_render_width_max.value,
             "progressive_render_height_max"   : self.options.progressive_render_height_max.value,
+            "full_arsenal_duration"           : self.options.full_arsenal_duration.value,
             "death_link"                      : bool(self.options.death_link),
         }

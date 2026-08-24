@@ -68,12 +68,23 @@ class CheckCount(Range):
 
 class TrapCount(Range):
     """
-    Sets the percentage of filler items to be replaced by random traps.
+    The percentage of filler items to be replaced by random traps.
     """
     display_name = "Trap Fill Percent"
     range_start = 0
     range_end = 100
     default = 50
+
+
+class FullArsenalDuration(Range):
+    """
+    The number of seconds full arsenal will last for.
+    Receiving the full arsenal item will remove all tool restrictions, as if every tool was unlocked.
+    """
+    display_name = "Full Arsenal Duration"
+    range_start = 10
+    range_end = 600
+    default = 60
 
 
 class BlenderDeathLink(DeathLink):
@@ -94,4 +105,5 @@ class BlenderOptions(PerGameCommonOptions):
     progressive_render_height_max : ProgressiveRenderHeightMax
     check_count                   : CheckCount
     trap_count                    : TrapCount
+    full_arsenal_duration         : FullArsenalDuration
     death_link                    : BlenderDeathLink
