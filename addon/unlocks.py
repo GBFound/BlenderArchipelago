@@ -88,18 +88,22 @@ def _activate_filler_and_traps(item: ids.Item):
 def _resolve_materials_redirect(item: ids.Item) -> ids.Item:
     materials_unlocked_by = bpy.context.scene.materials_unlocked_by
     if item in _MATERIALS_DEPENDENTS and not materials_unlocked_by:
-        if not resyncing:
-            popup.enqueue(f"Does not have Materials. Unlocked Materials instead.")
         bpy.context.scene.materials_unlocked_by = item.name
         persist.materials_unlocked_by = item.name
         item = ids.Item.MATERIALS
+        _popup_unless_resyncing("Does not have Materials. Unlocked Materials instead.")
     elif item == ids.Item.MATERIALS and materials_unlocked_by and not get_item_count(ids.Item[materials_unlocked_by]):
         item = ids.Item[materials_unlocked_by]
-        unlock_text = item.name.replace("_", " ").title()
-        if not resyncing:
-            popup.enqueue(f"Already have Materials. Unlocked {unlock_text} instead.")
+        unlock_text = popup.item_to_unlock_text(item)
+        _popup_unless_resyncing(f"Already have Materials. Unlocked {unlock_text} instead.")
     
     return item
+
+
+def _popup_unless_resyncing(message: str):
+    if not resyncing:
+        popup.enqueue(message)
+
 
 def register():
     bpy.types.Scene.item_counts = bpy.props.PointerProperty(type=ItemCounts)

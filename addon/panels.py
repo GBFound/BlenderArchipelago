@@ -1,6 +1,6 @@
 import bpy
 from . import ap_client
-from . import deathlink, ids, progress, thresholds, unlocks
+from . import deathlink, ids, popup, progress, thresholds, unlocks
 
 
 class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
@@ -77,7 +77,7 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
                 continue
 
             is_unlocked = unlocks.get_item_count(item)
-            unlock_text = item.name.replace("_", " ").title()
+            unlock_text = popup.item_to_unlock_text(item)
             row = box.row()
             if is_unlocked:
                 row.label(text=f"{unlock_text}", icon="UNLOCKED")

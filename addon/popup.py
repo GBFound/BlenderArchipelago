@@ -1,5 +1,6 @@
 import bpy
 import collections
+from . import ids
 
 _popups = collections.deque()
 _show_next = True
@@ -18,6 +19,10 @@ def show_next():
     
     if _popups:
         _schedule()
+
+
+def item_to_unlock_text(item: ids.Item) -> str:
+    return item.name.replace("_", " ").title()
 
 
 def _schedule():

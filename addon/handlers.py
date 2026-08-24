@@ -98,11 +98,10 @@ def _mode_locked(scene = None, depsgraph = None):
     for mode, item in modes.items():
         if obj and obj.mode == mode and not unlocks.get_item_count(item):
             bpy.ops.object.mode_set(mode="OBJECT")
-            unlock_text = item.name.replace("_", " ").title()
+            unlock_text = popup.item_to_unlock_text(item)
             if item == ids.Item.GREASE_PENCIL_MODES:
                 popup.enqueue(f"{unlock_text} are locked.")
             else:
-                unlock_text = item.name.replace("_", " ").title()
                 popup.enqueue(f"{unlock_text} is locked.")
             break
 
