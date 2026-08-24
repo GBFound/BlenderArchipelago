@@ -1,4 +1,5 @@
 import bpy
+import random
 from . import deathlink, ids, panels, persist, popup
 
 resyncing = False
@@ -79,7 +80,14 @@ def _set_last_index(index: int):
 
 def _activate_filler_and_traps(item: ids.Item):
     if item == ids.Item.POPUP:
-        popup.enqueue("your model look like poop from a butt 💔💔💔")
+        messages = [
+            "You're doing great!",
+            "your doing great",
+            "i bet this model looking so good rn",
+            "your model look like poop from a butt 💔💔💔",
+        ]
+        message = random.choice(messages)
+        popup.enqueue(message)
     elif item == ids.Item.UNDO or item == ids.Item.DESPAIR:  # TODO Currently placeholder for DESPAIR
         deathlink.schedule_undo()
         popup.enqueue("Undo trap.")
