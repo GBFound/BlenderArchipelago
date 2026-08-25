@@ -106,14 +106,14 @@ class AP_OT_Deathlink_Toggle(bpy.types.Operator):
 
 
 """
-from . import despair
+from . import panels
 class AP_OT_Debug(bpy.types.Operator):
     bl_idname = "ap.debug"
-    bl_label = "Despair"
+    bl_label = "Awesome Debug"
     bl_options = {"UNDO"}
 
     def execute(self, context):
-        despair.despair()
+        panels.add_message("test")
         return {"FINISHED"}
 """
 

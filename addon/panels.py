@@ -1,6 +1,5 @@
 import bpy
-from . import ap_client
-from . import deathlink, ids, popup, progress, thresholds, unlocks
+from . import ap_client, deathlink, ids, popup, progress, thresholds, unlocks
 
 
 class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
@@ -106,13 +105,45 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
                 row.label(text=f"{unlock_text}", icon="LOCKED")
 
 
+# CollectionProperty accepts PropertyGroup but not StringProperty
+class Message(bpy.types.PropertyGroup):
+    text: bpy.props.StringProperty()
+
+
+class AP_UL_Messages(bpy.types.UIList):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
+        layout.label(text=item.text)
+
+
+class VIEW3D_PT_AP_Messages(bpy.types.Panel):
+    bl_label       = "Messages"
+    bl_idname      = "VIEW3D_PT_AP_Messages"
+    bl_space_type  = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category    = "Blender AP"
+    bl_order = 3
+
+    @classmethod
+    def poll(cls, context):
+        return ap_client.is_connected()
+
+    def draw(self, context):
+        layout = self.layout
+        layout.template_list(
+            listtype_name="AP_UL_Messages",
+            list_id="",
+            dataptr=context.scene, propname="ap_messages",
+            active_dataptr=context.scene, active_propname="ap_messages_index",
+        )
+
+
 class VIEW3D_PT_AP_Connection(bpy.types.Panel):
     bl_label       = "Connection"
     bl_idname      = "VIEW3D_PT_AP_Connection"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
-    bl_order = 3
+    bl_order = 4
 
     def draw(self, context):
         connected = ap_client.is_connected() or ap_client.is_connecting()
@@ -140,6 +171,15 @@ class VIEW3D_PT_AP_Connection(bpy.types.Panel):
             box.operator("ap.connecting", icon="SORTTIME")
         else:
             box.operator("ap.connect", icon="LINKED")
+
+
+def add_message(text: str):
+    messages = bpy.context.scene.ap_messages
+    message = messages.add()
+    message.text = text
+    messages.move(len(messages) - 1, 0)
+    bpy.context.scene.ap_messages_index = 0
+    schedule_redraw_panels()
 
 
 def schedule_redraw_panels():
@@ -187,37 +227,16 @@ def register():
         name="Password",
         description="The password to use for this game, if any.",
     )
+    bpy.types.Scene.ap_messages = bpy.props.CollectionProperty(type=Message)
+    bpy.types.Scene.ap_messages_index = bpy.props.IntProperty()
 
 
 def unregister():
+    del bpy.types.Scene.ap_messages_index
+    del bpy.types.Scene.ap_messages
     del bpy.types.Scene.ap_password
     del bpy.types.Scene.ap_slot_name
     del bpy.types.Scene.ap_port
     del bpy.types.Scene.ap_host
     del bpy.types.Scene.ap_deathlink_enabled
     del bpy.types.Scene.ap_target_image
-
-
-"""
-For debugging.
-class VIEW3D_PT_AP_Thresholds(bpy.types.Panel):
-    bl_label       = "Thresholds (Debug)"
-    bl_idname      = "VIEW3D_PT_AP_Thresholds"
-    bl_space_type  = "VIEW_3D"
-    bl_region_type = "UI"
-    bl_category    = "Blender AP"
-
-    @classmethod
-    def poll(cls, context):
-        return ap_client.is_connected()
-
-    def draw(self, context):
-        layout = self.layout
-        box = layout.box()
-
-        for threshold, checked in thresholds.data.items():
-            if checked:
-                box.label(text=f"{threshold}%: CHECKED", icon="UNLOCKED")
-            else:
-                box.label(text=f"{threshold}%: NOT CHECKED", icon="LOCKED")
-"""

@@ -162,6 +162,7 @@ async def _handle_packet(packet: dict):
         initialize_from_slot_data(packet)
         unlocks.clear_unlocks()
         unlocks.schedule_last_index(0)
+        bpy.context.scene.ap_messages.clear()
         panels.schedule_redraw_panels()
         if _pending_checks:
             # Shallow copy to avoid mutation during send
@@ -181,8 +182,16 @@ async def _handle_packet(packet: dict):
     elif cmd == "ReceivedItems":
         await _handle_received_items(packet)
 
-    elif cmd == "PrintJSON":  # TODO Make work with cheats
-        if packet.get("type") == "ItemSend":
+    elif cmd == "PrintJSON":
+        parts = packet.get("data")
+        text_parts = []
+        for part in parts:
+            text = part.get("text", "")
+            text_parts.append(text)
+        text = "".join(text_parts)
+        panels.add_message(text)
+        printJsonType = packet.get("type")
+        if printJsonType == "ItemSend":
             item = packet.get("item")
             item_id = item.get("item")
             sender_id = item.get("player")
