@@ -1,6 +1,6 @@
 import bpy
 import random
-from . import deathlink, ids, panels, persist, popup
+from . import deathlink, despair, ids, panels, persist, popup
 
 progressive_render_width_max = 0
 progressive_render_height_max = 0
@@ -79,14 +79,17 @@ def initialize_unlocks(new_width_max: int, new_height_max: int, new_temp_unlock_
     temp_unlock_duration_seconds = new_temp_unlock_duration_seconds
 
 
-def temp_unlock_all_tools():
+def temp_unlock_all_tools(duration=None):
     global temp_unlock_countdown_timer, unlock_all
 
+    if duration == None:
+        duration = temp_unlock_duration_seconds
+
     unlock_all = True
-    temp_unlock_countdown_timer += temp_unlock_duration_seconds
-    if temp_unlock_countdown_timer == temp_unlock_duration_seconds:
+    temp_unlock_countdown_timer += duration
+    if temp_unlock_countdown_timer == duration:
         bpy.app.timers.register(_temp_unlock_countdown_timer)
-    popup.enqueue(f"Temporarily unlocked all tools for +{temp_unlock_duration_seconds} seconds.")
+    popup.enqueue(f"Temporarily unlocked all tools for +{duration} seconds.")
 
 
 def _temp_unlock_countdown_timer() -> int:
@@ -126,9 +129,11 @@ def _activate_filler_and_traps(item: ids.Item):
         popup.enqueue(message)
     elif item == ids.Item.FULL_ARSENAL:
         temp_unlock_all_tools()
-    elif item == ids.Item.UNDO or item == ids.Item.DESPAIR:  # TODO Currently placeholder for DESPAIR
+    elif item == ids.Item.UNDO:
         deathlink.schedule_undo()
         popup.enqueue("Undo trap.")
+    elif item == ids.Item.DESPAIR:
+        despair.despair()
 
 
 def _resolve_materials_redirect(item: ids.Item) -> ids.Item:

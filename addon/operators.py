@@ -106,6 +106,19 @@ class AP_OT_Deathlink_Toggle(bpy.types.Operator):
 
 
 """
+from . import despair
+class AP_OT_Debug(bpy.types.Operator):
+    bl_idname = "ap.debug"
+    bl_label = "Despair"
+    bl_options = {"UNDO"}
+
+    def execute(self, context):
+        despair.despair()
+        return {"FINISHED"}
+"""
+
+
+"""
 Does not work unless invoked by the user.
 Was to be used for less obtrusive popups.
 class AP_OT_Report(bpy.types.Operator):
