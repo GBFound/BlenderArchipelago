@@ -79,7 +79,7 @@ def send_deathlink(do: str):
     if deathlink.suppressed:
         return
     if bpy.context.active_operator is not None:
-        return  # Adjust last operation should not send a deathlink
+        return  # Adjusting last operation will not send a deathlink
                 # TODO Having adjust last operation on screen but using undo history should still send deathlink
 
     message = deathlink.choose_message(do)
