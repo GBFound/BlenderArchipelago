@@ -48,8 +48,22 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
         
         box.label(text=f"Goal: {goal:.1f}%")
 
+
+class VIEW3D_PT_AP_Target(bpy.types.Panel):
+    bl_label       = "Target Image"
+    bl_idname      = "VIEW3D_PT_AP_Target"
+    bl_space_type  = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category    = "Blender AP"
+    bl_order = 1
+
+    @classmethod
+    def poll(cls, context):
+        return ap_client.is_connected()
+
+    def draw(self, context):
+        layout = self.layout
         box = layout.box()
-        box.label(text="Target Image:")
         row = box.row(align=True)
         row.prop_search(context.scene, "ap_target_image", bpy.data, "images", text="")
         row.operator("ap.load_target_image", text="", icon="FILEBROWSER")
@@ -61,7 +75,7 @@ class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
-    bl_order = 1
+    bl_order = 2
 
     @classmethod
     def poll(cls, context):
@@ -98,7 +112,7 @@ class VIEW3D_PT_AP_Connection(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
-    bl_order = 2
+    bl_order = 3
 
     def draw(self, context):
         connected = ap_client.is_connected() or ap_client.is_connecting()
