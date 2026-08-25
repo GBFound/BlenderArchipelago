@@ -7,7 +7,6 @@ from BaseClasses import Item, ItemClassification
 
 BASE_ID = 7897897890
 
-# TODO 1 min of use of random unlock
 ITEM_NAME_TO_CLASSIFICATION = {
     "Progressive Render Width"  : ItemClassification.progression,
     "Progressive Render Height" : ItemClassification.progression,
