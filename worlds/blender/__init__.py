@@ -19,8 +19,8 @@ class BlenderWorld(World):
     def generate_early(self) -> None:
         if self.options.min_percent.value >= self.options.max_percent.value:
             raise OptionError(
-                f"min_percent ({self.options.min_percent.value}) "
-                f"must be lower than max_percent ({self.options.max_percent.value}). "
+                f"Minimum Similarity Percent ({self.options.min_percent.value}) "
+                f"must be lower than Maximum Similarity Percent ({self.options.max_percent.value}). "
                 f"Please fix your yaml."
             )
         self.thresholds = locations.get_thresholds(self)
