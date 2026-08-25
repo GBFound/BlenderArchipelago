@@ -4,7 +4,6 @@ if TYPE_CHECKING:
     from .world import BlenderWorld
 
 from BaseClasses import CollectionState
-from . import locations
 
 
 def set_rules(world: BlenderWorld) -> None:
