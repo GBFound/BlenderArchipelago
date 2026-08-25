@@ -73,7 +73,7 @@ class TrapCount(Range):
     display_name = "Trap Fill Percent"
     range_start = 0
     range_end = 100
-    default = 50
+    default = 25
 
 
 class FullArsenalDuration(Range):
