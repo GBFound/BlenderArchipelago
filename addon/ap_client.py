@@ -80,7 +80,10 @@ def send_deathlink(do: str):
         return
     if bpy.context.active_operator is not None:
         return  # Adjusting last operation will not send a deathlink
-                # TODO Having adjust last operation on screen but using undo history should still send deathlink
+        """
+        NOTE Using undo history to undo/redo while adjust last operation UI is on screen should still send deathlink,
+        but I could not find a solution to fix this without breaking other things.
+        """
 
     message = deathlink.choose_message(do)
     asyncio.run_coroutine_threadsafe(_send_deathlink(message), _loop)
