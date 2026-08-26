@@ -1,6 +1,6 @@
 import bpy
 import random
-from . import deathlink, despair, ids, panels, persist, popup
+from . import deathlink, despair, ids, persist, popup, redraw
 
 progressive_render_width_max = 0
 progressive_render_height_max = 0
@@ -49,7 +49,7 @@ def unlock_item(item: ids.Item):
 
     item = _resolve_materials_redirect(item)
     set_item_count(item, get_item_count(item) + 1)
-    panels.schedule_redraw_panels()
+    redraw.schedule_redraw_panels()
 
 
 def clear_unlocks():
@@ -95,7 +95,7 @@ def temp_unlock_all_tools(duration=None):
 def _temp_unlock_countdown_timer() -> int:
     global temp_unlock_countdown_timer
 
-    panels.schedule_redraw_panels()
+    redraw.schedule_redraw_panels()
     if popup.can_show_next:  # Pause timer when there is a popup to be nice
         temp_unlock_countdown_timer -= 1
     if not temp_unlock_countdown_timer:
@@ -108,7 +108,7 @@ def _temp_unlock_countdown_timer() -> int:
 def _relock_all_tools():
     global unlock_all
     unlock_all = False
-    panels.schedule_redraw_panels()
+    redraw.schedule_redraw_panels()
     popup.enqueue("Temporary unlocks have ended.")
 
 

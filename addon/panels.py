@@ -105,16 +105,6 @@ class AP_PT_Unlocked(bpy.types.Panel):
                 row.label(text=f"{unlock_text}", icon="LOCKED")
 
 
-# CollectionProperty accepts PropertyGroup but not StringProperty
-class Message(bpy.types.PropertyGroup):
-    text: bpy.props.StringProperty()
-
-
-class AP_UL_Messages(bpy.types.UIList):
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname, index):
-        layout.label(text=item.text)
-
-
 class AP_PT_Messages(bpy.types.Panel):
     bl_label       = "Messages"
     bl_idname      = "AP_PT_Messages"
@@ -173,26 +163,6 @@ class AP_PT_Connection(bpy.types.Panel):
             box.operator("ap.connect", icon="LINKED")
 
 
-def add_message(text: str):
-    messages = bpy.context.scene.ap_messages
-    message = messages.add()
-    message.text = text
-    messages.move(len(messages) - 1, 0)
-    bpy.context.scene.ap_messages_index = 0
-    schedule_redraw_panels()
-
-
-def schedule_redraw_panels():
-    bpy.app.timers.register(_redraw_panels)
-
-
-def _redraw_panels():
-    for screen in bpy.data.screens:
-        for area in screen.areas:
-            if area.type == "VIEW_3D":
-                area.tag_redraw()
-
-
 def register():
     bpy.types.Scene.ap_target_image = bpy.props.StringProperty(
         name="Target Image",
@@ -227,13 +197,9 @@ def register():
         name="Password",
         description="The password to use for this game, if any.",
     )
-    bpy.types.Scene.ap_messages = bpy.props.CollectionProperty(type=Message)
-    bpy.types.Scene.ap_messages_index = bpy.props.IntProperty()
 
 
 def unregister():
-    del bpy.types.Scene.ap_messages_index
-    del bpy.types.Scene.ap_messages
     del bpy.types.Scene.ap_password
     del bpy.types.Scene.ap_slot_name
     del bpy.types.Scene.ap_port

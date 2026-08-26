@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import ap_data_package, ap_uuid, deathlink, explosion, handlers, ids, panels, popup, progress, thresholds, unlocks
+from . import ap_data_package, ap_uuid, deathlink, explosion, handlers, ids, messages, popup, progress, redraw, thresholds, unlocks
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []
@@ -135,7 +135,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
     finally:
         _ws = None
         _connected = False
-        panels.schedule_redraw_panels()
+        redraw.schedule_redraw_panels()
 
 
 async def _handle_packet(packet: dict):
@@ -163,7 +163,7 @@ async def _handle_packet(packet: dict):
         unlocks.clear_unlocks()
         unlocks.schedule_last_index(0)
         bpy.context.scene.ap_messages.clear()
-        panels.schedule_redraw_panels()
+        redraw.schedule_redraw_panels()
         if _pending_checks:
             # Shallow copy to avoid mutation during send
             with _pending_checks_lock:
@@ -189,7 +189,7 @@ async def _handle_packet(packet: dict):
             text = part.get("text", "")
             text_parts.append(text)
         text = "".join(text_parts)
-        panels.add_message(text)
+        messages.add_message(text)
         printJsonType = packet.get("type")
         if printJsonType == "ItemSend":
             item = packet.get("item")
