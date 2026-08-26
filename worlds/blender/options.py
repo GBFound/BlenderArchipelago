@@ -81,7 +81,7 @@ class FullArsenalDuration(Range):
     """
     display_name = "Full Arsenal Duration"
     range_start = 10
-    range_end = 600
+    range_end = 300
     default = 60
 
 
