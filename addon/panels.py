@@ -2,9 +2,9 @@ import bpy
 from . import ap_client, deathlink, ids, popup, progress, thresholds, unlocks
 
 
-class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
+class AP_PT_Similarity(bpy.types.Panel):
     bl_label       = "Similarity"
-    bl_idname      = "VIEW3D_PT_AP_Similarity"
+    bl_idname      = "AP_PT_Similarity"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
@@ -48,9 +48,9 @@ class VIEW3D_PT_AP_Similarity(bpy.types.Panel):
         box.label(text=f"Goal: {goal:.1f}%")
 
 
-class VIEW3D_PT_AP_Target(bpy.types.Panel):
+class AP_PT_Target(bpy.types.Panel):
     bl_label       = "Target Image"
-    bl_idname      = "VIEW3D_PT_AP_Target"
+    bl_idname      = "AP_PT_Target"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
@@ -68,9 +68,9 @@ class VIEW3D_PT_AP_Target(bpy.types.Panel):
         row.operator("ap.load_target_image", text="", icon="FILEBROWSER")
 
 
-class VIEW3D_PT_AP_Unlocked(bpy.types.Panel):
+class AP_PT_Unlocked(bpy.types.Panel):
     bl_label       = "Unlocked"
-    bl_idname      = "VIEW3D_PT_AP_Unlocked"
+    bl_idname      = "AP_PT_Unlocked"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
@@ -115,9 +115,9 @@ class AP_UL_Messages(bpy.types.UIList):
         layout.label(text=item.text)
 
 
-class VIEW3D_PT_AP_Messages(bpy.types.Panel):
+class AP_PT_Messages(bpy.types.Panel):
     bl_label       = "Messages"
-    bl_idname      = "VIEW3D_PT_AP_Messages"
+    bl_idname      = "AP_PT_Messages"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
@@ -137,9 +137,9 @@ class VIEW3D_PT_AP_Messages(bpy.types.Panel):
         )
 
 
-class VIEW3D_PT_AP_Connection(bpy.types.Panel):
+class AP_PT_Connection(bpy.types.Panel):
     bl_label       = "Connection"
-    bl_idname      = "VIEW3D_PT_AP_Connection"
+    bl_idname      = "AP_PT_Connection"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Blender AP"
