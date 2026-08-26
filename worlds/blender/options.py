@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from Options import DeathLink, PerGameCommonOptions, Range
+from Options import DeathLink, DefaultOnToggle, PerGameCommonOptions, Range
 
 
 class MinPercent(Range):
@@ -85,6 +85,14 @@ class FullArsenalDuration(Range):
     default = 60
 
 
+class Despair(DefaultOnToggle):
+    """
+    Enables the despair item.
+    If disabled, the item will instead be undo traps.
+    """
+    display_name = "Despair"
+
+
 class BlenderDeathLink(DeathLink):
     """
     When you undo/redo, everyone with deathlink dies.
@@ -104,4 +112,5 @@ class BlenderOptions(PerGameCommonOptions):
     check_count                   : CheckCount
     trap_count                    : TrapCount
     full_arsenal_duration         : FullArsenalDuration
+    despair                       : Despair
     death_link                    : BlenderDeathLink
