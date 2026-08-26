@@ -5,6 +5,8 @@ if TYPE_CHECKING:
 
 from BaseClasses import CollectionState
 
+SAFETY_MARGIN = 0.9
+
 
 def set_rules(world: BlenderWorld) -> None:
     set_all_location_rules(world)
@@ -15,18 +17,17 @@ def set_rules(world: BlenderWorld) -> None:
 def set_all_location_rules(world: BlenderWorld) -> None:
     locs = world.multiworld.get_locations(world.player)
     thresholds = world.thresholds
-    safety_margin = 0.9
     for loc, threshold in zip(locs, thresholds):
         world.set_rule(
             loc,
-            lambda state, threshold=threshold: _calculate_render_percent_available(world, world.player, state) * safety_margin >= threshold
+            lambda state, threshold=threshold: threshold <= _render_percent_available_from_state(world, world.player, state) * SAFETY_MARGIN 
             # Use rule builder instead of lambda?
         )
 
 
 def set_completion_condition(world: BlenderWorld) -> None:
     world.set_completion_rule(
-        lambda state: _calculate_render_percent_available(world, world.player, state) >= world.options.goal_percent
+        lambda state: world.options.goal_percent <= _render_percent_available_from_state(world, world.player, state) 
     )
 
 
@@ -38,11 +39,17 @@ def set_early_items(world: BlenderWorld) -> None:
     world.multiworld.early_items[world.player][progressive_render_border] = 1
 
 
-def _calculate_render_percent_available(world: "BlenderWorld", player: int, state: CollectionState) -> float:
-    w = state.count("Progressive Render Width", player)
-    h = state.count("Progressive Render Height", player)
-    max_w = world.options.progressive_render_width_max
-    max_h = world.options.progressive_render_height_max
-    width_fraction = (1 + w) / (1 + max_w)
-    height_fraction = (1 + h) / (1 + max_h)
+def render_percent_available(world: BlenderWorld, width: int, height: int) -> float:
+    max_width = world.options.progressive_render_width_max
+    max_height = world.options.progressive_render_height_max
+    width_fraction = (1 + width) / (1 + max_width)
+    height_fraction = (1 + height) / (1 + max_height)
+
     return min(1, width_fraction) * min(1, height_fraction) * 100
+
+
+def _render_percent_available_from_state(world: BlenderWorld, player: int, state: CollectionState) -> float:
+    width = state.count("Progressive Render Width", player)
+    height = state.count("Progressive Render Height", player)
+
+    return render_percent_available(world, width, height)

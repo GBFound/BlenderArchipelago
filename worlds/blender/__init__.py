@@ -17,13 +17,19 @@ class BlenderWorld(World):
 
 
     def generate_early(self) -> None:
+        self.thresholds = locations.get_thresholds(self)
         if self.options.min_percent.value >= self.options.max_percent.value:
             raise OptionError(
                 f"Minimum Similarity Percent ({self.options.min_percent.value}) "
                 f"must be lower than Maximum Similarity Percent ({self.options.max_percent.value}). "
                 f"Please fix your yaml."
             )
-        self.thresholds = locations.get_thresholds(self)
+        elif self._is_fill_error_prone():
+            raise OptionError(
+                f"Progressive Render Width and/or Height Counts are too high. "
+                f"This may cause a fill error because there are not enough low similarity checks. "
+                f"Please fix your yaml."
+            )
 
 
     def create_regions(self) -> None:
@@ -49,10 +55,46 @@ class BlenderWorld(World):
 
     def fill_slot_data(self) -> dict[str, Any]:
         return {
-            "thresholds"                      : self.thresholds,
-            "goal_percent"                    : self.options.goal_percent.value,
-            "progressive_render_width_max"    : self.options.progressive_render_width_max.value,
-            "progressive_render_height_max"   : self.options.progressive_render_height_max.value,
-            "full_arsenal_duration"           : self.options.full_arsenal_duration.value,
-            "death_link"                      : bool(self.options.death_link),
+            "thresholds"                    : self.thresholds,
+            "goal_percent"                  : self.options.goal_percent.value,
+            "progressive_render_width_max"  : self.options.progressive_render_width_max.value,
+            "progressive_render_height_max" : self.options.progressive_render_height_max.value,
+            "full_arsenal_duration"         : self.options.full_arsenal_duration.value,
+            "death_link"                    : bool(self.options.death_link),
         }
+
+    def _is_fill_error_prone(self) -> bool:
+        width = 0
+        height = 0
+        max_width = self.options.progressive_render_width_max.value
+        max_height = self.options.progressive_render_height_max.value
+        
+        # Grow the larger max dimension first to minimize area growth per step,
+        # maximizing the number of steps before the grid is fully filled for worst-case scenario.
+        grow_width_first = max_width > max_height
+
+        for threshold in self.thresholds:
+            render_percent_available = rules.render_percent_available(self, width, height)
+            if threshold > render_percent_available * rules.SAFETY_MARGIN:
+                return True
+            new_size = self._grow(width, height, max_width, max_height, grow_width_first)
+            if new_size is None:
+                return False
+            width, height = new_size
+
+        return False
+
+
+    def _grow(self, width: int, height: int, max_width: int, max_height: int, grow_width_first: bool) -> tuple[int, int]:
+        if grow_width_first:
+            if width < max_width:
+                return width + 1, height
+            elif height < max_height:
+                return width, height + 1
+            return None
+        else:
+            if height < max_height:
+                return width, height + 1
+            elif width < max_width:
+                return width + 1, height
+            return None

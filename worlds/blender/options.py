@@ -32,7 +32,6 @@ class GoalPercent(Range):
     default = 80
 
 
-# This value being too high could lead to fill errors, so range_end is low
 class ProgressiveRenderWidthMax(Range):
     """
     The number of Progressive Render Width items in the item pool.
@@ -40,11 +39,10 @@ class ProgressiveRenderWidthMax(Range):
     """
     display_name = "Progressive Render Width Count"
     range_start = 0
-    range_end = 3
+    range_end = 5
     default = 2
 
 
-# This value being too high could lead to fill errors, so range_end is low
 class ProgressiveRenderHeightMax(Range):
     """
     The number of Progressive Render Height items in the item pool.
@@ -52,7 +50,7 @@ class ProgressiveRenderHeightMax(Range):
     """
     display_name = "Progressive Render Height Count"
     range_start = 0
-    range_end = 3
+    range_end = 5
     default = 2
 
 
