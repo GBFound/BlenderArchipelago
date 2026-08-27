@@ -10,7 +10,6 @@ BASE_ID = 7897897890
 
 # Location IDs need to be unique and greater than 0.
 LOCATION_NAME_TO_ID = {}
-_PROGRESSIVE_RENDER_RANGE_END = 5
 
 _total_location_ids = 200
 
