@@ -71,7 +71,7 @@ class TrapCount(Range):
     display_name = "Trap Fill Percent"
     range_start = 0
     range_end = 100
-    default = 25
+    default = 10
 
 
 class FullArsenalDuration(Range):
@@ -82,7 +82,7 @@ class FullArsenalDuration(Range):
     display_name = "Full Arsenal Duration"
     range_start = 10
     range_end = 300
-    default = 60
+    default = 30
 
 
 class Despair(DefaultOnToggle):
