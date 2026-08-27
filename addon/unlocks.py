@@ -133,7 +133,7 @@ def _activate_filler_and_traps(item: ids.Item):
         deathlink.schedule_undo()
         popup.enqueue("Undo trap.")
     elif item == ids.Item.DESPAIR:
-        despair.despair()
+        despair.schedule_despair()
 
 
 def _resolve_materials_redirect(item: ids.Item) -> ids.Item:
