@@ -98,8 +98,10 @@ class AP_PT_Unlocked(bpy.types.Panel):
             is_unlocked = unlocks.get_item_count(item)
             unlock_text = popup.item_to_unlock_text(item)
             row = box.row()
-            if is_unlocked or unlocks.unlock_all:
+            if is_unlocked:
                 row.label(text=f"{unlock_text}", icon="UNLOCKED")
+            elif unlocks.unlock_all:
+                row.label(text=f"{unlock_text}", icon="TIME")
             else:
                 row.enabled = False
                 row.label(text=f"{unlock_text}", icon="LOCKED")
