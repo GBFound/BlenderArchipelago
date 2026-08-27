@@ -11,8 +11,8 @@ Creating simple objects and lights in object mode is one of the only things you 
 
 Render region size is restricted and will only expand when the Progressive Render Width and Progressive Render Height items are obtained.
 
-Items are found based on similarity to a target image, measured as a percentage. Every threshold, spaced at equal intervals up
-to a maximum set in the game options will send an item, and the game will be considered done when a certain target
+Items are found based on the render's similarity to a target image, measured as a percentage. Every threshold, spaced at equal intervals up
+to a maximum (set in the game options) will send an item, and the game will be considered done when a certain target
 percentage (set in the game options) is reached.
 
 If deathlink is enabled, when you undo/redo, everyone with deathlink dies. When someone with deathlink dies, you will undo to the furthest undo in history. Blender's default setting is 32 undos max in history.
