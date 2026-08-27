@@ -22,10 +22,8 @@ class ItemCounts(bpy.types.PropertyGroup):
 
 annotations = {}
 for item in ids.Item:
-    if item >= ids.Item.POPUP:
-        break
-    annotations[item.name] = bpy.props.IntProperty(name=item.name, default=0)
-    persist.item_counts[item] = 0
+    annotations[item.name] = bpy.props.IntProperty(name=item.name, default=1)
+    persist.item_counts[item] = 1
 
 ItemCounts.__annotations__ = annotations
 
@@ -54,8 +52,6 @@ def unlock_item(item: ids.Item):
 
 def clear_unlocks():
     for item in ids.Item:
-        if is_trap_or_filler(item):
-            break
         set_item_count(item, 0)
 
     bpy.context.scene.materials_unlocked_by = ""
