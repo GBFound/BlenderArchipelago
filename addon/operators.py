@@ -36,14 +36,18 @@ class AP_OT_LoadTargetImage(bpy.types.Operator):
     filter_folder: bpy.props.BoolProperty(default=True, options={"HIDDEN"})
 
     def execute(self, context):
+        camera = context.scene.camera
+        if not camera:
+            popup.enqueue("Set active camera before loading the target image.")
+            return {"FINISHED"}
+
         image = bpy.data.images.load(self.filepath)
         context.scene.ap_target_image = image.name
         persist.ap_target_image = image.name
         context.scene.render.resolution_x = image.size[0]
         context.scene.render.resolution_y = image.size[1]
         handlers.use_render_border(context.scene)
-        
-        camera = context.scene.camera
+
         bg = camera.data.background_images.new()
         bg.image = image
         camera.data.show_background_images = True
