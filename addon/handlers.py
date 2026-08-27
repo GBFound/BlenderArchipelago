@@ -14,7 +14,7 @@ def _update_similarity_percent(target_name: str):
         popup.enqueue(f"Target image \"{target_name}\" not found.")
         return
 
-    tmp_path = os.path.join(tempfile.gettempdir(), "ap_blender_render.png")
+    tmp_path = os.path.join(tempfile.gettempdir(), "blender_ap_render.png")
     scene = bpy.context.scene
     scene.render.image_settings.file_format = "PNG"
     bpy.data.images["Render Result"].save_render(tmp_path, scene = scene)
