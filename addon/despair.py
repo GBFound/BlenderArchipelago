@@ -2,7 +2,7 @@ import bpy
 import random
 from . import unlocks
 
-_TEMP_UNLOCK_DURATION_SECONDS = 60
+_TEMP_UNLOCK_DURATION_SECONDS = 30
 
 
 def schedule_despair():
