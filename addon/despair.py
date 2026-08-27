@@ -5,7 +5,11 @@ from . import unlocks
 _TEMP_UNLOCK_DURATION_SECONDS = 60
 
 
-def despair():
+def schedule_despair():
+    bpy.app.timers.register(_despair)
+
+
+def _despair():
     unlocks.temp_unlock_all_tools(_TEMP_UNLOCK_DURATION_SECONDS)
     mesh = _select_single_mesh()
     bpy.context.view_layer.objects.active = mesh
@@ -15,7 +19,8 @@ def despair():
     _delete_random_face_region(mesh)
     _set_cloth(mesh)
     _play_animation()
-    bpy.ops.view3d.view_selected()
+
+    _view_selected()
 
 
 def _select_single_mesh() -> bpy.types.Object:
@@ -148,3 +153,12 @@ def _play_animation():
     bpy.context.scene.frame_start = 1
     bpy.context.scene.frame_end = 250
     bpy.ops.screen.animation_play()
+
+
+def _view_selected():
+    for area in bpy.context.screen.areas:
+        if area.type == "VIEW_3D":
+                for region in area.regions:
+                    if region.type == 'WINDOW':
+                        with bpy.context.temp_override(area=area, region=region):
+                            bpy.ops.view3d.view_selected()
