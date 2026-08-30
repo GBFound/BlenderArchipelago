@@ -87,7 +87,7 @@ class FullArsenalDuration(Range):
 
 class Despair(DefaultOnToggle):
     """
-    Enables the despair item.
+    Enables the despair item. (Despair item may cause lag.)
     If disabled, the item will instead be undo traps.
     """
     display_name = "Despair"
