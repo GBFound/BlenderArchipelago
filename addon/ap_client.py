@@ -24,6 +24,9 @@ _connected:           bool                                      = False
 # Use certifi's up-to-date CA bundle instead of Blender's outdated one
 _ssl_context:         ssl.SSLContext                            = ssl.create_default_context(cafile=certifi.where())
 
+# From CommonClient.py
+_MAX_SIZE: int = 16 * 1024 * 1024  # 16 MB of max incoming packet size
+
 
 def connect(host: str, port: str, slot_name: str, password: str):
     global _thread
@@ -105,7 +108,12 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
     try:
         print(f"[Blender AP] Connecting to {url}.")
         ssl_context = _ssl_context if scheme == "wss" else None
-        async with websockets.connect(url, compression="deflate", ssl=ssl_context) as ws:
+        async with websockets.connect(
+            url,
+            compression="deflate",
+            ssl=ssl_context,
+            max_size=_MAX_SIZE,
+        ) as ws:
             _ws = ws
 
             await ws.send(json.dumps([{
