@@ -2,7 +2,7 @@ schema_version = "1.0.0"
 
 # Example of manifest file for a Blender extension
 # Change the values according to your extension
-id = "archipelago"
+id = "blender_ap"
 version = "1.0.2"
 name = "Archipelago"
 tagline = "Connects to Archipelago, a multiworld, multi-game randomizer."
