@@ -45,7 +45,7 @@ def connect(host: str, port: str, slot_name: str, password: str):
 def disconnect():
     if _ws:
         asyncio.run_coroutine_threadsafe(_ws.close(), _loop)
-        print("[Blender AP] Disconnected.")
+        print("[Archipelago] Disconnected.")
 
 
 def send_check(location_id: int):
@@ -106,7 +106,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
     url = f"{scheme}://{host}:{port}"
 
     try:
-        print(f"[Blender AP] Connecting to {url}.")
+        print(f"[Archipelago] Connecting to {url}.")
         ssl_context = _ssl_context if scheme == "wss" else None
         async with websockets.connect(
             url,
@@ -134,7 +134,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
 
     except websockets.InvalidMessage as e:
         if not secure:
-            print(f"[Blender AP] {url} appears to require TLS, retrying as wss://.")
+            print(f"[Archipelago] {url} appears to require TLS, retrying as wss://.")
             await _connect(host, port, slot_name, password, secure=True)
         else:
             popup.enqueue(f"Connection error: {e}")
@@ -155,7 +155,7 @@ async def _handle_packet(packet: dict):
     cmd = packet.get("cmd")
 
     if cmd == "RoomInfo":
-        print("[Blender AP] Connected to room.")
+        print("[Archipelago] Connected to room.")
         data_package_checksums = packet.get("datapackage_checksums")
         for game in data_package_checksums:
             data_package_checksum = data_package_checksums.get(game)
@@ -164,7 +164,7 @@ async def _handle_packet(packet: dict):
 
     elif cmd == "DataPackage":
         data = packet.get("data")
-        print(f"[Blender AP] Received data package for {list(data.get('games').keys())}.")
+        print(f"[Archipelago] Received data package for {list(data.get('games').keys())}.")
         ap_data_package.save_data_package(data)
 
     elif cmd == "Connected":

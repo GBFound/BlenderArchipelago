@@ -1,4 +1,4 @@
-# BlenderArchipelago
+# Blender Archipelago
 
 ## What is this?
 
@@ -47,4 +47,4 @@ You can have multiple worlds of the same game (each with different options), as 
 ### Using the add-on in Blender.
 
 - Open Blender and select `Edit > Preferences > Add-Ons`. Open `Install from Disk` and select `BlenderArchipelago.zip`.
-- Now in `View 3D > Sidebar > Blender AP`, and you will be asked for connection info such as the host, port, and slot name. By default, archipelago.gg rooms have no password.
+- Now in `View 3D > Sidebar > Archipelago`, and you will be asked for connection info such as the host, port, and slot name. By default, archipelago.gg rooms have no password.

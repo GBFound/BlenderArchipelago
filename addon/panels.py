@@ -7,7 +7,7 @@ class AP_PT_Similarity(bpy.types.Panel):
     bl_idname      = "AP_PT_Similarity"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category    = "Blender AP"
+    bl_category    = "Archipelago"
     bl_order = 0
 
     @classmethod
@@ -53,7 +53,7 @@ class AP_PT_Target(bpy.types.Panel):
     bl_idname      = "AP_PT_Target"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category    = "Blender AP"
+    bl_category    = "Archipelago"
     bl_order = 1
 
     @classmethod
@@ -73,7 +73,7 @@ class AP_PT_Unlocked(bpy.types.Panel):
     bl_idname      = "AP_PT_Unlocked"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category    = "Blender AP"
+    bl_category    = "Archipelago"
     bl_order = 2
 
     @classmethod
@@ -112,7 +112,7 @@ class AP_PT_Messages(bpy.types.Panel):
     bl_idname      = "AP_PT_Messages"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category    = "Blender AP"
+    bl_category    = "Archipelago"
     bl_order = 3
 
     @classmethod
@@ -134,7 +134,7 @@ class AP_PT_Connection(bpy.types.Panel):
     bl_idname      = "AP_PT_Connection"
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
-    bl_category    = "Blender AP"
+    bl_category    = "Archipelago"
     bl_order = 4
 
     def draw(self, context):

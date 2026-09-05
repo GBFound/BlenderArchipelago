@@ -35,4 +35,4 @@ def _schedule():
         # Returning None stops the timer from repeating
         lambda: bpy.ops.ap.popup("INVOKE_DEFAULT", message=message) and None,
     )
-    print(f"[Blender AP] {message}")
+    print(f"[Archipelago] {message}")

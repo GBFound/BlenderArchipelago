@@ -4,7 +4,7 @@ from . import ap_client, deathlink, handlers, persist, popup
 
 class AP_OT_Popup(bpy.types.Operator):
     """Pop-Up"""
-    bl_label  = "Blender AP"
+    bl_label  = "Archipelago"
     bl_idname = "ap.popup"
 
     message: bpy.props.StringProperty(default="")
@@ -124,7 +124,7 @@ class AP_OT_Debug(bpy.types.Operator):
 Does not work unless invoked by the user.
 Was to be used for less obtrusive popups.
 class AP_OT_Report(bpy.types.Operator):
-    bl_label  = "Blender AP"
+    bl_label  = "Archipelago"
     bl_idname = "ap.report"
 
     message: bpy.props.StringProperty()
