@@ -150,20 +150,22 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
 
 
 async def _handle_packet(packet: dict):
-    global _connected, _slot_info, _slot_id
+    global _connected, _room_info, _slot_info, _slot_id
 
     cmd = packet.get("cmd")
 
     if cmd == "RoomInfo":
         print("[Blender AP] Connected to room.")
         data_package_checksums = packet.get("datapackage_checksums")
-        data_package_checksum = data_package_checksums.get("Blender")
-        if not ap_data_package.is_cached() or ap_data_package.is_outdated(data_package_checksum):
-            await _send_get_data_package()
+        for game in data_package_checksums:
+            data_package_checksum = data_package_checksums.get(game)
+            if ap_data_package.is_outdated(data_package_checksum, game):
+                await _send_get_data_package([game])
 
     elif cmd == "DataPackage":
-        print("[Blender AP] Received data package.")
-        ap_data_package.save_data_package(packet.get("data"))
+        data = packet.get("data")
+        print(f"[Blender AP] Received data package for {list(data.get('games').keys())}.")
+        ap_data_package.save_data_package(data)
 
     elif cmd == "Connected":
         _connected = True
@@ -285,9 +287,9 @@ async def _resync():
         await _send_checks(checks)
 
 
-async def _send_get_data_package():
+async def _send_get_data_package(games: list):
     if _ws:
-        await _ws.send(json.dumps([{"cmd": "GetDataPackage"}]))
+        await _ws.send(json.dumps([{"cmd": "GetDataPackage", "games": games}]))
 
 
 async def _send_sync():

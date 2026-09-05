@@ -1,34 +1,42 @@
 import bpy
 import json
-from . import persist
+from . import persist, popup
 
 
-def save_data_package(data):
+def save_data_package(data: dict):
     text = bpy.data.texts.get("ap_data_package")
+    data_package = load_data_package()
     if not text:
         text = bpy.data.texts.new("ap_data_package")
+    if not data_package:
+        text.clear
+        text.write(json.dumps({"games": {}}))
+        data_package = {"games": {}}
+
+    games = data.get("games")
+    for game in games:
+        data_package["games"][game] = games.get(game)
+
     text.clear()
-    text.write(json.dumps(data))
-    persist.ap_data_package = data
+    text.write(json.dumps(data_package))
+    persist.ap_data_package = data_package
 
 
 def load_data_package() -> dict:
-    text = bpy.data.texts.get("ap_data_package")
+    text = bpy.data.texts.get(f"ap_data_package")
     if not text:
         return {}
-    return json.loads(text.as_string())
+    try:
+        return json.loads(text.as_string())
+    except json.JSONDecodeError:
+        return {}
 
 
-def is_cached() -> bool:
-    text = bpy.data.texts.get("ap_data_package")
-    if text:
-        return True
-    return False
-
-
-def is_outdated(data_package_checksum: str) -> bool:
+def is_outdated(data_package_checksum: str, game: str) -> bool:
     local_data_package = load_data_package()
-    game_data = local_data_package.get("games", {}).get("Blender")
+    if not local_data_package:
+        return True
+    game_data = local_data_package.get("games", {}).get(game)
     if game_data is None:
         return True
     local_data_package_checksum = game_data.get("checksum")
