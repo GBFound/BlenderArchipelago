@@ -172,7 +172,7 @@ async def _handle_packet(packet: dict):
         _slot_info = packet.get("slot_info")
         _slot_id = packet.get("slot")
         handlers.schedule_use_render_border()
-        initialize_from_slot_data(packet)
+        _initialize_from_slot_data(packet)
         unlocks.clear_unlocks()
         unlocks.schedule_last_index(0)
         bpy.context.scene.ap_messages.clear()
@@ -233,7 +233,7 @@ async def _handle_packet(packet: dict):
             _receive_deathlink(cause)
 
 
-def initialize_from_slot_data(packet: dict):
+def _initialize_from_slot_data(packet: dict):
     slot_data = packet.get("slot_data")
     checked_locations = packet.get("checked_locations")
     goal_percent = slot_data.get("goal_percent")
