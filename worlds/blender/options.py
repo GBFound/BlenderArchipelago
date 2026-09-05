@@ -87,7 +87,7 @@ class FullArsenalDuration(Range):
 
 class Despair(DefaultOnToggle):
     """
-    Enables the despair item. (Despair item may cause lag.)
+    Enables the despair item. (Despair item may cause lag due to using Blender's physics simulation.)
     If disabled, the item will instead be undo traps.
     """
     display_name = "Despair"
