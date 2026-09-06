@@ -78,9 +78,10 @@ class FullArsenalDuration(Range):
     """
     The number of seconds full arsenal will last for.
     Receiving the full arsenal item will remove all tool restrictions, as if every tool was unlocked.
+    A value of 0 will disable the item. If disabled, the item will instead be replaced with Pop Ups.
     """
     display_name = "Full Arsenal Duration"
-    range_start = 10
+    range_start = 0
     range_end = 300
     default = 30
 
@@ -88,7 +89,7 @@ class FullArsenalDuration(Range):
 class Despair(DefaultOnToggle):
     """
     Enables the despair item. (Despair item may cause lag due to using Blender's physics simulation.)
-    If disabled, the item will instead be undo traps.
+    If disabled, the item will instead be replaced with Undo traps.
     """
     display_name = "Despair"
 
