@@ -56,7 +56,7 @@ def create_items(world: BlenderWorld) -> None:
         elif name == "Progressive Render Height":
             for _ in range(world.options.progressive_render_height_max):
                 itempool.append(world.create_item(name))
-        elif classification != ItemClassification.filler or classification != ItemClassification.trap:
+        elif classification == ItemClassification.progression or classification != ItemClassification.useful:
             itempool.append(world.create_item(name))
 
     while len(itempool) != world.options.check_count:
