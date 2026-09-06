@@ -51,6 +51,7 @@ class AP_OT_LoadTargetImage(bpy.types.Operator):
         bg = camera.data.background_images.new()
         bg.image = image
         camera.data.show_background_images = True
+        camera.data.background_images[0].alpha = 1
         
         return {"FINISHED"}
 
