@@ -114,11 +114,11 @@ def _modifiers_locked(scene, depsgraph):
     
     obj = bpy.context.active_object
     if obj and obj.modifiers:
-        if (_clear_other_modifiers(obj)):
+        if (_clear_legacy_modifiers(obj)):
             popup.enqueue("Modifiers are locked.")
 
 
-def _clear_other_modifiers(obj) -> bool:
+def _clear_legacy_modifiers(obj) -> bool:
     did_clear = False
     for mod in list(obj.modifiers):  # list() to avoid mutating while iterating
         if mod.type != 'NODES':
