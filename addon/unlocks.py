@@ -53,7 +53,7 @@ def unlock_item(item: ids.Item):
 
     if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
         redraw.render_border()
-    redraw.schedule_redraw_panels()
+    redraw.panels()
 
 
 def clear_unlocks():
@@ -67,7 +67,7 @@ def is_trap_or_filler(item: ids.Item) -> bool:
     return item >= ids.Item.POPUP
 
 
-def schedule_last_index(index: int):
+def set_last_index(index: int):
     bpy.app.timers.register(lambda: _set_last_index(index))
 
 
@@ -95,7 +95,7 @@ def temp_unlock_all_tools(duration=None):
 def _temp_unlock_countdown_timer() -> int:
     global temp_unlock_countdown_timer
 
-    redraw.schedule_redraw_panels()
+    redraw.panels()
     if popup.can_show_next:  # Pause timer when there is a popup to be nice
         temp_unlock_countdown_timer -= 1
     if not temp_unlock_countdown_timer:
@@ -108,7 +108,7 @@ def _temp_unlock_countdown_timer() -> int:
 def _relock_all_tools():
     global unlock_all
     unlock_all = False
-    redraw.schedule_redraw_panels()
+    redraw.panels()
     popup.enqueue("Temporary unlocks have ended.")
 
 
@@ -130,10 +130,10 @@ def _activate_filler_and_traps(item: ids.Item):
     elif item == ids.Item.FULL_ARSENAL:
         temp_unlock_all_tools()
     elif item == ids.Item.UNDO:
-        deathlink.schedule_undo()
+        deathlink.undo()
         popup.enqueue("Undo trap.")
     elif item == ids.Item.DESPAIR:
-        despair.schedule_despair()
+        despair.despair()
 
 
 def _resolve_materials_redirect(item: ids.Item) -> ids.Item:

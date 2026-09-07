@@ -5,7 +5,7 @@ from . import unlocks
 _TEMP_UNLOCK_DURATION_SECONDS = 30
 
 
-def schedule_despair():
+def despair():
     bpy.app.timers.register(_despair)
 
 

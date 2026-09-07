@@ -16,7 +16,7 @@ def choose_message(do: str) -> str:
     return message
 
 
-def schedule_undo():
+def undo():
     bpy.app.timers.register(_undo)
 
 

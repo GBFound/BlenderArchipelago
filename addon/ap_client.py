@@ -95,7 +95,7 @@ def send_deathlink(do: str):
 
 
 def _receive_deathlink(cause: str):
-    deathlink.schedule_undo()
+    deathlink.undo()
     deathlink.enqueue_popup(cause)
 
 
@@ -146,7 +146,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
     finally:
         _ws = None
         _connected = False
-        redraw.schedule_redraw_panels()
+        redraw.panels()
 
 
 async def _handle_packet(packet: dict):
@@ -174,9 +174,9 @@ async def _handle_packet(packet: dict):
         redraw.render_border()
         _initialize_from_slot_data(packet)
         unlocks.clear_unlocks()
-        unlocks.schedule_last_index(0)
+        unlocks.set_last_index(0)
         bpy.context.scene.ap_messages.clear()
-        redraw.schedule_redraw_panels()
+        redraw.panels()
         if _pending_checks:
             # Shallow copy to avoid mutation during send
             with _pending_checks_lock:
@@ -269,7 +269,7 @@ async def _handle_received_items(packet: dict):
         item = ids.ID_TO_ITEM.get(item_id)
         unlocks.unlock_item(item)
 
-    unlocks.schedule_last_index(packet_index + len(items))
+    unlocks.set_last_index(packet_index + len(items))
     unlocks.resyncing = False
     handlers.clear_locked_features()
 

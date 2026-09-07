@@ -18,7 +18,7 @@ def add_message(text: str):
     message.text = text
     messages.move(len(messages) - 1, 0)
     bpy.context.scene.ap_messages_index = 0
-    redraw.schedule_redraw_panels()
+    redraw.panels()
 
 
 def register():
