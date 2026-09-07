@@ -92,7 +92,7 @@ class AP_PT_Unlocked(bpy.types.Panel):
         for item in ids.Item:
             if unlocks.is_trap_or_filler(item):
                 break
-            if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
+            if unlocks.is_progressive_render_border(item):
                 continue
 
             is_unlocked = unlocks.get_item_count(item)

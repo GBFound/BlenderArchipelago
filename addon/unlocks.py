@@ -51,7 +51,7 @@ def unlock_item(item: ids.Item):
     item = _resolve_materials_redirect(item)
     set_item_count(item, get_item_count(item) + 1)
 
-    if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
+    if is_progressive_render_border(item):
         redraw.render_border()
     redraw.panels()
 
@@ -61,7 +61,11 @@ def clear_unlocks():
         set_item_count(item, 0)
 
     bpy.context.scene.materials_unlocked_by = ""
-    
+
+
+def is_progressive_render_border(item: ids.Item) -> bool:
+    return item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT
+
 
 def is_trap_or_filler(item: ids.Item) -> bool:
     return item >= ids.Item.POPUP
