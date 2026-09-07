@@ -162,5 +162,6 @@ def register():
 
 
 def unregister():
+    del bpy.types.Scene.materials_unlocked_by
     del bpy.types.Scene.ap_last_item_index
     del bpy.types.Scene.item_counts
