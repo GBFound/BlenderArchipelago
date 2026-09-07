@@ -143,6 +143,9 @@ def _resolve_materials_redirect(item: ids.Item) -> ids.Item:
         item = ids.Item[materials_unlocked_by]
         unlock_text = popup.item_to_unlock_text(item)
         _popup_unless_resyncing(f"Already have Materials. Unlocked {unlock_text} instead.")
+    elif item == ids.Item.MATERIALS and not materials_unlocked_by:
+        bpy.context.scene.materials_unlocked_by = item.name
+        persist.materials_unlocked_by = item.name
     
     return item
 
