@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import ap_data_package, ap_uuid, deathlink, explosion, handlers, ids, messages, popup, progress, redraw, thresholds, unlocks
+from . import ap_data_package, ap_uuid, deathlink, explosion, ids, messages, persist, popup, progress, redraw, thresholds, unlocks
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []
@@ -253,7 +253,7 @@ async def _handle_received_items(packet: dict):
     if not items:
         return
 
-    last_index = bpy.context.scene.ap_last_item_index
+    last_index = persist.ap_last_item_index  # bpy.context.scene.ap_last_item_index may not update in time
 
     if packet_index == 0:
         unlocks.clear_unlocks()

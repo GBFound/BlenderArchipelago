@@ -70,6 +70,7 @@ def is_trap_or_filler(item: ids.Item) -> bool:
 
 
 def set_last_index(index: int):
+    persist.ap_last_item_index = index
     bpy.app.timers.register(lambda: _set_last_index(index))
 
 
