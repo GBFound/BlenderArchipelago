@@ -270,7 +270,6 @@ async def _handle_received_items(packet: dict):
         unlocks.unlock_item(item, resyncing)
 
     unlocks.set_last_index(packet_index + len(items))
-    handlers.clear_locked_features()  # TODO Move to clear_unlocks
 
 
 async def _resync():
