@@ -23,10 +23,10 @@ def _update_similarity_percent(target_name: str):
 
     try:
         score = similarity.compare_images(render, target)
-        bpy.context.scene.difference = score - bpy.context.scene.current_percent
-        persist.difference = bpy.context.scene.difference
-        bpy.context.scene.current_percent = score
-        persist.current_percent = score
+        bpy.context.scene.ap_difference = score - bpy.context.scene.ap_current_percent
+        persist.ap_difference = bpy.context.scene.ap_difference
+        bpy.context.scene.ap_current_percent = score
+        persist.ap_current_percent = score
         print(f"[Archipelago] Similarity: {score:.3f}%")
     finally:
         bpy.data.images.remove(render)
@@ -36,7 +36,7 @@ def _update_similarity_percent(target_name: str):
 
 def _update_checks():
     for i, (threshold, checked) in enumerate(sorted(thresholds.data.items())):
-        if bpy.context.scene.current_percent >= threshold:
+        if bpy.context.scene.ap_current_percent >= threshold:
             if not checked:
                 location_id = ids.BASE_ID + i
                 thresholds.data[threshold] = True
@@ -46,7 +46,7 @@ def _update_checks():
 
 
 def _update_goal():
-    if bpy.context.scene.current_percent >= progress.goal_percent:
+    if bpy.context.scene.ap_current_percent >= progress.goal_percent:
         for threshold in thresholds.data:
             thresholds.data[threshold] = True
         ap_client.send_goal_complete()
@@ -209,7 +209,7 @@ def _clear_compositor(scene = None, depsgraph = None):
 
 @persistent
 def _persist_to_blender_properties(scene, depsgraph):
-    for item, count in persist.item_counts.items():
+    for item, count in persist.ap_item_counts.items():
         unlocks.set_item_count(item, count)
 
     ap_data_package.save_data_package(persist.ap_data_package)
@@ -221,8 +221,8 @@ def _persist_to_blender_properties(scene, depsgraph):
 
 @persistent
 def _blender_properties_to_persist(scene, depsgraph):
-    for item in persist.item_counts:
-        persist.item_counts[item] = unlocks.get_item_count(item)
+    for item in persist.ap_item_counts:
+        persist.ap_item_counts[item] = unlocks.get_item_count(item)
 
     persist.ap_data_package = ap_data_package.load_data_package()
     

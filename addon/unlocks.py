@@ -25,20 +25,20 @@ for item in ids.Item:
     if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
         item_count = 0
     annotations[item.name] = bpy.props.IntProperty(name=item.name, default=item_count)
-    persist.item_counts[item] = item_count
+    persist.ap_item_counts[item] = item_count
 
 ItemCounts.__annotations__ = annotations
 
 
 def get_item_count(item: ids.Item) -> int:
-    counts = bpy.context.scene.item_counts
+    counts = bpy.context.scene.ap_item_counts
     return getattr(counts, item.name)
 
 
 def set_item_count(item: ids.Item, value: int):
-    counts = bpy.context.scene.item_counts
+    counts = bpy.context.scene.ap_item_counts
     setattr(counts, item.name, value)
-    persist.item_counts[item] = value
+    persist.ap_item_counts[item] = value
 
 
 def unlock_item(item: ids.Item, resyncing: bool):
@@ -58,7 +58,7 @@ def unlock_item(item: ids.Item, resyncing: bool):
 def clear_unlocks():
     for item in ids.Item:
         set_item_count(item, 0)
-    bpy.context.scene.materials_unlocked_by = ""
+    bpy.context.scene.ap_materials_unlocked_by = ""
 
 
 def is_progressive_render_border(item: ids.Item) -> bool:
@@ -139,19 +139,19 @@ def _activate_filler_and_traps(item: ids.Item):
 
 
 def _resolve_materials_redirect(item: ids.Item, resyncing: bool) -> ids.Item:
-    materials_unlocked_by = bpy.context.scene.materials_unlocked_by
-    if item in _MATERIALS_DEPENDENTS and not materials_unlocked_by:
-        bpy.context.scene.materials_unlocked_by = item.name
-        persist.materials_unlocked_by = item.name
+    ap_materials_unlocked_by = bpy.context.scene.ap_materials_unlocked_by
+    if item in _MATERIALS_DEPENDENTS and not ap_materials_unlocked_by:
+        bpy.context.scene.ap_materials_unlocked_by = item.name
+        persist.ap_materials_unlocked_by = item.name
         item = ids.Item.MATERIALS
         _popup_unless_resyncing("Does not have Materials. Unlocked Materials instead.", resyncing)
-    elif item == ids.Item.MATERIALS and materials_unlocked_by and not get_item_count(ids.Item[materials_unlocked_by]):
-        item = ids.Item[materials_unlocked_by]
+    elif item == ids.Item.MATERIALS and ap_materials_unlocked_by and not get_item_count(ids.Item[ap_materials_unlocked_by]):
+        item = ids.Item[ap_materials_unlocked_by]
         unlock_text = popup.item_to_unlock_text(item)
         _popup_unless_resyncing(f"Already have Materials. Unlocked {unlock_text} instead.", resyncing)
-    elif item == ids.Item.MATERIALS and not materials_unlocked_by:
-        bpy.context.scene.materials_unlocked_by = item.name
-        persist.materials_unlocked_by = item.name
+    elif item == ids.Item.MATERIALS and not ap_materials_unlocked_by:
+        bpy.context.scene.ap_materials_unlocked_by = item.name
+        persist.ap_materials_unlocked_by = item.name
     
     return item
 
@@ -162,12 +162,12 @@ def _popup_unless_resyncing(message: str, resyncing: bool):
 
 
 def register():
-    bpy.types.Scene.item_counts = bpy.props.PointerProperty(type=ItemCounts)
+    bpy.types.Scene.ap_item_counts = bpy.props.PointerProperty(type=ItemCounts)
     bpy.types.Scene.ap_last_item_index = bpy.props.IntProperty()
-    bpy.types.Scene.materials_unlocked_by = bpy.props.StringProperty()
+    bpy.types.Scene.ap_materials_unlocked_by = bpy.props.StringProperty()
 
 
 def unregister():
-    del bpy.types.Scene.materials_unlocked_by
+    del bpy.types.Scene.ap_materials_unlocked_by
     del bpy.types.Scene.ap_last_item_index
-    del bpy.types.Scene.item_counts
+    del bpy.types.Scene.ap_item_counts

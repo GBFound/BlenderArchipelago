@@ -9,10 +9,10 @@ def initialize_progress(new_goal_percent: int):
 
 
 def register():
-    bpy.types.Scene.current_percent = bpy.props.FloatProperty()
-    bpy.types.Scene.difference = bpy.props.FloatProperty()
+    bpy.types.Scene.ap_current_percent = bpy.props.FloatProperty()
+    bpy.types.Scene.ap_difference = bpy.props.FloatProperty()
 
 
 def unregister():
-    del bpy.types.Scene.difference
-    del bpy.types.Scene.current_percent
+    del bpy.types.Scene.ap_difference
+    del bpy.types.Scene.ap_current_percent

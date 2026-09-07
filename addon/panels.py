@@ -18,14 +18,14 @@ class AP_PT_Similarity(bpy.types.Panel):
         layout = self.layout
 
         box = layout.box()
-        percent = bpy.context.scene.current_percent
+        percent = bpy.context.scene.ap_current_percent
         goal = progress.goal_percent
 
-        difference = bpy.context.scene.difference
+        ap_difference = bpy.context.scene.ap_difference
         icon = "ARROW_LEFTRIGHT"
-        if difference > 0:
+        if ap_difference > 0:
             icon = "SORT_DESC"
-        elif difference < 0:
+        elif ap_difference < 0:
             icon = "SORT_ASC"
         
         if percent != 0:
