@@ -159,15 +159,3 @@ def _resolve_materials_redirect(item: ids.Item, resyncing: bool) -> ids.Item:
 def _popup_unless_resyncing(message: str, resyncing: bool):
     if not resyncing:
         popup.enqueue(message)
-
-
-def register():
-    bpy.types.Scene.ap_item_counts = bpy.props.PointerProperty(type=ItemCounts)
-    bpy.types.Scene.ap_last_item_index = bpy.props.IntProperty()
-    bpy.types.Scene.ap_materials_unlocked_by = bpy.props.StringProperty()
-
-
-def unregister():
-    del bpy.types.Scene.ap_materials_unlocked_by
-    del bpy.types.Scene.ap_last_item_index
-    del bpy.types.Scene.ap_item_counts

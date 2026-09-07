@@ -19,13 +19,3 @@ def add_message(text: str):
     messages.move(len(messages) - 1, 0)
     bpy.context.scene.ap_messages_index = 0
     redraw.panels()
-
-
-def register():
-    bpy.types.Scene.ap_messages = bpy.props.CollectionProperty(type=Message)
-    bpy.types.Scene.ap_messages_index = bpy.props.IntProperty()
-
-
-def unregister():
-    del bpy.types.Scene.ap_messages_index
-    del bpy.types.Scene.ap_messages
