@@ -8,6 +8,7 @@ ap_password              : str                 = ""
 
 # Target image
 ap_target_image          : str                 = ""
+ap_target_image_filepath : str                 = ""
 
 # Progress tracking
 ap_current_percent       : int                 = 0
@@ -30,6 +31,7 @@ SIMPLE_SCENE_FIELDS = [
     "ap_password",
 
     "ap_target_image",
+    "ap_target_image_filepath",
 
     "ap_current_percent",
     "ap_difference",

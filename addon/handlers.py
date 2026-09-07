@@ -245,6 +245,9 @@ def _clear_locked_features(scene = None, depsgraph = None):
 
 @persistent
 def use_render_border(scene = None, depsgraph = None):
+    if persist.ap_target_image_filepath:
+        bpy.data.images.load(persist.ap_target_image_filepath)
+
     if scene is None:
         scene = bpy.context.scene
     scene.render.use_border = True

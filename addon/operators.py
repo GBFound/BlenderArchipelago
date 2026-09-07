@@ -44,6 +44,7 @@ class AP_OT_LoadTargetImage(bpy.types.Operator):
         image = bpy.data.images.load(self.filepath)
         context.scene.ap_target_image = image.name
         persist.ap_target_image = image.name
+        persist.ap_target_image_filepath = self.filepath
         context.scene.render.resolution_x = image.size[0]
         context.scene.render.resolution_y = image.size[1]
         redraw.render_border()

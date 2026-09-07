@@ -35,6 +35,7 @@ _properties = {
         name="Target Image",
         description="The target image to compare renders against",
     ),
+    "ap_target_image_filepath": bpy.props.StringProperty(),
 
     # Progress tracking
     "ap_current_percent": bpy.props.FloatProperty(),
