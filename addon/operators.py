@@ -16,7 +16,7 @@ class AP_OT_Popup(bpy.types.Operator):
         popup.show_next()
 
     def invoke(self, context, event):
-        width = max(100, len(self.message) * 6)
+        width = max(110, len(self.message) * 6)
         return context.window_manager.invoke_popup(self, width=width)
 
     def draw(self, context):
