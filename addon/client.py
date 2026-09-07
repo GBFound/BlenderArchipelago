@@ -58,6 +58,7 @@ def send_check(location_id: int):
 
 def send_goal_complete():
     if _connected:
+        popup.enqueue("Goal completed!")
         asyncio.run_coroutine_threadsafe(_send_goal_complete(), _loop)
 
 
