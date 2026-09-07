@@ -8,7 +8,7 @@ class AP_PT_Similarity(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Archipelago"
-    bl_order = 0
+    bl_order       = 0
 
     @classmethod
     def poll(cls, context):
@@ -54,7 +54,7 @@ class AP_PT_Target(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Archipelago"
-    bl_order = 1
+    bl_order       = 1
 
     @classmethod
     def poll(cls, context):
@@ -74,7 +74,7 @@ class AP_PT_Unlocked(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Archipelago"
-    bl_order = 2
+    bl_order       = 2
 
     @classmethod
     def poll(cls, context):
@@ -113,7 +113,7 @@ class AP_PT_Messages(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Archipelago"
-    bl_order = 3
+    bl_order       = 3
 
     @classmethod
     def poll(cls, context):
@@ -135,7 +135,7 @@ class AP_PT_Connection(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Archipelago"
-    bl_order = 4
+    bl_order       = 4
 
     def draw(self, context):
         connected = ap_client.is_connected() or ap_client.is_connecting()
