@@ -134,7 +134,6 @@ def _activate_filler_and_traps(item: ids.Item):
         temp_unlock_all_tools()
     elif item == ids.Item.UNDO:
         deathlink.undo()
-        popup.enqueue("Undo trap.")
     elif item == ids.Item.DESPAIR:
         despair.despair()
 
