@@ -48,7 +48,10 @@ class AP_OT_LoadTargetImage(bpy.types.Operator):
         context.scene.render.resolution_y = image.size[1]
         redraw.render_border()
 
-        bg = camera.data.background_images.new()
+        if camera.data.background_images:
+            bg = camera.data.background_images[0]
+        else:
+            bg = camera.data.background_images.new()
         bg.image = image
         camera.data.show_background_images = True
         camera.data.background_images[0].alpha = 1
