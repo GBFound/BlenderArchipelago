@@ -82,8 +82,8 @@ class FullArsenalDuration(Range):
     """
     display_name = "Full Arsenal Duration"
     range_start = 0
-    range_end = 300
-    default = 30
+    range_end = 60
+    default = 15
 
 
 class Despair(DefaultOnToggle):
