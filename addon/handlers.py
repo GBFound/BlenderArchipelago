@@ -245,10 +245,6 @@ def clear_locked_features(scene = None, depsgraph = None):
     _clear_compositor()
 
 
-def schedule_use_render_border():
-    bpy.app.timers.register(use_render_border)
-
-
 @persistent
 def use_render_border(scene = None, depsgraph = None):
     if scene is None:
@@ -293,6 +289,8 @@ _handlers = [
     # (bpy.app.handlers.blend_import_post,     _import_disabled),  Too annoying
     (bpy.app.handlers.render_init,           use_render_border),
     (bpy.app.handlers.render_complete,       _update_state),
+    (bpy.app.handlers.undo_post,             use_render_border),
+    (bpy.app.handlers.redo_post,             use_render_border),
     (bpy.app.handlers.undo_post,             _deathlink_undo),
     (bpy.app.handlers.redo_post,             _deathlink_redo),
     (bpy.app.handlers.undo_post,             _persist_to_blender_properties),

@@ -171,7 +171,7 @@ async def _handle_packet(packet: dict):
         _connected = True
         _slot_info = packet.get("slot_info")
         _slot_id = packet.get("slot")
-        handlers.schedule_use_render_border()
+        redraw.render_border()
         _initialize_from_slot_data(packet)
         unlocks.clear_unlocks()
         unlocks.schedule_last_index(0)

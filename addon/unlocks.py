@@ -22,6 +22,9 @@ class ItemCounts(bpy.types.PropertyGroup):
 
 annotations = {}
 for item in ids.Item:
+    if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
+        annotations[item.name] = bpy.props.IntProperty(name=item.name, default=0)
+        persist.item_counts[item] = 0
     annotations[item.name] = bpy.props.IntProperty(name=item.name, default=1)
     persist.item_counts[item] = 1
 
@@ -47,6 +50,9 @@ def unlock_item(item: ids.Item):
 
     item = _resolve_materials_redirect(item)
     set_item_count(item, get_item_count(item) + 1)
+
+    if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
+        redraw.render_border()
     redraw.schedule_redraw_panels()
 
 
@@ -70,8 +76,6 @@ def initialize_unlocks(new_width_max: int, new_height_max: int, new_temp_unlock_
 
     progressive_render_width_max = new_width_max
     progressive_render_height_max = new_height_max
-    persist.progressive_render_width = new_width_max
-    persist.progressive_render_height = new_height_max
     temp_unlock_duration_seconds = new_temp_unlock_duration_seconds
 
 

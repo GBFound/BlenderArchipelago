@@ -1,4 +1,10 @@
 import bpy
+from . import handlers
+
+
+def render_border():
+    bpy.app.timers.register(handlers.use_render_border)
+
 
 def schedule_redraw_panels():
     bpy.app.timers.register(_redraw_panels)
