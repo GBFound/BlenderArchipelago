@@ -59,7 +59,6 @@ def unlock_item(item: ids.Item):
 def clear_unlocks():
     for item in ids.Item:
         set_item_count(item, 0)
-
     bpy.context.scene.materials_unlocked_by = ""
 
 
