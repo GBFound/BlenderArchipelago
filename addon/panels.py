@@ -47,7 +47,7 @@ class AP_PT_Similarity(bpy.types.Panel):
 
         completed_text = ""
         if bpy.context.scene.ap_current_percent >= progress.goal_percent:
-            completed_text = " - Complete!"
+            completed_text = " - Completed!"
         box.label(text=f"Goal: {goal:.1f}%{completed_text}")
 
 
