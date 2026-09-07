@@ -25,8 +25,9 @@ for item in ids.Item:
     if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
         annotations[item.name] = bpy.props.IntProperty(name=item.name, default=0)
         persist.item_counts[item] = 0
-    annotations[item.name] = bpy.props.IntProperty(name=item.name, default=1)
-    persist.item_counts[item] = 1
+    else:
+        annotations[item.name] = bpy.props.IntProperty(name=item.name, default=1)
+        persist.item_counts[item] = 1
 
 ItemCounts.__annotations__ = annotations
 
