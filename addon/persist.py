@@ -17,10 +17,13 @@ materials_unlocked_by     : str                 = ""
 SIMPLE_SCENE_FIELDS = [
     "current_percent",
     "difference",
+    "progressive_render_width",
+    "progressive_render_height",
     "ap_last_item_index",
     "ap_target_image",
     "ap_host",
     "ap_port",
     "ap_slot_name",
     "ap_password",
+    "materials_unlocked_by",
 ]
