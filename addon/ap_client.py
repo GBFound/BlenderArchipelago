@@ -263,15 +263,14 @@ async def _handle_received_items(packet: dict):
 
     for i, item in enumerate(items):
         item_index = packet_index + i
-        unlocks.resyncing = item_index < last_index
+        resyncing = item_index < last_index
 
         item_id = item.get("item")
         item = ids.ID_TO_ITEM.get(item_id)
-        unlocks.unlock_item(item)
+        unlocks.unlock_item(item, resyncing)
 
     unlocks.set_last_index(packet_index + len(items))
-    unlocks.resyncing = False
-    handlers.clear_locked_features()
+    handlers.clear_locked_features()  # TODO Move to clear_unlocks
 
 
 async def _resync():

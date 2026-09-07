@@ -7,7 +7,6 @@ progressive_render_height_max = 0
 temp_unlock_duration_seconds = 60
 temp_unlock_countdown_timer = 0
 unlock_all = False
-resyncing = False
 
 
 _MATERIALS_DEPENDENTS = (
@@ -43,13 +42,13 @@ def set_item_count(item: ids.Item, value: int):
     persist.item_counts[item] = value
 
 
-def unlock_item(item: ids.Item):
+def unlock_item(item: ids.Item, resyncing: bool):
     if is_trap_or_filler(item):
         if not resyncing:
             _activate_filler_and_traps(item)
         return
 
-    item = _resolve_materials_redirect(item)
+    item = _resolve_materials_redirect(item, resyncing)
     set_item_count(item, get_item_count(item) + 1)
 
     if is_progressive_render_border(item):
@@ -140,17 +139,17 @@ def _activate_filler_and_traps(item: ids.Item):
         despair.despair()
 
 
-def _resolve_materials_redirect(item: ids.Item) -> ids.Item:
+def _resolve_materials_redirect(item: ids.Item, resyncing: bool) -> ids.Item:
     materials_unlocked_by = bpy.context.scene.materials_unlocked_by
     if item in _MATERIALS_DEPENDENTS and not materials_unlocked_by:
         bpy.context.scene.materials_unlocked_by = item.name
         persist.materials_unlocked_by = item.name
         item = ids.Item.MATERIALS
-        _popup_unless_resyncing("Does not have Materials. Unlocked Materials instead.")
+        _popup_unless_resyncing("Does not have Materials. Unlocked Materials instead.", resyncing)
     elif item == ids.Item.MATERIALS and materials_unlocked_by and not get_item_count(ids.Item[materials_unlocked_by]):
         item = ids.Item[materials_unlocked_by]
         unlock_text = popup.item_to_unlock_text(item)
-        _popup_unless_resyncing(f"Already have Materials. Unlocked {unlock_text} instead.")
+        _popup_unless_resyncing(f"Already have Materials. Unlocked {unlock_text} instead.", resyncing)
     elif item == ids.Item.MATERIALS and not materials_unlocked_by:
         bpy.context.scene.materials_unlocked_by = item.name
         persist.materials_unlocked_by = item.name
@@ -158,7 +157,7 @@ def _resolve_materials_redirect(item: ids.Item) -> ids.Item:
     return item
 
 
-def _popup_unless_resyncing(message: str):
+def _popup_unless_resyncing(message: str, resyncing: bool):
     if not resyncing:
         popup.enqueue(message)
 
