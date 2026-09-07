@@ -2,7 +2,7 @@ import bpy
 import os
 import tempfile
 from bpy.app.handlers import persistent
-from . import ap_client, ap_data_package, ids, persist, popup, progress, similarity, thresholds, unlocks
+from . import client, data_package, ids, persist, popup, progress, similarity, thresholds, unlocks
 
 
 _msgbus_owner = object()
@@ -40,7 +40,7 @@ def _update_checks():
             if not checked:
                 location_id = ids.BASE_ID + i
                 thresholds.data[threshold] = True
-                ap_client.send_check(location_id)
+                client.send_check(location_id)
         else:
             break
 
@@ -49,7 +49,7 @@ def _update_goal():
     if bpy.context.scene.ap_current_percent >= progress.goal_percent:
         for threshold in thresholds.data:
             thresholds.data[threshold] = True
-        ap_client.send_goal_complete()
+        client.send_goal_complete()
 
 
 @persistent
@@ -71,12 +71,12 @@ def _update_state(scene, depsgraph):
 
 @persistent
 def _deathlink_undo(scene, depsgraph):
-    ap_client.send_deathlink("undo")
+    client.send_deathlink("undo")
 
 
 @persistent
 def _deathlink_redo(scene, depsgraph):
-    ap_client.send_deathlink("redo")
+    client.send_deathlink("redo")
 
 
 @persistent
@@ -212,7 +212,7 @@ def _persist_to_blender_properties(scene, depsgraph):
     for item, count in persist.ap_item_counts.items():
         unlocks.set_item_count(item, count)
 
-    ap_data_package.save_data_package(persist.ap_data_package)
+    data_package.save_data_package(persist.ap_data_package)
 
     for field in persist.SIMPLE_SCENE_FIELDS:
         value = getattr(persist, field)
@@ -224,7 +224,7 @@ def _blender_properties_to_persist(scene, depsgraph):
     for item in persist.ap_item_counts:
         persist.ap_item_counts[item] = unlocks.get_item_count(item)
 
-    persist.ap_data_package = ap_data_package.load_data_package()
+    persist.ap_data_package = data_package.load_data_package()
     
     for field in persist.SIMPLE_SCENE_FIELDS:
         value = getattr(bpy.context.scene, field)

@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import ap_data_package, ap_uuid, deathlink, explosion, ids, messages, persist, popup, progress, redraw, thresholds, unlocks
+from . import data_package, deathlink, explosion, ids, messages, persist, player_id, popup, progress, redraw, thresholds, unlocks
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []
@@ -121,7 +121,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
                 "password": password,
                 "game": "Blender",
                 "name": slot_name,
-                "uuid": ap_uuid.get_uuid(),
+                "uuid": player_id.get_uuid(),
                 "version": {"major": 0, "minor": 6, "build": 7, "class": "Version"},
                 "items_handling": 0b111,
                 "tags": ["AP"],
@@ -159,13 +159,13 @@ async def _handle_packet(packet: dict):
         data_package_checksums = packet.get("datapackage_checksums")
         for game in data_package_checksums:
             data_package_checksum = data_package_checksums.get(game)
-            if ap_data_package.is_outdated(data_package_checksum, game):
+            if data_package.is_outdated(data_package_checksum, game):
                 await _send_get_data_package([game])
 
     elif cmd == "DataPackage":
         data = packet.get("data")
         print(f"[Archipelago] Received data package for {list(data.get('games').keys())}.")
-        ap_data_package.save_data_package(data)
+        data_package.save_data_package(data)
 
     elif cmd == "Connected":
         _connected = True
@@ -208,17 +208,17 @@ async def _handle_packet(packet: dict):
             item = packet.get("item")
             item_id = item.get("item")
             sender_id = item.get("player")
-            sender_name = ap_data_package.player_id_to_name(_slot_info, sender_id)
+            sender_name = data_package.player_id_to_name(_slot_info, sender_id)
             receiving_id = packet.get("receiving")
-            receiving_name = ap_data_package.player_id_to_name(_slot_info, receiving_id)
+            receiving_name = data_package.player_id_to_name(_slot_info, receiving_id)
             if _slot_id == sender_id and _slot_id == receiving_id:
-                item_name = ap_data_package.item_id_to_name(_slot_info, item_id, sender_id)
+                item_name = data_package.item_id_to_name(_slot_info, item_id, sender_id)
                 popup.enqueue(f"Unlocked {item_name}.")
             elif _slot_id == sender_id:
-                item_name = ap_data_package.item_id_to_name(_slot_info, item_id, receiving_id)
+                item_name = data_package.item_id_to_name(_slot_info, item_id, receiving_id)
                 popup.enqueue(f"Found {item_name} for {receiving_name}.")
             elif _slot_id == receiving_id:
-                item_name = ap_data_package.item_id_to_name(_slot_info, item_id, receiving_id)
+                item_name = data_package.item_id_to_name(_slot_info, item_id, receiving_id)
                 popup.enqueue(f"Unlocked {item_name} from {sender_name}.")
 
     elif cmd == "Bounced":

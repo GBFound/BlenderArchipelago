@@ -1,5 +1,5 @@
 import bpy
-from . import ap_client, deathlink, ids, popup, progress, thresholds, unlocks
+from . import client, deathlink, ids, popup, progress, thresholds, unlocks
 
 
 class AP_PT_Similarity(bpy.types.Panel):
@@ -12,7 +12,7 @@ class AP_PT_Similarity(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return ap_client.is_connected()
+        return client.is_connected()
 
     def draw(self, context):
         layout = self.layout
@@ -58,7 +58,7 @@ class AP_PT_Target(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return ap_client.is_connected()
+        return client.is_connected()
 
     def draw(self, context):
         layout = self.layout
@@ -78,7 +78,7 @@ class AP_PT_Unlocked(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return ap_client.is_connected()
+        return client.is_connected()
 
     def draw(self, context):
         layout = self.layout
@@ -117,7 +117,7 @@ class AP_PT_Messages(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return ap_client.is_connected()
+        return client.is_connected()
 
     def draw(self, context):
         layout = self.layout
@@ -138,7 +138,7 @@ class AP_PT_Connection(bpy.types.Panel):
     bl_order       = 4
 
     def draw(self, context):
-        connected = ap_client.is_connected() or ap_client.is_connecting()
+        connected = client.is_connected() or client.is_connecting()
         layout = self.layout
         box = layout.box()
 
@@ -153,13 +153,13 @@ class AP_PT_Connection(bpy.types.Panel):
             else:
                 split.prop(context.scene, prop, text="")
 
-        if ap_client.is_connected():
+        if client.is_connected():
             box.operator("ap.disconnect", icon="PANEL_CLOSE")
             icon = "GHOST_DISABLED"
             if deathlink.enabled:
                 icon = "GHOST_ENABLED"
             box.operator("ap.deathlink_toggle", icon=icon, depress=deathlink.enabled)
-        elif ap_client.is_connecting():
+        elif client.is_connecting():
             box.operator("ap.connecting", icon="SORTTIME")
         else:
             box.operator("ap.connect", icon="LINKED")

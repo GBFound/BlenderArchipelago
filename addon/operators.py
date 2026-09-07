@@ -1,5 +1,5 @@
 import bpy
-from . import ap_client, deathlink, persist, popup, redraw
+from . import client, deathlink, persist, popup, redraw
 
 
 class AP_OT_Popup(bpy.types.Operator):
@@ -67,7 +67,7 @@ class AP_OT_Connect(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
-        ap_client.connect(
+        client.connect(
             host=scene.ap_host,
             port=scene.ap_port,
             slot_name=scene.ap_slot_name,
@@ -86,7 +86,7 @@ class AP_OT_Disconnect(bpy.types.Operator):
     bl_idname = "ap.disconnect"
 
     def execute(self, context):
-        ap_client.disconnect()
+        client.disconnect()
         return {"FINISHED"}
 
 
@@ -106,7 +106,7 @@ class AP_OT_Deathlink_Toggle(bpy.types.Operator):
 
     def execute(self, context):
         deathlink.enabled = not deathlink.enabled
-        ap_client.send_deathlink_tag_update()
+        client.send_deathlink_tag_update()
         return {"FINISHED"}
 
 
