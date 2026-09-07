@@ -47,8 +47,6 @@ def _update_checks():
 
 def _update_goal():
     if bpy.context.scene.ap_current_percent >= progress.goal_percent:
-        for threshold in thresholds.data:
-            thresholds.data[threshold] = True
         client.send_goal_complete()
 
 
