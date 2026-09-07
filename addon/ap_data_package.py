@@ -14,8 +14,9 @@ def save_data_package(data: dict):
         data_package = {"games": {}}
 
     games = data.get("games")
-    for game in games:
-        data_package["games"][game] = games.get(game)
+    if games:
+        for game in games:
+            data_package["games"][game] = games.get(game)
 
     text.clear()
     text.write(json.dumps(data_package))
