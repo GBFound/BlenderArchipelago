@@ -114,6 +114,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
             compression="deflate",
             ssl=ssl_context,
             max_size=_MAX_SIZE,
+            open_timeout=15,
         ) as ws:
             _ws = ws
 
