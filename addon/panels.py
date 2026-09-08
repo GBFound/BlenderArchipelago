@@ -157,11 +157,11 @@ class AP_PT_Connection(bpy.types.Panel):
                 split.prop(context.scene, prop, text="")
 
         if client.is_connected():
-            box.operator("ap.disconnect", icon="PANEL_CLOSE")
             icon = "GHOST_DISABLED"
             if deathlink.enabled:
                 icon = "GHOST_ENABLED"
             box.operator("ap.deathlink_toggle", icon=icon, depress=deathlink.enabled)
+            box.operator("ap.disconnect", icon="PANEL_CLOSE")
         elif client.is_connecting():
             box.operator("ap.connecting", icon="SORTTIME")
         else:
