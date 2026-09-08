@@ -45,6 +45,7 @@ def unlock_item(item: ids.Item, resyncing: bool):
     if is_trap_or_filler(item):
         if not resyncing:
             _activate_filler_and_traps(item)
+            set_item_count(item, get_item_count(item) + 1)
         return
 
     item = _resolve_materials_redirect(item, resyncing)
