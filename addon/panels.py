@@ -67,8 +67,10 @@ class AP_PT_Target(bpy.types.Panel):
         layout = self.layout
         box = layout.box()
         row = box.row(align=True)
-        row.prop_search(context.scene, "ap_target_image", bpy.data, "images", text="")
-        row.operator("ap.load_target_image", text="", icon="FILEBROWSER")
+        text = "No image selected."
+        if context.scene.ap_target_image:
+            text = context.scene.ap_target_image
+        row.operator("ap.load_target_image", text=text, icon="FILEBROWSER")
 
 
 class AP_PT_Unlocked(bpy.types.Panel):
