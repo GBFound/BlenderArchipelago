@@ -1,16 +1,11 @@
 import bpy
-from . import handlers
-
-
-def render_border():
-    bpy.app.timers.register(handlers.use_render_border)
 
 
 def panels():
-    bpy.app.timers.register(_redraw_panels)
+    bpy.app.timers.register(_panels)
 
 
-def _redraw_panels():
+def _panels():
     for screen in bpy.data.screens:
         for area in screen.areas:
             if area.type == "VIEW_3D":

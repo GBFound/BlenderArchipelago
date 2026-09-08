@@ -1,6 +1,6 @@
 import bpy
 import random
-from . import deathlink, despair, ids, persist, popup, redraw
+from . import deathlink, despair, ids, persist, popup, redraw, render_settings
 
 progressive_render_width_max = 0
 progressive_render_height_max = 0
@@ -51,7 +51,7 @@ def unlock_item(item: ids.Item, resyncing: bool):
     set_item_count(item, get_item_count(item) + 1)
 
     if is_progressive_render_border(item):
-        redraw.render_border()
+        render_settings.enforce_async()
     redraw.panels()
 
 

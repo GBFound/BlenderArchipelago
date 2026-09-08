@@ -1,5 +1,5 @@
 import bpy
-from . import client, deathlink, persist, popup, redraw
+from . import client, deathlink, persist, popup, render_settings
 
 
 class AP_OT_Popup(bpy.types.Operator):
@@ -44,18 +44,9 @@ class AP_OT_LoadTargetImage(bpy.types.Operator):
         image = bpy.data.images.load(self.filepath)
         context.scene.ap_target_image = image.name
         persist.ap_target_image = image.name
+        context.scene.ap_target_image_filepath = self.filepath
         persist.ap_target_image_filepath = self.filepath
-        context.scene.render.resolution_x = image.size[0]
-        context.scene.render.resolution_y = image.size[1]
-        redraw.render_border()
-
-        if camera.data.background_images:
-            bg = camera.data.background_images[0]
-        else:
-            bg = camera.data.background_images.new()
-        bg.image = image
-        camera.data.show_background_images = True
-        camera.data.background_images[0].alpha = 1
+        render_settings.enforce(context.scene)
         
         return {"FINISHED"}
 

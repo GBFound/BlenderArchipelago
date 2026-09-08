@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import data_package, deathlink, explosion, ids, messages, persist, player_id, popup, progress, redraw, thresholds, unlocks
+from . import data_package, deathlink, explosion, ids, messages, persist, player_id, popup, progress, redraw, render_settings, thresholds, unlocks
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []
@@ -172,7 +172,7 @@ async def _handle_packet(packet: dict):
         _connected = True
         _slot_info = packet.get("slot_info")
         _slot_id = packet.get("slot")
-        redraw.render_border()
+        render_settings.enforce_async()
         _initialize_from_slot_data(packet)
         unlocks.clear_unlocks()
         unlocks.set_last_index(0)

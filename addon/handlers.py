@@ -2,7 +2,7 @@ import bpy
 import os
 import tempfile
 from bpy.app.handlers import persistent
-from . import client, data_package, ids, persist, popup, progress, similarity, thresholds, unlocks
+from . import client, data_package, ids, persist, popup, progress, render_settings, similarity, thresholds, unlocks
 
 
 _msgbus_owner = object()
@@ -148,6 +148,7 @@ def _clear_geometry_nodes(obj):
 
     return did_clear
 
+
 @persistent
 def _materials_locked(scene = None, depsgraph = None):
     if unlocks.unlock_all or unlocks.get_item_count(ids.Item.MATERIALS):
@@ -160,7 +161,7 @@ def _materials_locked(scene = None, depsgraph = None):
 
 
 @persistent
-def _clear_materials(scene = None, depsgraph = None):
+def _clear_materials():
     if unlocks.get_item_count(ids.Item.MATERIALS):
         return
     
@@ -180,7 +181,7 @@ def _world_shaders_locked(scene = None, depsgraph = None):
 
 
 @persistent
-def _clear_world_shaders(scene = None, depsgraph = None):
+def _clear_world_shaders():
     if unlocks.get_item_count(ids.Item.WORLD_SHADERS):
         return
     
@@ -198,7 +199,7 @@ def _compositor_locked(scene = None, depsgraph = None):
 
 
 @persistent
-def _clear_compositor(scene = None, depsgraph = None):
+def _clear_compositor():
     if unlocks.get_item_count(ids.Item.COMPOSITOR):
         return
 
@@ -211,6 +212,10 @@ def _persist_to_blender_properties(scene, depsgraph):
         unlocks.set_item_count(item, count)
 
     data_package.save_data_package(persist.ap_data_package)
+
+    image = bpy.data.images.get(persist.ap_target_image)
+    if image is None and persist.ap_target_image_filepath:
+        bpy.data.images.load(persist.ap_target_image_filepath)
 
     for field in persist.SIMPLE_SCENE_FIELDS:
         value = getattr(persist, field)
@@ -230,43 +235,15 @@ def _blender_properties_to_persist(scene, depsgraph):
 
 
 @persistent
-def _import_disabled(scene, depsgraph):
-    for obj in bpy.context.selected_objects:
-        bpy.data.objects.remove(obj, do_unlink=True)
-    popup.enqueue("Importing is disabled in Archipelago.")
-
-
-@persistent
-def _clear_locked_features(scene = None, depsgraph = None):
+def _clear_locked_features(scene, depsgraph):
     _clear_materials()
     _clear_world_shaders()
     _clear_compositor()
 
 
 @persistent
-def use_render_border(scene = None, depsgraph = None):
-    if persist.ap_target_image_filepath:
-        bpy.data.images.load(persist.ap_target_image_filepath)
-
-    if scene is None:
-        scene = bpy.context.scene
-    scene.render.use_border = True
-    scene.render.border_min_x = 0
-    scene.render.border_min_y = 0
-    progressive_render_width_value = unlocks.get_item_count(ids.Item.PROGRESSIVE_RENDER_WIDTH)
-    progressive_render_height_value = unlocks.get_item_count(ids.Item.PROGRESSIVE_RENDER_HEIGHT)
-    progressive_render_width_max = unlocks.progressive_render_width_max
-    progressive_render_height_max = unlocks.progressive_render_height_max
-    scene.render.border_max_x = (1 + progressive_render_width_value) / (1 + progressive_render_width_max)
-    scene.render.border_max_y = (1 + progressive_render_height_value) / (1 + progressive_render_height_max)
-
-
-_subscriptions = (
-    (bpy.types.Object, "mode",                   _mode_locked),
-    (bpy.types.Object, "active_material",        _materials_locked),
-    (bpy.types.Scene,  "world",                  _world_shaders_locked),
-    (bpy.types.Scene,  "compositing_node_group", _compositor_locked),
-)
+def _enforce_render_border(scene, depsgraph):
+    render_settings.enforce(scene)
 
 
 @persistent
@@ -281,21 +258,29 @@ def _subscribe(scene = None, depsgraph = None):
         )
 
 
+# The methods in this require @persistent
+_subscriptions = (
+    (bpy.types.Object, "mode",                   _mode_locked),
+    (bpy.types.Object, "active_material",        _materials_locked),
+    (bpy.types.Scene,  "world",                  _world_shaders_locked),
+    (bpy.types.Scene,  "compositing_node_group", _compositor_locked),
+)
+
+# The methods in this require @persistent
 _handlers = [
     (bpy.app.handlers.load_post,             _subscribe),
     (bpy.app.handlers.load_post,             _blender_properties_to_persist),
     (bpy.app.handlers.load_post,             _clear_locked_features),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     (bpy.app.handlers.depsgraph_update_post, _geometry_nodes_locked),
-    # (bpy.app.handlers.blend_import_post,     _import_disabled),  Too annoying
-    (bpy.app.handlers.render_init,           use_render_border),
-    (bpy.app.handlers.render_complete,       _update_state),
-    (bpy.app.handlers.undo_post,             use_render_border),
-    (bpy.app.handlers.redo_post,             use_render_border),
+    (bpy.app.handlers.render_init,           _enforce_render_border),
+    (bpy.app.handlers.undo_post,             _enforce_render_border),
+    (bpy.app.handlers.redo_post,             _enforce_render_border),
     (bpy.app.handlers.undo_post,             _deathlink_undo),
     (bpy.app.handlers.redo_post,             _deathlink_redo),
     (bpy.app.handlers.undo_post,             _persist_to_blender_properties),
     (bpy.app.handlers.redo_post,             _persist_to_blender_properties),
+    (bpy.app.handlers.render_complete,       _update_state),
 ]
 for _, _, handler in _subscriptions:
     _handlers.append((bpy.app.handlers.undo_post, handler))
