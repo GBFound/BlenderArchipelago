@@ -46,7 +46,9 @@ def _update_checks():
 
 
 def _update_goal():
-    if bpy.context.scene.ap_current_percent >= progress.goal_percent:
+    if not bpy.context.scene.ap_has_reached_goal and bpy.context.scene.ap_current_percent >= progress.goal_percent:
+        bpy.context.scene.ap_has_reached_goal = True
+        persist.ap_has_reached_goal = True
         client.send_goal_complete()
 
 

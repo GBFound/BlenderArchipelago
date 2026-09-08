@@ -40,6 +40,7 @@ _properties = {
     # Progress tracking
     "ap_current_percent": bpy.props.FloatProperty(),
     "ap_difference": bpy.props.FloatProperty(),
+    "ap_has_reached_goal": bpy.props.BoolProperty(),
 
     # Item tracking
     "ap_item_counts": bpy.props.PointerProperty(type=unlocks.ItemCounts),

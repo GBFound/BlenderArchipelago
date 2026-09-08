@@ -13,6 +13,7 @@ ap_target_image_filepath : str                 = ""
 # Progress tracking
 ap_current_percent       : int                 = 0
 ap_difference            : int                 = 0
+ap_has_reached_goal          : bool                = False
 
 # Item tracking
 ap_item_counts           : dict[ids.Item, int] = {}
@@ -35,6 +36,7 @@ SIMPLE_SCENE_FIELDS = [
 
     "ap_current_percent",
     "ap_difference",
+    "ap_has_reached_goal",
 
     "ap_last_item_index",
     "ap_materials_unlocked_by",

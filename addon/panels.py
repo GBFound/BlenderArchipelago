@@ -46,7 +46,7 @@ class AP_PT_Similarity(bpy.types.Panel):
         box.label(text=f"{i} / {len(thresholds.data)} checks completed.")
 
         completed_text = ""
-        if bpy.context.scene.ap_current_percent >= progress.goal_percent:
+        if bpy.context.scene.ap_has_reached_goal:
             completed_text = " - Completed!"
         box.label(text=f"Goal: {goal:.1f}%{completed_text}")
 
