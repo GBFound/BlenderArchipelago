@@ -33,12 +33,12 @@ for i, name in enumerate(ITEM_NAME_TO_CLASSIFICATION):
 
 FILLER = []
 for name, classification in ITEM_NAME_TO_CLASSIFICATION.items():
-    if classification in (ItemClassification.filler):
+    if classification == (ItemClassification.filler):
         FILLER.append(name)
 
 TRAPS = []
 for name, classification in ITEM_NAME_TO_CLASSIFICATION.items():
-    if classification in (ItemClassification.trap):
+    if classification == (ItemClassification.trap):
         TRAPS.append(name)
 
 
