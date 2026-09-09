@@ -82,5 +82,5 @@ def get_filler_item_name(world: BlenderWorld) -> str:
     else:
         trap = world.random.choice(TRAPS)
         if trap == "Despair" and not world.options.despair:
-            trap = "Pop Up"
+            trap = "Undo"
         return trap
