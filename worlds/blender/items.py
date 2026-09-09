@@ -76,7 +76,7 @@ def create_item(world: BlenderWorld, name: str) -> BlenderItem:
 def get_filler_item_name(world: BlenderWorld) -> str:
     if world.random.randint(0, 99) >= world.options.trap_count:
         filler = world.random.choice(FILLER)
-        if filler == "Full Arsenal" and not world.options.full_arsenal_duration:
+        if filler == "Full Arsenal" and not world.options.full_arsenal_duration.value:
             filler = "Pop Up"
         return filler
     else:
