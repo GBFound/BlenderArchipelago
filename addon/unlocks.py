@@ -129,7 +129,8 @@ def _activate_filler_and_traps(item: ids.Item):
             "i bet this model looking so good rn",
             "your model look like poop from a butt 💔💔💔",
         ]
-        message = random.choice(messages)
+        weights = [40, 30, 20, 10]
+        message = random.choices(messages, weights=weights)[0]
         popup.enqueue(message)
     elif item == ids.Item.FULL_ARSENAL:
         temp_unlock_all_tools()
