@@ -16,7 +16,7 @@ _total_location_ids = 200
 _padding = len(str(_total_location_ids))
 for i in range(_total_location_ids):
     id = BASE_ID + i
-    name = f"Similarity Check {str(i).zfill(_padding)}"
+    name = f"Similarity Check {str(i + 1).zfill(_padding)}"
     LOCATION_NAME_TO_ID[name] = id
 
 
@@ -28,7 +28,7 @@ def create_locations(world: BlenderWorld) -> None:
     menu = world.get_region("Menu")
     thresholds = world.thresholds
     for i, threshold in enumerate(thresholds):
-        name = f"Similarity Check {str(i).zfill(_padding)}"
+        name = f"Similarity Check {str(i + 1).zfill(_padding)}"
         id = LOCATION_NAME_TO_ID[name]
         name = f"Similarity {threshold}%"
         menu.add_locations({name: id}, BlenderLocation)
