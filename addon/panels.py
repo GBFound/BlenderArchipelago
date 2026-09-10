@@ -112,6 +112,10 @@ class AP_PT_Unlocked(bpy.types.Panel):
                 row.label(text=f"{unlock_text}", icon="LOCKED")
 
 
+"""
+Currently works but too unpolished to be used.
+Susceptible to undos and text gets cut off.
+"""
 # class AP_PT_Messages(bpy.types.Panel):
 #     bl_label       = "Messages"
 #     bl_idname      = "AP_PT_Messages"

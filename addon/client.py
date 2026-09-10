@@ -237,20 +237,13 @@ async def _handle_received_items(packet: dict):
 
 
 def _handle_print_json(packet: dict):
-    parts = packet.get("data")
-    text_parts = []
-    for part in parts:
-        text = part.get("text", "")
-        text_parts.append(text)
-    text = "".join(text_parts)
-    messages.add_message(text)
     printJsonType = packet.get("type")
     if printJsonType == "ItemSend":
         item = packet.get("item")
         item_id = item.get("item")
         sender_id = item.get("player")
-        sender_name = data_package.player_id_to_name(_slot_info, sender_id)
         receiving_id = packet.get("receiving")
+        sender_name = data_package.player_id_to_name(_slot_info, sender_id)
         receiving_name = data_package.player_id_to_name(_slot_info, receiving_id)
         if _slot_id == sender_id and _slot_id == receiving_id:
             item_name = data_package.item_id_to_name(_slot_info, item_id, sender_id)
@@ -260,7 +253,19 @@ def _handle_print_json(packet: dict):
             popup.enqueue(f"Found {item_name} for {receiving_name}.")
         elif _slot_id == receiving_id:
             item_name = data_package.item_id_to_name(_slot_info, item_id, receiving_id)
-            popup.enqueue(f"Unlocked {item_name} from {sender_name}.")
+            popup.enqueue(f"Unlocked {item_name} from {sender_name}.")   
+
+    """
+    Currently works but too unpolished to be used.
+    Susceptible to undos and text gets cut off.
+    """
+    # parts = packet.get("data")
+    # text_parts = []
+    # for part in parts:
+    #     text = part.get("text", "")
+    #     text_parts.append(text)
+    # text = "".join(text_parts)
+    # messages.add_message(text)
 
 
 def _handle_data_package(packet: dict):
