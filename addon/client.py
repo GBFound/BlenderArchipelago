@@ -22,7 +22,7 @@ _ws:                  websockets.WebSocketClientProtocol | None = None
 _connected:           bool                                      = False
 
 # Use certifi's up-to-date CA bundle instead of Blender's outdated one
-_ssl_context:         ssl.SSLContext                            = ssl.create_default_context(cafile=certifi.where())
+_SSL_CONTEXT:         ssl.SSLContext                            = ssl.create_default_context(cafile=certifi.where())
 
 # From CommonClient.py
 _MAX_SIZE: int = 16 * 1024 * 1024  # 16 MB of max incoming packet size
@@ -108,7 +108,7 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
 
     try:
         print(f"[Archipelago] Connecting to {url}.")
-        ssl_context = _ssl_context if scheme == "wss" else None
+        ssl_context = _SSL_CONTEXT if scheme == "wss" else None
         async with websockets.connect(
             url,
             compression="deflate",
