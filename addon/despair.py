@@ -152,7 +152,8 @@ def _play_animation():
     bpy.context.scene.frame_current = 1
     bpy.context.scene.frame_start = 1
     bpy.context.scene.frame_end = 250
-    bpy.ops.screen.animation_play()
+    if not bpy.context.screen.is_animation_playing:
+        bpy.ops.screen.animation_play()
 
 
 def _view_selected():
