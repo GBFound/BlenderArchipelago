@@ -162,4 +162,4 @@ def _view_selected():
                 for region in area.regions:
                     if region.type == 'WINDOW':
                         with bpy.context.temp_override(area=area, region=region):
-                            bpy.ops.view3d.view_selected()
+                            bpy.ops.view3d.view_selected("INVOKE_DEFAULT")
