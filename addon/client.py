@@ -163,7 +163,7 @@ async def _handle_packet(packet: dict):
     elif cmd == "ReceivedItems":
         await _handle_received_items(packet)
     elif cmd == "RoomUpdate":
-        pass
+        await _handle_room_update(packet)
     elif cmd == "PrintJSON":
         _handle_print_json(packet)
     elif cmd == "DataPackage":
@@ -174,11 +174,7 @@ async def _handle_packet(packet: dict):
 
 async def _handle_room_info(packet: dict):
     print("[Archipelago] Connected to room.")
-    data_package_checksums = packet.get("datapackage_checksums")
-    for game in data_package_checksums:
-        data_package_checksum = data_package_checksums.get(game)
-        if data_package.is_outdated(data_package_checksum, game):
-            await _send_get_data_package([game])
+    await _check_data_package_checksums(packet)
 
 
 async def _handle_connection_refused(packet: dict):
@@ -234,6 +230,10 @@ async def _handle_received_items(packet: dict):
     unlocks.set_last_index(packet_index + len(items))
 
 
+async def _handle_room_update(packet: dict):
+    await _check_data_package_checksums(packet);
+
+
 def _handle_print_json(packet: dict):
     printJsonType = packet.get("type")
     if printJsonType == "ItemSend":
@@ -285,6 +285,15 @@ def _handle_bounced(packet: dict):
             return  # Ignore if our own deathlink or deathlink is disabled
         cause = data.get("cause", f"{source} died.")
         _receive_deathlink(cause)
+
+
+async def _check_data_package_checksums(packet: dict):
+    data_package_checksums = packet.get("datapackage_checksums")
+    if (data_package_checksums):
+        for game in data_package_checksums:
+            data_package_checksum = data_package_checksums.get(game)
+            if data_package.is_outdated(data_package_checksum, game):
+                await _send_get_data_package([game])
 
 
 def _initialize_from_slot_data(packet: dict):
