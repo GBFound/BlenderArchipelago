@@ -195,8 +195,6 @@ async def _handle_connected(packet: dict):
     render_settings.enforce_async()
     _initialize_from_slot_data(packet)
     unlocks.clear_unlocks()
-    unlocks.set_last_index(0)
-    bpy.context.scene.ap_messages.clear()
     redraw.panels()
     if _pending_checks:
         # Shallow copy to avoid mutation during send

@@ -118,7 +118,6 @@ def _relock_all_tools():
 
 def _set_last_index(index: int):
     bpy.context.scene.ap_last_item_index = index
-    persist.ap_last_item_index = index
 
 
 def _activate_filler_and_traps(item: ids.Item):
