@@ -276,6 +276,9 @@ def _handle_data_package(packet: dict):
 
 def _handle_bounced(packet: dict):
     tags = packet.get("tags")
+    if not tags:
+        return
+    
     if "DeathLink" in tags:
         data = packet.get("data", {})
         source = data.get("source")
