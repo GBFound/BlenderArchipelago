@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import data_package, deathlink, explosion, ids, messages, persist, player_id, popup, progress, redraw, render_settings, thresholds, unlocks
+from . import data_package, deathlink, explosion, ids, persist, player_id, popup, progress, redraw, render_settings, thresholds, unlocks
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []

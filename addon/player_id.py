@@ -2,6 +2,7 @@ import json
 import os
 import sys
 
+
 # Copied from Archipelago/Utils.py
 def get_uuid() -> str:
     common_path = _cache_path("common.json")

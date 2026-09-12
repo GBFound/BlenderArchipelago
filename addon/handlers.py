@@ -4,7 +4,6 @@ import tempfile
 from bpy.app.handlers import persistent
 from . import client, data_package, ids, persist, popup, progress, render_settings, similarity, thresholds, unlocks
 
-
 _msgbus_owner = object()
 
 

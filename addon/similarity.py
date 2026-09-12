@@ -2,6 +2,7 @@ import bpy
 import numpy
 from . import popup
 
+
 def _get_image_pixels(image: bpy.types.Image) -> numpy.ndarray:
     image.update()
     w, h = image.size[0], image.size[1]

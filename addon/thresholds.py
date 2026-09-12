@@ -1,5 +1,6 @@
 data: dict[float, bool] = {}
 
+
 def initialize_thresholds(new_thresholds: list[float], checked_locations: list[int]):
     data.clear()
 

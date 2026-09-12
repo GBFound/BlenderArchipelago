@@ -1,6 +1,6 @@
 import bpy
 import json
-from . import persist, popup
+from . import persist
 
 
 def save_data_package(data: dict):
