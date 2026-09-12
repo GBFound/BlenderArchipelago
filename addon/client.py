@@ -253,18 +253,6 @@ def _handle_print_json(packet: dict):
             item_name = data_package.item_id_to_name(_slot_info, item_id, receiving_id)
             popup.enqueue(f"Unlocked {item_name} from {sender_name}.")   
 
-    """
-    Currently works but too unpolished to be used.
-    Susceptible to undos and text gets cut off.
-    """
-    # parts = packet.get("data")
-    # text_parts = []
-    # for part in parts:
-    #     text = part.get("text", "")
-    #     text_parts.append(text)
-    # text = "".join(text_parts)
-    # messages.add_message(text)
-
 
 def _handle_data_package(packet: dict):
     data = packet.get("data")

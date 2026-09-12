@@ -1,6 +1,6 @@
 import bpy
 
-from . import messages, unlocks
+from . import unlocks
 
 
 _properties = {
@@ -46,10 +46,6 @@ _properties = {
     "ap_item_counts": bpy.props.PointerProperty(type=unlocks.ItemCounts),
     "ap_last_item_index": bpy.props.IntProperty(),
     "ap_materials_unlocked_by": bpy.props.StringProperty(),
-
-    # Messages
-    "ap_messages": bpy.props.CollectionProperty(type=messages.Message),
-    "ap_messages_index": bpy.props.IntProperty(),
 }
 
 

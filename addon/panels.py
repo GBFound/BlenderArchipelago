@@ -112,32 +112,6 @@ class AP_PT_Unlocked(bpy.types.Panel):
                 row.label(text=f"{unlock_text}", icon="LOCKED")
 
 
-"""
-Currently works but too unpolished to be used.
-Susceptible to undos and text gets cut off.
-"""
-# class AP_PT_Messages(bpy.types.Panel):
-#     bl_label       = "Messages"
-#     bl_idname      = "AP_PT_Messages"
-#     bl_space_type  = "VIEW_3D"
-#     bl_region_type = "UI"
-#     bl_category    = "Archipelago"
-#     bl_order       = 3
-
-#     @classmethod
-#     def poll(cls, context):
-#         return client.is_connected()
-
-#     def draw(self, context):
-#         layout = self.layout
-#         layout.template_list(
-#             listtype_name="AP_UL_Messages",
-#             list_id="",
-#             dataptr=context.scene, propname="ap_messages",
-#             active_dataptr=context.scene, active_propname="ap_messages_index",
-#         )
-
-
 class AP_PT_Connection(bpy.types.Panel):
     bl_label       = "Connection"
     bl_idname      = "AP_PT_Connection"
