@@ -1,5 +1,5 @@
 import bpy
-from . import client, deathlink, ids, popup, progress, thresholds, unlocks
+from . import client, deathlink, ids, popup, progress, unlocks
 
 
 class AP_PT_Similarity(bpy.types.Panel):
@@ -35,15 +35,16 @@ class AP_PT_Similarity(bpy.types.Panel):
         else:
             box.label(text="Similarity not yet found. Render first.")
 
+        thresholds = progress.thresholds_checked
         has_more_checks = False
-        for i, (threshold, checked) in enumerate(thresholds.data.items()):
+        for i, (threshold, checked) in enumerate(thresholds.items()):
             if not checked:
                 box.label(text=f"Next Check: {threshold}%")
                 has_more_checks = True
                 break
         if not has_more_checks:
             i += 1
-        box.label(text=f"{i} / {len(thresholds.data)} checks completed.")
+        box.label(text=f"{i} / {len(thresholds)} checks completed.")
 
         completed_text = ""
         if bpy.context.scene.ap_has_reached_goal:
@@ -89,9 +90,9 @@ class AP_PT_Unlocked(bpy.types.Panel):
         layout = self.layout
         box = layout.box()
 
-        if unlocks.temp_unlock_countdown_timer:
+        if unlocks.is_unlock_all():
             box.label(text=f"Temporarily unlocked all tools.")
-            box.label(text=f"{unlocks.temp_unlock_countdown_timer} seconds left.")
+            box.label(text=f"{unlocks.full_arsenal_countdown} seconds left.")
             box = layout.box()
 
         for item in ids.Item:
@@ -105,7 +106,7 @@ class AP_PT_Unlocked(bpy.types.Panel):
             row = box.row()
             if is_unlocked:
                 row.label(text=f"{unlock_text}", icon="UNLOCKED")
-            elif unlocks.unlock_all:
+            elif unlocks.is_unlock_all():
                 row.label(text=f"{unlock_text}", icon="TIME")
             else:
                 row.enabled = False

@@ -2,6 +2,13 @@ import bpy
 from . import ids, persist, unlocks
 
 
+def set_progressive_render_border_max(width_max: int, height_max: int):
+    bpy.context.scene.ap_progressive_render_width_max = width_max
+    bpy.context.scene.ap_progressive_render_height_max = height_max
+    persist.ap_progressive_render_width_max = width_max
+    persist.ap_progressive_render_height_max = height_max
+
+
 def enforce_async():
     bpy.app.timers.register(enforce)
 
@@ -47,7 +54,7 @@ def _enforce_render_border(scene):
     scene.render.border_min_y = 0
     progressive_render_width_value = unlocks.get_item_count(ids.Item.PROGRESSIVE_RENDER_WIDTH)
     progressive_render_height_value = unlocks.get_item_count(ids.Item.PROGRESSIVE_RENDER_HEIGHT)
-    progressive_render_width_max = unlocks.progressive_render_width_max
-    progressive_render_height_max = unlocks.progressive_render_height_max
+    progressive_render_width_max = persist.ap_progressive_render_width_max
+    progressive_render_height_max = persist.ap_progressive_render_height_max
     scene.render.border_max_x = (1 + progressive_render_width_value) / (1 + progressive_render_width_max)
     scene.render.border_max_y = (1 + progressive_render_height_value) / (1 + progressive_render_height_max)

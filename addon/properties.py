@@ -2,7 +2,6 @@ import bpy
 
 from . import unlocks
 
-
 _properties = {
     # Connection settings
     "ap_host": bpy.props.StringProperty(
@@ -21,7 +20,8 @@ _properties = {
         description="The slot name to use for this game. This is required, and must match the name provided on your YAML file.",
     ),
     "ap_password": bpy.props.StringProperty(
-        default="", subtype="PASSWORD",
+        default="",
+        subtype="PASSWORD",
         name="Password",
         description="The password to use for this game, if any.",
     ),
@@ -46,6 +46,10 @@ _properties = {
     "ap_item_counts": bpy.props.PointerProperty(type=unlocks.ItemCounts),
     "ap_last_item_index": bpy.props.IntProperty(),
     "ap_materials_unlocked_by": bpy.props.StringProperty(),
+
+    # Options
+    "ap_progressive_render_width_max": bpy.props.IntProperty(),
+    "ap_progressive_render_height_max": bpy.props.IntProperty(),
 }
 
 

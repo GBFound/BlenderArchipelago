@@ -2,12 +2,9 @@ import bpy
 import random
 from . import deathlink, despair, ids, persist, popup, redraw, render_settings
 
-progressive_render_width_max = 0
-progressive_render_height_max = 0
-temp_unlock_duration_seconds = 60
-temp_unlock_countdown_timer = 0
-unlock_all = False
 
+full_arsenal_countdown = 0
+_full_arsenal_duration = 0
 
 _MATERIALS_DEPENDENTS = (
     ids.Item.VERTEX_PAINT_MODE,
@@ -18,6 +15,7 @@ _MATERIALS_DEPENDENTS = (
 
 class ItemCounts(bpy.types.PropertyGroup):
     pass
+
 
 annotations = {}
 for item in ids.Item:
@@ -75,45 +73,36 @@ def set_last_index(index: int):
     bpy.app.timers.register(lambda: _set_last_index(index))
 
 
-def initialize_unlocks(new_width_max: int, new_height_max: int, new_temp_unlock_duration_seconds: int):
-    global progressive_render_width_max, progressive_render_height_max, temp_unlock_duration_seconds
-
-    progressive_render_width_max = new_width_max
-    progressive_render_height_max = new_height_max
-    temp_unlock_duration_seconds = new_temp_unlock_duration_seconds
+def set_arsenal_duration(arsenal_duration: int):
+    global _full_arsenal_duration
+    _full_arsenal_duration = arsenal_duration
 
 
-def temp_unlock_all_tools(duration=None):
-    global temp_unlock_countdown_timer, unlock_all
+def temp_unlock_all_tools(duration):
+    global full_arsenal_countdown
 
-    if duration == None:
-        duration = temp_unlock_duration_seconds
-
-    unlock_all = True
-    temp_unlock_countdown_timer += duration
-    if temp_unlock_countdown_timer == duration:
+    full_arsenal_countdown += duration
+    if full_arsenal_countdown == duration:
         bpy.app.timers.register(_temp_unlock_countdown_timer)
     popup.enqueue(f"Temporarily unlocked all tools for +{duration} seconds.")
 
 
 def _temp_unlock_countdown_timer() -> int:
-    global temp_unlock_countdown_timer
+    global full_arsenal_countdown
 
     redraw.panels()
-    if popup.can_show_next:  # Pause timer when there is a popup to be nice
-        temp_unlock_countdown_timer -= 1
-    if not temp_unlock_countdown_timer:
-        _relock_all_tools()
+    if popup.can_show_next:  # Pause countdown when there is a popup to be nice
+        full_arsenal_countdown -= 1
+    if not full_arsenal_countdown:
+        redraw.panels()
+        popup.enqueue("Temporary unlocks have ended.")
         return None
     
     return 1
 
 
-def _relock_all_tools():
-    global unlock_all
-    unlock_all = False
-    redraw.panels()
-    popup.enqueue("Temporary unlocks have ended.")
+def is_unlock_all() -> bool:
+    return full_arsenal_countdown > 0
 
 
 def _set_last_index(index: int):
@@ -132,7 +121,7 @@ def _activate_filler_and_traps(item: ids.Item):
         message = random.choices(messages, weights=weights)[0]
         popup.enqueue(message)
     elif item == ids.Item.FULL_ARSENAL:
-        temp_unlock_all_tools()
+        temp_unlock_all_tools(_full_arsenal_duration)
     elif item == ids.Item.UNDO:
         deathlink.undo()
     elif item == ids.Item.DESPAIR:
