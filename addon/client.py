@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import data_package, deathlink, explosion, ids, persist, player_id, popup, progress, redraw, render_settings, thresholds, unlocks
+from . import data_package, deathlink, explosion, ids, persist, player_id, popup, progress, redraw, render_settings, unlocks
 
 # _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
 _pending_checks:      list[int]                                 = []
@@ -287,21 +287,22 @@ async def _check_data_package_checksums(packet: dict):
 def _initialize_from_slot_data(packet: dict):
     slot_data = packet.get("slot_data")
     checked_locations = packet.get("checked_locations")
+    thresholds = slot_data.get("thresholds")
     goal_percent = slot_data.get("goal_percent")
-    new_thresholds = slot_data.get("thresholds")
-    new_width_max = slot_data.get("progressive_render_width_max")
-    new_height_max = slot_data.get("progressive_render_height_max")
-    new_temp_unlock_duration_seconds = slot_data.get("full_arsenal_duration")
-    progress.initialize_progress(goal_percent)
-    thresholds.initialize_thresholds(new_thresholds, checked_locations)
-    unlocks.initialize_unlocks(new_width_max, new_height_max, new_temp_unlock_duration_seconds)
+    width_max = slot_data.get("progressive_render_width_max")
+    height_max = slot_data.get("progressive_render_height_max")
+    full_arsenal_duration = slot_data.get("full_arsenal_duration")
+    progress.set_thresholds(thresholds, checked_locations)
+    progress.set_goal_percent(goal_percent)
+    render_settings.set_progressive_render_border_max(width_max, height_max)
+    unlocks.set_arsenal_duration(full_arsenal_duration)
 
 
 async def _resync():
     await _send_sync()
 
     checks = []
-    for i, (_, checked) in enumerate(sorted(thresholds.data.items())):
+    for i, (_, checked) in enumerate(sorted(progress.thresholds_checked.items())):
         if checked:
             location_id = ids.BASE_ID + i
             checks.append(location_id)

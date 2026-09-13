@@ -2,7 +2,7 @@ import bpy
 import os
 import tempfile
 from bpy.app.handlers import persistent
-from . import client, data_package, ids, persist, popup, progress, render_settings, similarity, thresholds, unlocks
+from . import client, data_package, ids, persist, popup, progress, render_settings, similarity, unlocks
 
 _msgbus_owner = object()
 
@@ -34,11 +34,12 @@ def _update_similarity_percent(target_name: str):
 
 
 def _update_checks():
-    for i, (threshold, checked) in enumerate(sorted(thresholds.data.items())):
+    thresholds = progress.thresholds_checked
+    for i, (threshold, checked) in enumerate(sorted(thresholds.items())):
         if bpy.context.scene.ap_current_percent >= threshold:
             if not checked:
                 location_id = ids.BASE_ID + i
-                thresholds.data[threshold] = True
+                thresholds[threshold] = True
                 client.send_check(location_id)
         else:
             break
@@ -80,7 +81,7 @@ def _deathlink_redo(scene, depsgraph):
 
 @persistent
 def _mode_locked(scene = None, depsgraph = None):
-    if unlocks.unlock_all:
+    if unlocks.is_unlock_all():
         return
 
     obj = bpy.context.active_object
@@ -110,7 +111,7 @@ def _mode_locked(scene = None, depsgraph = None):
 
 @persistent
 def _modifiers_locked(scene, depsgraph):
-    if unlocks.unlock_all or unlocks.get_item_count(ids.Item.MODIFIERS):
+    if unlocks.is_unlock_all() or unlocks.get_item_count(ids.Item.MODIFIERS):
         return
     
     obj = bpy.context.active_object
@@ -131,7 +132,7 @@ def _clear_legacy_modifiers(obj) -> bool:
 
 @persistent
 def _geometry_nodes_locked(scene, depsgraph):
-    if unlocks.unlock_all or unlocks.get_item_count(ids.Item.GEOMETRY_NODES):
+    if unlocks.is_unlock_all() or unlocks.get_item_count(ids.Item.GEOMETRY_NODES):
         return
     
     obj = bpy.context.active_object
@@ -152,7 +153,7 @@ def _clear_geometry_nodes(obj):
 
 @persistent
 def _materials_locked(scene = None, depsgraph = None):
-    if unlocks.unlock_all or unlocks.get_item_count(ids.Item.MATERIALS):
+    if unlocks.is_unlock_all() or unlocks.get_item_count(ids.Item.MATERIALS):
         return
 
     obj = bpy.context.active_object
@@ -173,7 +174,7 @@ def _clear_materials():
 
 @persistent
 def _world_shaders_locked(scene = None, depsgraph = None):
-    if unlocks.unlock_all or unlocks.get_item_count(ids.Item.WORLD_SHADERS):
+    if unlocks.is_unlock_all() or unlocks.get_item_count(ids.Item.WORLD_SHADERS):
         return
     
     if bpy.context.scene.world:
@@ -191,7 +192,7 @@ def _clear_world_shaders():
 
 @persistent
 def _compositor_locked(scene = None, depsgraph = None):
-    if unlocks.unlock_all or unlocks.get_item_count(ids.Item.COMPOSITOR):
+    if unlocks.is_unlock_all() or unlocks.get_item_count(ids.Item.COMPOSITOR):
         return
 
     if bpy.context.scene.compositing_node_group:
