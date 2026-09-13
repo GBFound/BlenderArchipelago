@@ -52,8 +52,8 @@ def _enforce_render_border(scene):
     scene.render.use_border = True
     scene.render.border_min_x = 0
     scene.render.border_min_y = 0
-    progressive_render_width_value = unlocks.get_item_count(ids.Item.PROGRESSIVE_RENDER_WIDTH)
-    progressive_render_height_value = unlocks.get_item_count(ids.Item.PROGRESSIVE_RENDER_HEIGHT)
+    progressive_render_width_value = persist.ap_item_counts[ids.Item.PROGRESSIVE_RENDER_WIDTH]
+    progressive_render_height_value = persist.ap_item_counts[ids.Item.PROGRESSIVE_RENDER_HEIGHT]
     progressive_render_width_max = persist.ap_progressive_render_width_max
     progressive_render_height_max = persist.ap_progressive_render_height_max
     scene.render.border_max_x = (1 + progressive_render_width_value) / (1 + progressive_render_width_max)

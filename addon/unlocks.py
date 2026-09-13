@@ -70,7 +70,6 @@ def is_trap_or_filler(item: ids.Item) -> bool:
 
 def set_last_index(index: int):
     persist.ap_last_item_index = index
-    bpy.context.scene.ap_last_item_index = index
     bpy.app.timers.register(lambda: _set_last_index(index))
 
 
@@ -130,7 +129,7 @@ def _activate_filler_and_traps(item: ids.Item):
 
 
 def _resolve_materials_redirect(item: ids.Item, resyncing: bool) -> ids.Item:
-    ap_materials_unlocked_by = bpy.context.scene.ap_materials_unlocked_by
+    ap_materials_unlocked_by = persist.ap_materials_unlocked_by
     if item in _MATERIALS_DEPENDENTS and not ap_materials_unlocked_by:
         bpy.context.scene.ap_materials_unlocked_by = item.name
         persist.ap_materials_unlocked_by = item.name

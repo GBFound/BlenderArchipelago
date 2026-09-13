@@ -1,5 +1,5 @@
 import bpy
-from . import client, deathlink, ids, popup, progress, unlocks
+from . import client, deathlink, ids, persist, popup, progress, unlocks
 
 
 class AP_PT_Similarity(bpy.types.Panel):
@@ -18,10 +18,10 @@ class AP_PT_Similarity(bpy.types.Panel):
         layout = self.layout
 
         box = layout.box()
-        percent = bpy.context.scene.ap_current_percent
+        percent = persist.ap_current_percent
         goal = progress.goal_percent
 
-        ap_difference = bpy.context.scene.ap_difference
+        ap_difference = persist.ap_difference
         icon = "ARROW_LEFTRIGHT"
         if ap_difference > 0:
             icon = "SORT_DESC"
@@ -101,7 +101,7 @@ class AP_PT_Unlocked(bpy.types.Panel):
             if unlocks.is_progressive_render_border(item):
                 continue
 
-            is_unlocked = unlocks.get_item_count(item)
+            is_unlocked = persist.ap_item_counts[item]
             unlock_text = popup.item_to_unlock_text(item)
             row = box.row()
             if is_unlocked:

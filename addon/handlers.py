@@ -23,7 +23,7 @@ def _update_similarity_percent(target_name: str):
     try:
         score = similarity.compare_images(render, target)
         bpy.context.scene.ap_difference = score - bpy.context.scene.ap_current_percent
-        persist.ap_difference = bpy.context.scene.ap_difference
+        persist.ap_difference = persist.ap_difference
         bpy.context.scene.ap_current_percent = score
         persist.ap_current_percent = score
         print(f"[Archipelago] Similarity: {score:.3f}%")
@@ -99,7 +99,7 @@ def _mode_locked(scene = None, depsgraph = None):
     }
 
     for mode, item in modes.items():
-        if obj and obj.mode == mode and not unlocks.get_item_count(item):
+        if obj and obj.mode == mode and not persist.ap_item_counts[item]:
             bpy.ops.object.mode_set(mode="OBJECT")
             unlock_text = popup.item_to_unlock_text(item)
             if item == ids.Item.GREASE_PENCIL_MODES:
@@ -111,7 +111,7 @@ def _mode_locked(scene = None, depsgraph = None):
 
 @persistent
 def _modifiers_locked(scene, depsgraph):
-    if unlocks.is_unlock_all() or unlocks.get_item_count(ids.Item.MODIFIERS):
+    if unlocks.is_unlock_all() or persist.ap_item_counts[ids.Item.MODIFIERS]:
         return
     
     obj = bpy.context.active_object
@@ -132,7 +132,7 @@ def _clear_legacy_modifiers(obj) -> bool:
 
 @persistent
 def _geometry_nodes_locked(scene, depsgraph):
-    if unlocks.is_unlock_all() or unlocks.get_item_count(ids.Item.GEOMETRY_NODES):
+    if unlocks.is_unlock_all() or persist.ap_item_counts[ids.Item.GEOMETRY_NODES]:
         return
     
     obj = bpy.context.active_object
@@ -153,7 +153,7 @@ def _clear_geometry_nodes(obj):
 
 @persistent
 def _materials_locked(scene = None, depsgraph = None):
-    if unlocks.is_unlock_all() or unlocks.get_item_count(ids.Item.MATERIALS):
+    if unlocks.is_unlock_all() or persist.ap_item_counts[ids.Item.MATERIALS]:
         return
 
     obj = bpy.context.active_object
@@ -164,7 +164,7 @@ def _materials_locked(scene = None, depsgraph = None):
 
 @persistent
 def _clear_materials():
-    if unlocks.get_item_count(ids.Item.MATERIALS):
+    if persist.ap_item_counts[ids.Item.MATERIALS]:
         return
     
     for obj in bpy.data.objects:
@@ -174,7 +174,7 @@ def _clear_materials():
 
 @persistent
 def _world_shaders_locked(scene = None, depsgraph = None):
-    if unlocks.is_unlock_all() or unlocks.get_item_count(ids.Item.WORLD_SHADERS):
+    if unlocks.is_unlock_all() or persist.ap_item_counts[ids.Item.WORLD_SHADERS]:
         return
     
     if bpy.context.scene.world:
@@ -184,7 +184,7 @@ def _world_shaders_locked(scene = None, depsgraph = None):
 
 @persistent
 def _clear_world_shaders():
-    if unlocks.get_item_count(ids.Item.WORLD_SHADERS):
+    if persist.ap_item_counts[ids.Item.WORLD_SHADERS]:
         return
     
     bpy.context.scene.world = None
@@ -192,7 +192,7 @@ def _clear_world_shaders():
 
 @persistent
 def _compositor_locked(scene = None, depsgraph = None):
-    if unlocks.is_unlock_all() or unlocks.get_item_count(ids.Item.COMPOSITOR):
+    if unlocks.is_unlock_all() or persist.ap_item_counts[ids.Item.COMPOSITOR]:
         return
 
     if bpy.context.scene.compositing_node_group:
@@ -202,7 +202,7 @@ def _compositor_locked(scene = None, depsgraph = None):
 
 @persistent
 def _clear_compositor():
-    if unlocks.get_item_count(ids.Item.COMPOSITOR):
+    if persist.ap_item_counts[ids.Item.COMPOSITOR]:
         return
 
     bpy.context.scene.compositing_node_group = None

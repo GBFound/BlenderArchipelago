@@ -268,7 +268,7 @@ def _handle_bounced(packet: dict):
     if "DeathLink" in tags:
         data = packet.get("data", {})
         source = data.get("source")
-        slot_name = bpy.context.scene.ap_slot_name
+        slot_name = persist.ap_slot_name
         if source == slot_name or not deathlink.enabled:
             return  # Ignore if our own deathlink or deathlink is disabled
         cause = data.get("cause", f"{source} died.")
@@ -336,7 +336,7 @@ async def _send_deathlink_tag_update():
 
 async def _send_deathlink(message: str):
     if _ws:
-        slot_name = bpy.context.scene.ap_slot_name
+        slot_name = persist.ap_slot_name
         await _ws.send(json.dumps([{
             "cmd": "Bounce",
             "tags": ["DeathLink"],
