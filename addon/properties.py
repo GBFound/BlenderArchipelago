@@ -1,5 +1,4 @@
 import bpy
-
 from . import unlocks
 
 _properties = {
