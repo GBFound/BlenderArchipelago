@@ -1,5 +1,5 @@
 import bpy
-from . import client, deathlink, full_arsenal, ids, persist, popup, progress, unlocks
+from . import client, deathlink, full_arsenal, ids, persist, popup, progress
 
 
 class AP_PT_Similarity(bpy.types.Panel):
