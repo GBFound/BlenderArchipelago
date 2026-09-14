@@ -2,23 +2,27 @@ import bpy
 import collections
 from . import ids
 
-can_show_next = True
+_can_show_next = True
 _popups = collections.deque()
 
 
 def enqueue(message: str):
     _popups.append(message)
 
-    if can_show_next:
+    if _can_show_next:
         _schedule()
 
 
 def show_next():
-    global can_show_next
-    can_show_next = True
+    global _can_show_next
+    _can_show_next = True
     
     if _popups:
         _schedule()
+
+
+def can_show_next() -> bool:
+    return _can_show_next
 
 
 def item_to_unlock_text(item: ids.Item) -> str:
@@ -26,8 +30,8 @@ def item_to_unlock_text(item: ids.Item) -> str:
 
 
 def _schedule():
-    global can_show_next
-    can_show_next = False
+    global _can_show_next
+    _can_show_next = False
 
     message = _popups.popleft()
     bpy.app.timers.register(
