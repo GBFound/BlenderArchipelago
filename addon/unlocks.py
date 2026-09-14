@@ -36,7 +36,7 @@ def set_item_count(item: ids.Item, value: int):
 
 
 def unlock_item(item: ids.Item, resyncing: bool):
-    if is_trap_or_filler(item):
+    if ids.is_trap_or_filler(item):
         if not resyncing:
             _activate_filler_and_traps(item)
             set_item_count(item, get_item_count(item) + 1)
@@ -45,7 +45,7 @@ def unlock_item(item: ids.Item, resyncing: bool):
     item = _resolve_materials_redirect(item, resyncing)
     set_item_count(item, get_item_count(item) + 1)
 
-    if is_progressive_render_border(item):
+    if ids.is_progressive_render_border(item):
         render_settings.enforce_async()
     redraw.panels()
 
@@ -54,14 +54,6 @@ def clear_unlocks():
     for item in ids.Item:
         set_item_count(item, 0)
     bpy.context.scene.ap_materials_unlocked_by = ""
-
-
-def is_progressive_render_border(item: ids.Item) -> bool:
-    return item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT
-
-
-def is_trap_or_filler(item: ids.Item) -> bool:
-    return item >= ids.Item.POPUP
 
 
 def set_last_index(index: int):

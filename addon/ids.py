@@ -27,3 +27,11 @@ class Item(IntEnum):
     DESPAIR                   = auto()
 
 ID_TO_ITEM : dict[int, Item] = {BASE_ID + item.value: item for item in Item}
+
+
+def is_progressive_render_border(item: Item) -> bool:
+    return item == Item.PROGRESSIVE_RENDER_WIDTH or item == Item.PROGRESSIVE_RENDER_HEIGHT
+
+
+def is_trap_or_filler(item: Item) -> bool:
+    return item >= Item.POPUP

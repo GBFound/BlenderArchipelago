@@ -96,9 +96,9 @@ class AP_PT_Unlocked(bpy.types.Panel):
             box = layout.box()
 
         for item in ids.Item:
-            if unlocks.is_trap_or_filler(item):
+            if ids.is_trap_or_filler(item):
                 break
-            if unlocks.is_progressive_render_border(item):
+            if ids.is_progressive_render_border(item):
                 continue
 
             is_unlocked = persist.ap_item_counts[item]
