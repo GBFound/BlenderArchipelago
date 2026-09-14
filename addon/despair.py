@@ -1,6 +1,6 @@
 import bpy
 import random
-from . import unlocks
+from . import full_arsenal
 
 _TEMP_UNLOCK_DURATION_SECONDS = 30
 
@@ -10,7 +10,7 @@ def despair():
 
 
 def _despair():
-    unlocks.temp_unlock_all_tools(_TEMP_UNLOCK_DURATION_SECONDS)
+    full_arsenal.unlock_all(_TEMP_UNLOCK_DURATION_SECONDS)
     mesh = _select_single_mesh()
     bpy.context.view_layer.objects.active = mesh
 

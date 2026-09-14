@@ -1,10 +1,6 @@
 import bpy
 import random
-from . import deathlink, despair, ids, persist, popup, redraw, render_settings
-
-
-full_arsenal_countdown = 0
-_full_arsenal_duration = 0
+from . import deathlink, despair, full_arsenal, ids, persist, popup, redraw, render_settings
 
 _MATERIALS_DEPENDENTS = (
     ids.Item.VERTEX_PAINT_MODE,
@@ -73,38 +69,6 @@ def set_last_index(index: int):
     bpy.app.timers.register(lambda: _set_last_index(index))
 
 
-def set_arsenal_duration(arsenal_duration: int):
-    global _full_arsenal_duration
-    _full_arsenal_duration = arsenal_duration
-
-
-def temp_unlock_all_tools(duration):
-    global full_arsenal_countdown
-
-    full_arsenal_countdown += duration
-    if full_arsenal_countdown == duration:
-        bpy.app.timers.register(_temp_unlock_countdown_timer)
-    popup.enqueue(f"Temporarily unlocked all tools for +{duration} seconds.")
-
-
-def _temp_unlock_countdown_timer() -> int:
-    global full_arsenal_countdown
-
-    redraw.panels()
-    if popup.can_show_next:  # Pause countdown when there is a popup to be nice
-        full_arsenal_countdown -= 1
-    if not full_arsenal_countdown:
-        redraw.panels()
-        popup.enqueue("Temporary unlocks have ended.")
-        return None
-    
-    return 1
-
-
-def is_unlock_all() -> bool:
-    return full_arsenal_countdown > 0
-
-
 def _set_last_index(index: int):
     bpy.context.scene.ap_last_item_index = index
 
@@ -121,7 +85,7 @@ def _activate_filler_and_traps(item: ids.Item):
         message = random.choices(messages, weights=weights)[0]
         popup.enqueue(message)
     elif item == ids.Item.FULL_ARSENAL:
-        temp_unlock_all_tools(_full_arsenal_duration)
+        full_arsenal.unlock_all()
     elif item == ids.Item.UNDO:
         deathlink.undo()
     elif item == ids.Item.DESPAIR:

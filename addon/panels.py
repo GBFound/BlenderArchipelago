@@ -1,5 +1,5 @@
 import bpy
-from . import client, deathlink, ids, persist, popup, progress, unlocks
+from . import client, deathlink, full_arsenal, ids, persist, popup, progress, unlocks
 
 
 class AP_PT_Similarity(bpy.types.Panel):
@@ -90,9 +90,9 @@ class AP_PT_Unlocked(bpy.types.Panel):
         layout = self.layout
         box = layout.box()
 
-        if unlocks.is_unlock_all():
+        if full_arsenal.is_unlock_all():
             box.label(text=f"Temporarily unlocked all tools.")
-            box.label(text=f"{unlocks.full_arsenal_countdown} seconds left.")
+            box.label(text=f"{full_arsenal.get_countdown()} seconds left.")
             box = layout.box()
 
         for item in ids.Item:
@@ -106,7 +106,7 @@ class AP_PT_Unlocked(bpy.types.Panel):
             row = box.row()
             if is_unlocked:
                 row.label(text=f"{unlock_text}", icon="UNLOCKED")
-            elif unlocks.is_unlock_all():
+            elif full_arsenal.is_unlock_all():
                 row.label(text=f"{unlock_text}", icon="TIME")
             else:
                 row.enabled = False

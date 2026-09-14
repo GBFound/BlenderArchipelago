@@ -7,7 +7,7 @@ import time
 import ssl
 import certifi
 import traceback
-from . import data_package, deathlink, explosion, ids, persist, player_id, popup, progress, redraw, render_settings, unlocks
+from . import data_package, deathlink, explosion, full_arsenal, ids, persist, player_id, popup, progress, redraw, render_settings, unlocks
 
 _pending_checks: list[int] = []
 _pending_checks_lock: threading.Lock = threading.Lock()
@@ -294,7 +294,7 @@ def _initialize_from_slot_data(packet: dict):
     progress.set_thresholds(thresholds, checked_locations)
     progress.set_goal_percent(goal_percent)
     render_settings.set_progressive_render_border_max(width_max, height_max)
-    unlocks.set_arsenal_duration(full_arsenal_duration)
+    full_arsenal.set_duration(full_arsenal_duration)
 
 
 async def _resync():
