@@ -1,5 +1,5 @@
 import bpy
-from . import ids, persist, unlocks
+from . import ids, persist
 
 
 def set_progressive_render_border_max(width_max: int, height_max: int):
