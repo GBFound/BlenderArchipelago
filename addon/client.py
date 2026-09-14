@@ -9,20 +9,19 @@ import certifi
 import traceback
 from . import data_package, deathlink, explosion, ids, persist, player_id, popup, progress, redraw, render_settings, unlocks
 
-# _pending_checks can be accessed from both the main thread and the async thread simultaneously, so the lock prevents race conditions
-_pending_checks:      list[int]                                 = []
-_pending_checks_lock: threading.Lock                            = threading.Lock()
+_pending_checks: list[int] = []
+_pending_checks_lock: threading.Lock = threading.Lock()
 
-_slot_info:           dict                                      = None
-_slot_id:             int                                       = None
+_slot_info: dict = None
+_slot_id: int = None
 
-_thread:              threading.Thread | None                   = None
-_loop:                asyncio.AbstractEventLoop | None          = None
-_ws:                  websockets.WebSocketClientProtocol | None = None
-_connected:           bool                                      = False
+_thread: threading.Thread = None
+_loop: asyncio.AbstractEventLoop = None
+_ws: websockets.WebSocketClientProtocol = None
+_connected: bool = False
 
 # Use certifi's up-to-date CA bundle instead of Blender's outdated one
-_SSL_CONTEXT:         ssl.SSLContext                            = ssl.create_default_context(cafile=certifi.where())
+_SSL_CONTEXT: ssl.SSLContext = ssl.create_default_context(cafile=certifi.where())
 
 # From CommonClient.py
 _MAX_SIZE: int = 16 * 1024 * 1024  # 16 MB of max incoming packet size

@@ -2,7 +2,7 @@ import bpy
 import random
 from . import explosion
 
-enabled:    bool = False
+enabled: bool = False
 
 # Suppresses deathlink when an undo is caused by an undo trap
 suppressed: bool = False
