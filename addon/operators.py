@@ -2,6 +2,10 @@ import bpy
 from . import client, deathlink, persist, popup, render_settings
 
 
+# NOTE: bpy.types.Operator.report() would have been a less intrusive way to 
+# show messages. However, it only displays to the user when the operator is 
+# invoked interactively (like a key/button click). Calling it from script code 
+# does nothing. Popups use bpy.types.WindowManager.invoke_popup() instead.
 class AP_OT_Popup(bpy.types.Operator):
     """Pop-Up"""
     bl_label  = "Archipelago"
@@ -103,29 +107,3 @@ class AP_OT_Deathlink_Toggle(bpy.types.Operator):
         deathlink.enabled = not deathlink.enabled
         client.send_deathlink_tag_update()
         return {"FINISHED"}
-
-
-"""
-class AP_OT_Debug(bpy.types.Operator):
-    bl_idname = "ap.debug"
-    bl_label = "Awesome Debug"
-    bl_options = {"UNDO"}
-
-    def execute(self, context):
-        return {"FINISHED"}
-"""
-
-
-"""
-Does not work unless invoked by the user.
-Was to be used for less obtrusive popups.
-class AP_OT_Report(bpy.types.Operator):
-    bl_label  = "Archipelago"
-    bl_idname = "ap.report"
-
-    message: bpy.props.StringProperty()
-
-    def execute(self, context):
-        self.report({"INFO"}, self.message)
-        return {"FINISHED"}
-"""
