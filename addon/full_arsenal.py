@@ -14,7 +14,7 @@ def set_duration(seconds: int):
     _duration_seconds = seconds
 
 
-def get_countdown():
+def get_countdown() -> int:
     return _countdown_seconds
 
 
