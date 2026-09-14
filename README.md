@@ -22,7 +22,7 @@ If deathlink is enabled, when you undo/redo, everyone with deathlink dies. When 
 
 ### Prerequisites
 
-- Make sure you have Blender 4.2.0 or above installed (Any version lower is not guaranteed to work.)
+- Make sure you have Blender 5.0.0 or above installed (Any version lower is not guaranteed to work.)
 - Install Archipelago from [Archipelago's Github Releases page](https://github.com/ArchipelagoMW/Archipelago/releases). On that page, scroll down to the `Assets` section for the release you want, click on the appropriate installer for your system to start downloading it (for most Windows users, that will be the file called `Setup.Archipelago.X.Y.Z.exe`), then run it.
   - The `Archipelago` folder can be found by opening the Archipelago Launcher and selecting `Browse Files`.
 - Go to the [Releases page](https://github.com/GBFound/BlenderArchipelago/releases) of this repository and look at the latest release. Download `BlenderArchipelago.zip` and `blender.apworld`.
