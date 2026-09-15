@@ -1,47 +1,15 @@
-import bpy
 import json
-from . import persist
+import logging
+import os
+import typing
+from typing import Any, Dict
+from . import cache
+
+checksums: dict = None
 
 
-def save_data_package(data: dict):
-    text = bpy.data.texts.get("ap_data_package")
-    data_package = load_data_package()
-    if not text:
-        text = bpy.data.texts.new("ap_data_package")
-    if not data_package:
-        text.clear
-        text.write(json.dumps({"games": {}}))
-        data_package = {"games": {}}
-
-    games = data.get("games")
-    if games:
-        for game in games:
-            data_package["games"][game] = games.get(game)
-
-    text.clear()
-    text.write(json.dumps(data_package))
-    persist.ap_data_package = data_package
-
-
-def load_data_package() -> dict:
-    text = bpy.data.texts.get(f"ap_data_package")
-    if not text:
-        return {}
-    try:
-        return json.loads(text.as_string())
-    except json.JSONDecodeError:
-        return {}
-
-
-def is_outdated(data_package_checksum: str, game: str) -> bool:
-    local_data_package = load_data_package()
-    if not local_data_package:
-        return True
-    game_data = local_data_package.get("games", {}).get(game)
-    if game_data is None:
-        return True
-    local_data_package_checksum = game_data.get("checksum")
-    return data_package_checksum != local_data_package_checksum
+def is_outdated(checksum: str, game: str) -> bool:
+    return not _load_data_package_for_checksum(game, checksum)
 
 
 def player_id_to_name(slot_info: dict, player_id: str) -> str:
@@ -52,9 +20,46 @@ def player_id_to_name(slot_info: dict, player_id: str) -> str:
 
 def item_id_to_name(slot_info: dict, item_id: str, player_id: str) -> str:
     game = slot_info.get(str(player_id)).get("game")
-    data_package = load_data_package()
-    game_data = data_package.get("games").get(game)
-    item_name_to_id = game_data.get("item_name_to_id")
+    checksum = checksums.get(game)
+    data_package = _load_data_package_for_checksum(game, checksum)
+    item_name_to_id = data_package.get("item_name_to_id")
     item_id_to_name = {v: k for k, v in item_name_to_id.items()}
     item_name = item_id_to_name.get(item_id)
     return item_name
+
+
+# Copied from Archipelago/Utils.py
+def store_data_package_for_checksum(game: str, data: typing.Dict[str, Any]) -> None:
+    checksum = data.get("checksum")
+    if checksum and game:
+        if checksum != _get_file_safe_name(checksum):
+            raise ValueError(f"Bad symbols in checksum: {checksum}")
+        game_folder = cache.path("datapackage", _get_file_safe_name(game))
+        os.makedirs(game_folder, exist_ok=True)
+        try:
+            with open(os.path.join(game_folder, f"{checksum}.json"), "w", encoding="utf-8-sig") as f:
+                json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+        except Exception as e:
+            logging.debug(f"Could not store data package: {e}")
+
+
+# Copied from Archipelago/Utils.py
+def _load_data_package_for_checksum(game: str, checksum: typing.Optional[str]) -> Dict[str, Any]:
+    if checksum and game:
+        if checksum != _get_file_safe_name(checksum):
+            raise ValueError(f"Bad symbols in checksum: {checksum}")
+        path = cache.path("datapackage", _get_file_safe_name(game), f"{checksum}.json")
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8-sig") as f:
+                    return json.load(f)
+            except Exception as e:
+                logging.debug(f"Could not load data package: {e}")
+
+    # cache does not match
+    return {}
+
+
+# Copied from Archipelago/Utils.py
+def _get_file_safe_name(name: str) -> str:
+    return "".join(c for c in name if c not in '<>:"/\\|?*')

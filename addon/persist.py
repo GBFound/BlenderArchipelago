@@ -36,11 +36,7 @@ ap_materials_unlocked_by: str = ""
 ap_progressive_render_width_max: int = 0
 ap_progressive_render_height_max: int = 0
 
-# Data package
-ap_data_package: dict = {}
-
-# ap_item_counts and ap_data_package need custom (de)serialization and are 
-# handled separately
+# ap_item_counts need custom (de)serialization and is handled separately
 SIMPLE_SCENE_FIELDS = [
     "ap_host",
     "ap_port",

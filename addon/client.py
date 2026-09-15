@@ -230,7 +230,7 @@ async def _handle_received_items(packet: dict):
 
 
 async def _handle_room_update(packet: dict):
-    await _check_data_package_checksums(packet);
+    await _check_data_package_checksums(packet)
 
 
 def _handle_print_json(packet: dict):
@@ -245,18 +245,20 @@ def _handle_print_json(packet: dict):
         if _slot_id == sender_id and _slot_id == receiving_id:
             item_name = data_package.item_id_to_name(_slot_info, item_id, sender_id)
             popup.enqueue(f"Unlocked {item_name}.")
+        elif _slot_id == receiving_id:
+            item_name = data_package.item_id_to_name(_slot_info, item_id, receiving_id)
+            popup.enqueue(f"Unlocked {item_name} from {sender_name}.")
         elif _slot_id == sender_id:
             item_name = data_package.item_id_to_name(_slot_info, item_id, receiving_id)
             popup.enqueue(f"Found {item_name} for {receiving_name}.")
-        elif _slot_id == receiving_id:
-            item_name = data_package.item_id_to_name(_slot_info, item_id, receiving_id)
-            popup.enqueue(f"Unlocked {item_name} from {sender_name}.")   
 
 
 def _handle_data_package(packet: dict):
     data = packet.get("data")
-    print(f"[Archipelago] Received data package for {list(data.get('games').keys())}.")
-    data_package.save_data_package(data)
+    games = data.get('games')
+    print(f"[Archipelago] Received data package for {list(games.keys())}.")
+    for game_name, game_data in games.items():
+        data_package.store_data_package_for_checksum(game_name, game_data)
 
 
 def _handle_bounced(packet: dict):
@@ -274,15 +276,6 @@ def _handle_bounced(packet: dict):
         _receive_deathlink(cause)
 
 
-async def _check_data_package_checksums(packet: dict):
-    data_package_checksums = packet.get("datapackage_checksums")
-    if (data_package_checksums):
-        for game in data_package_checksums:
-            data_package_checksum = data_package_checksums.get(game)
-            if data_package.is_outdated(data_package_checksum, game):
-                await _send_get_data_package([game])
-
-
 def _initialize_from_slot_data(packet: dict):
     slot_data = packet.get("slot_data")
     checked_locations = packet.get("checked_locations")
@@ -295,6 +288,17 @@ def _initialize_from_slot_data(packet: dict):
     progress.set_goal_percent(goal_percent)
     render_settings.set_progressive_render_border_max(width_max, height_max)
     full_arsenal.set_duration(full_arsenal_duration)
+
+
+async def _check_data_package_checksums(packet: dict):
+    checksums = packet.get("datapackage_checksums")
+    if not checksums:
+        return
+
+    data_package.checksums = checksums
+    for game, checksum in checksums.items():
+        if data_package.is_outdated(checksum, game):
+            await _send_get_data_package([game])
 
 
 async def _resync():

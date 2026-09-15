@@ -213,8 +213,6 @@ def _persist_to_blender_properties(scene, depsgraph):
     for item, count in persist.ap_item_counts.items():
         unlocks.set_item_count(item, count)
 
-    data_package.save_data_package(persist.ap_data_package)
-
     image = bpy.data.images.get(persist.ap_target_image)
     if image is None and persist.ap_target_image_filepath:
         bpy.data.images.load(persist.ap_target_image_filepath)
@@ -228,8 +226,6 @@ def _persist_to_blender_properties(scene, depsgraph):
 def _blender_properties_to_persist(scene, depsgraph):
     for item in persist.ap_item_counts:
         persist.ap_item_counts[item] = unlocks.get_item_count(item)
-
-    persist.ap_data_package = data_package.load_data_package()
     
     for field in persist.SIMPLE_SCENE_FIELDS:
         value = getattr(bpy.context.scene, field)
