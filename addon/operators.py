@@ -29,7 +29,7 @@ class AP_OT_Popup(bpy.types.Operator):
         layout.label(text=self.message)
 
 
-class AP_OT_LoadTargetImage(bpy.types.Operator):
+class AP_OT_Load_Target_Image(bpy.types.Operator):
     """Load Target Image"""
     bl_label  = "Load Target Image"
     bl_idname = "ap.load_target_image"
