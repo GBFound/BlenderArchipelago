@@ -1,6 +1,8 @@
 import bpy
 from . import client, deathlink, full_arsenal, ids, persist, popup, progress
 
+show_early: bool = False
+
 
 class AP_PT_Similarity(bpy.types.Panel):
     bl_label       = "Similarity"
@@ -12,7 +14,7 @@ class AP_PT_Similarity(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return client.is_connected()
+        return client.is_connected() or show_early
 
     def draw(self, context):
         layout = self.layout
@@ -57,7 +59,7 @@ class AP_PT_Target(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return client.is_connected()
+        return client.is_connected() or show_early
 
     def draw(self, context):
         layout = self.layout
@@ -79,7 +81,7 @@ class AP_PT_Unlocked(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return client.is_connected()
+        return client.is_connected() or show_early
 
     def draw(self, context):
         layout = self.layout
@@ -143,3 +145,26 @@ class AP_PT_Connection(bpy.types.Panel):
             box.operator("ap.connecting", icon="SORTTIME")
         else:
             box.operator("ap.connect", icon="LINKED")
+
+
+class AP_PT_View(bpy.types.Panel):
+    bl_label       = "Advanced"
+    bl_idname      = "AP_PT_View"
+    bl_space_type  = "VIEW_3D"
+    bl_region_type = "UI"
+    bl_category    = "Archipelago"
+    bl_options     = {"DEFAULT_CLOSED"}
+    bl_order       = 4
+
+    @classmethod
+    def poll(cls, context):
+        return not client.is_connected()
+
+    def draw(self, context):
+        layout = self.layout
+        box = layout.box()
+
+        icon = "HIDE_ON"
+        if show_early:
+            icon = "HIDE_OFF"
+        box.operator("ap.panels_early_toggle", icon=icon)

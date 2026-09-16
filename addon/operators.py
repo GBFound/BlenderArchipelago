@@ -1,5 +1,5 @@
 import bpy
-from . import client, deathlink, persist, popup, render_settings
+from . import client, deathlink, panels, persist, popup, render_settings
 
 
 # NOTE: bpy.types.Operator.report() would have been a less intrusive way to 
@@ -106,4 +106,14 @@ class AP_OT_Deathlink_Toggle(bpy.types.Operator):
     def execute(self, context):
         deathlink.toggle()
         client.send_deathlink_tag_update()
+        return {"FINISHED"}
+
+
+class AP_OT_Panels_Early_Toggle(bpy.types.Operator):
+    """View Progress Offline"""
+    bl_idname = "ap.panels_early_toggle"
+    bl_label = "View Progress Offline"
+
+    def execute(self, context):
+        panels.show_early = not panels.show_early
         return {"FINISHED"}
