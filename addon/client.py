@@ -344,7 +344,7 @@ async def _check_data_package_checksums(packet: dict):
 
 async def _resync():
     await _send_sync()
-    checks = progress.get_checked_location_ids()
+    checks = progress.get_thresholds_ids()
     if checks:
         await _send_checks(checks)
 
