@@ -29,12 +29,11 @@ def update_state():
 def _update_thresholds():
     from . import client
 
-    thresholds = thresholds_checked
-    for i, (threshold, checked) in enumerate(sorted(thresholds.items())):
+    for i, (threshold, checked) in enumerate(sorted(thresholds_checked.items())):
         if bpy.context.scene.ap_current_percent >= threshold:
             if not checked:
                 location_id = ids.BASE_ID + i
-                thresholds[threshold] = True
+                thresholds_checked[threshold] = True
                 client.send_check(location_id)
         else:
             break
