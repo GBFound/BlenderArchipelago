@@ -214,8 +214,8 @@ async def _handle_connected(packet: dict):
 
     _slot_info = packet.get("slot_info")
     _slot_id = packet.get("slot")
-    render_settings.enforce_async()
     _initialize_from_slot_data(packet)
+    render_settings.enforce_async()
     unlocks.clear_unlocks()
     progress.update_state()
     redraw.panels()
