@@ -215,6 +215,7 @@ async def _handle_connected(packet: dict):
     _slot_info = packet.get("slot_info")
     _slot_id = packet.get("slot")
     _initialize_from_slot_data(packet)
+    connected_before_async()
     render_settings.enforce_async()
     unlocks.clear_unlocks()
     progress.update_state()
@@ -319,6 +320,15 @@ def _initialize_from_slot_data(packet: dict):
     progress.set_goal_percent(goal_percent)
     render_settings.set_progressive_render_border_max(width_max, height_max)
     full_arsenal.set_duration(full_arsenal_duration)
+
+
+def connected_before_async():
+    bpy.app.timers.register(_connected_before)
+
+
+def _connected_before():
+    bpy.context.scene.ap_has_connected_before = True
+    persist.ap_has_connected_before = True
 
 
 async def _check_data_package_checksums(packet: dict):

@@ -158,7 +158,7 @@ class AP_PT_View(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return not client.is_connected()
+        return not client.is_connected() and bpy.context.scene.ap_has_connected_before
 
     def draw(self, context):
         layout = self.layout

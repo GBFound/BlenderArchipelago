@@ -17,6 +17,7 @@ ap_host: str = ""
 ap_port: str = ""
 ap_slot_name: str = ""
 ap_password: str = ""
+ap_has_connected_before: bool = False
 
 # Target image
 ap_target_image: str = ""
@@ -42,6 +43,7 @@ SIMPLE_SCENE_FIELDS = [
     "ap_port",
     "ap_slot_name",
     "ap_password",
+    "ap_has_connected_before",
 
     "ap_target_image",
     "ap_target_image_filepath",

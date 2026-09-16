@@ -28,6 +28,7 @@ _properties = {
         name="Deathlink",
         description="When you die, everyone with deathlink dies. The reverse is also true.",
     ),
+    "ap_has_connected_before": bpy.props.BoolProperty(),
 
     # Target image
     "ap_target_image": bpy.props.StringProperty(
