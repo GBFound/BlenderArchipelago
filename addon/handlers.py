@@ -2,7 +2,7 @@ import bpy
 import os
 import tempfile
 from bpy.app.handlers import persistent
-from . import client, data_package, full_arsenal, ids, persist, popup, progress, redraw, render_settings, similarity, unlocks
+from . import client, full_arsenal, ids, persist, popup, progress, render_settings, similarity, unlocks
 
 _msgbus_owner = object()
 
@@ -33,40 +33,18 @@ def _update_similarity_percent(target_name: str):
             os.remove(tmp_path)
 
 
-def _update_checks():
-    thresholds = progress.thresholds_checked
-    for i, (threshold, checked) in enumerate(sorted(thresholds.items())):
-        if bpy.context.scene.ap_current_percent >= threshold:
-            if not checked:
-                location_id = ids.BASE_ID + i
-                thresholds[threshold] = True
-                client.send_check(location_id)
-        else:
-            break
-
-    redraw.panels()
-
-
-def _update_goal():
-    if not bpy.context.scene.ap_has_reached_goal and bpy.context.scene.ap_current_percent >= progress.goal_percent:
-        bpy.context.scene.ap_has_reached_goal = True
-        persist.ap_has_reached_goal = True
-        client.send_goal_complete()
-
-
 @persistent
 def _update_state(scene, depsgraph):
     target_name = scene.ap_target_image
     if not target_name:
         popup.enqueue("No target image selected.")
         return
-    
-    # A timer for each function does not guarantee they run in order,
-    # so they are put into one function so that they are guaranteed to run in this order
+
+    # A timer for each function does not guarantee they run in order, so they 
+    # are put into one function so that they are guaranteed to run in this order
     def _update():
         _update_similarity_percent(target_name)
-        _update_checks()
-        _update_goal()
+        progress.update_state()
 
     bpy.app.timers.register(_update)
 
