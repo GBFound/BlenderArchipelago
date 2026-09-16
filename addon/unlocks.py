@@ -47,7 +47,6 @@ def unlock_item(item: ids.Item, resyncing: bool):
 
     if ids.is_progressive_render_border(item):
         render_settings.enforce_async()
-    redraw.panels()
 
 
 def clear_unlocks():

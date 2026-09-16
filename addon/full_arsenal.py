@@ -37,7 +37,6 @@ def _unlock_all_countdown_timer() -> int:
     if popup.can_show_next:  # Pause countdown when there is a popup to be nice
         _countdown_seconds -= 1
     if not _countdown_seconds:
-        redraw.panels()
         popup.enqueue("Temporary unlocks have ended.")
         return None
 

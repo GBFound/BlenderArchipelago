@@ -2,7 +2,7 @@ import bpy
 import os
 import tempfile
 from bpy.app.handlers import persistent
-from . import client, data_package, full_arsenal, ids, persist, popup, progress, render_settings, similarity, unlocks
+from . import client, data_package, full_arsenal, ids, persist, popup, progress, redraw, render_settings, similarity, unlocks
 
 _msgbus_owner = object()
 
@@ -43,6 +43,8 @@ def _update_checks():
                 client.send_check(location_id)
         else:
             break
+
+    redraw.panels()
 
 
 def _update_goal():
