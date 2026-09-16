@@ -318,13 +318,7 @@ async def _check_data_package_checksums(packet: dict):
 
 async def _resync():
     await _send_sync()
-
-    checks = []
-    for i, (_, checked) in enumerate(sorted(progress.thresholds_checked.items())):
-        if checked:
-            location_id = ids.BASE_ID + i
-            checks.append(location_id)
-
+    checks = progress.get_checked_location_ids()
     if checks:
         await _send_checks(checks)
 

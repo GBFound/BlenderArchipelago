@@ -35,16 +35,11 @@ class AP_PT_Similarity(bpy.types.Panel):
         else:
             box.label(text="Similarity not yet found. Render first.")
 
-        thresholds = progress.thresholds_checked
-        has_more_checks = False
-        for i, (threshold, checked) in enumerate(thresholds.items()):
-            if not checked:
-                box.label(text=f"Next Check: {threshold}%")
-                has_more_checks = True
-                break
-        if not has_more_checks:
-            i += 1
-        box.label(text=f"{i} / {len(thresholds)} checks completed.")
+
+        next, checked, total = progress.get_thresholds_state()
+        if next is not None:
+            box.label(text=f"Next Check: {next}%")
+        box.label(text=f"{checked} / {total} checks completed.")
 
         completed_text = ""
         if bpy.context.scene.ap_has_reached_goal:
