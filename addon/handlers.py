@@ -230,6 +230,11 @@ def _clear_locked_features(scene, depsgraph):
 
 
 @persistent
+def _clear_full_arsenal_countdown(scene, depsgraph):
+    full_arsenal.set_countdown(0)
+
+
+@persistent
 def _enforce_render_border(scene, depsgraph):
     render_settings.enforce(scene)
 
@@ -259,6 +264,7 @@ _handlers = [
     (bpy.app.handlers.load_post,             _subscribe),
     (bpy.app.handlers.load_post,             _blender_properties_to_persist),
     (bpy.app.handlers.load_post,             _clear_locked_features),
+    (bpy.app.handlers.load_post,             _clear_full_arsenal_countdown),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     (bpy.app.handlers.depsgraph_update_post, _geometry_nodes_locked),
     (bpy.app.handlers.render_init,           _enforce_render_border),
