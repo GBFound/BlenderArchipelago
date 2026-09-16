@@ -1,6 +1,14 @@
 import bpy
 import random
-from . import deathlink, despair, full_arsenal, ids, persist, popup, redraw, render_settings
+from . import (
+    deathlink,
+    despair,
+    full_arsenal,
+    ids,
+    persist,
+    popup,
+    render_settings,
+)
 
 _MATERIALS_DEPENDENTS = (
     ids.Item.VERTEX_PAINT_MODE,

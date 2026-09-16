@@ -7,7 +7,20 @@ import time
 import ssl
 import certifi
 import traceback
-from . import data_package, deathlink, explosion, full_arsenal, ids, persist, player_id, popup, progress, redraw, render_settings, unlocks
+from . import (
+    data_package,
+    deathlink,
+    explosion,
+    full_arsenal,
+    ids,
+    persist,
+    player_id,
+    popup,
+    progress,
+    redraw,
+    render_settings,
+    unlocks,
+)
 
 _pending_checks: list[int] = []
 _pending_checks_lock: threading.Lock = threading.Lock()

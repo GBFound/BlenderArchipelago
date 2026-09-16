@@ -2,7 +2,17 @@ import bpy
 import os
 import tempfile
 from bpy.app.handlers import persistent
-from . import client, full_arsenal, ids, persist, popup, progress, render_settings, similarity, unlocks
+from . import (
+    client,
+    full_arsenal,
+    ids,
+    persist,
+    popup,
+    progress,
+    render_settings,
+    similarity,
+    unlocks,
+)
 
 _msgbus_owner = object()
 
