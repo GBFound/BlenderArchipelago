@@ -210,7 +210,8 @@ async def _handle_received_items(packet: dict):
     if not items:
         return
 
-    last_index = persist.ap_last_item_index  # bpy.context.scene.ap_last_item_index may not update in time
+    # bpy.context.scene.ap_last_item_index may not update in time
+    last_index = persist.ap_last_item_index
 
     if packet_index == 0:
         unlocks.clear_unlocks()
