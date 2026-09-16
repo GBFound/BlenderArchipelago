@@ -90,6 +90,12 @@ def is_connected() -> bool:
     return connected
 
 
+def resync():
+    _, connected, loop = _get_state()
+    if connected:
+        asyncio.run_coroutine_threadsafe(_resync(), loop)
+
+
 def send_deathlink_tag_update():
     _, connected, loop = _get_state()
     if connected:

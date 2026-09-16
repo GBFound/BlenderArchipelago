@@ -240,6 +240,11 @@ def _enforce_render_border(scene, depsgraph):
 
 
 @persistent
+def _resync(scene, depsgraph):
+    client.resync()
+
+
+@persistent
 def _subscribe(scene = None, depsgraph = None):
     bpy.msgbus.clear_by_owner(_msgbus_owner)
     for rna_struct, property, handler in _subscriptions:
@@ -265,6 +270,7 @@ _handlers = [
     (bpy.app.handlers.load_post,             _blender_properties_to_persist),
     (bpy.app.handlers.load_post,             _clear_locked_features),
     (bpy.app.handlers.load_post,             _clear_full_arsenal_countdown),
+    (bpy.app.handlers.load_post,             _resync),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     (bpy.app.handlers.depsgraph_update_post, _geometry_nodes_locked),
     (bpy.app.handlers.render_init,           _enforce_render_border),
