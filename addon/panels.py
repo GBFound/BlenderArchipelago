@@ -114,7 +114,7 @@ class AP_PT_Connection(bpy.types.Panel):
     bl_space_type  = "VIEW_3D"
     bl_region_type = "UI"
     bl_category    = "Archipelago"
-    bl_order       = 4
+    bl_order       = 3
 
     def draw(self, context):
         connected = client.is_connected() or client.is_connecting()
