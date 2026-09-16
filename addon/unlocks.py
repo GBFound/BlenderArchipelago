@@ -13,15 +13,15 @@ class ItemCounts(bpy.types.PropertyGroup):
     pass
 
 
-annotations = {}
+_annotations = {}
 for item in ids.Item:
     item_count = 1
     if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
         item_count = 0
-    annotations[item.name] = bpy.props.IntProperty(name=item.name, default=item_count)
+    _annotations[item.name] = bpy.props.IntProperty(name=item.name, default=item_count)
     persist.ap_item_counts[item] = item_count
 
-ItemCounts.__annotations__ = annotations
+ItemCounts.__annotations__ = _annotations
 
 
 def get_item_count(item: ids.Item) -> int:
