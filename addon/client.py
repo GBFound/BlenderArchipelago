@@ -90,7 +90,7 @@ def send_deathlink_tag_update():
 def send_deathlink(do: str):
     if not _connected:
         return
-    if not deathlink.enabled:
+    if not deathlink.get_enabled():
         return
     if deathlink.suppressed:
         return
@@ -212,8 +212,8 @@ async def _handle_connected(packet: dict):
             _pending_checks.clear()
         await _send_checks(checks)
     slot_data = packet.get("slot_data")
-    deathlink.enabled = slot_data.get("death_link")
-    if deathlink.enabled:
+    deathlink.set_enabled(slot_data.get("death_link"))
+    if deathlink.get_enabled():
         await _send_deathlink_tag_update()
 
 
@@ -285,7 +285,7 @@ def _handle_bounced(packet: dict):
         data = packet.get("data", {})
         source = data.get("source")
         slot_name = persist.ap_slot_name
-        if source == slot_name or not deathlink.enabled:
+        if source == slot_name or not deathlink.get_enabled():
             return  # Ignore if our own deathlink or deathlink is disabled
         cause = data.get("cause", f"{source} died.")
         _receive_deathlink(cause)
@@ -336,7 +336,7 @@ async def _send_sync():
 async def _send_deathlink_tag_update():
     if _ws:
         tags = ["AP"]
-        if deathlink.enabled:
+        if deathlink.get_enabled():
             tags.append("DeathLink")
 
         await _ws.send(json.dumps([{

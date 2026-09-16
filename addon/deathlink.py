@@ -1,8 +1,10 @@
 import bpy
 import random
+import threading
 from . import explosion
 
-enabled: bool = False
+_enabled: bool = False
+_enabled_lock: threading.Lock = threading.Lock()
 
 # Suppresses deathlink when an undo is caused by an undo trap
 suppressed: bool = False
@@ -14,6 +16,23 @@ def choose_message(do: str) -> str:
     if message_choice == 2:
         message = "'s model look like poop from a butt 💔💔💔"
     return message
+
+
+def toggle():
+    global _enabled
+    with _enabled_lock:
+        _enabled = not _enabled
+
+
+def set_enabled(value: bool):
+    global _enabled
+    with _enabled_lock:
+        _enabled = value
+
+
+def get_enabled() -> bool:
+    with _enabled_lock:
+        return _enabled
 
 
 def undo():

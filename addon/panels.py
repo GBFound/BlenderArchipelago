@@ -134,9 +134,10 @@ class AP_PT_Connection(bpy.types.Panel):
 
         if client.is_connected():
             icon = "GHOST_DISABLED"
-            if deathlink.enabled:
+            deathlink_enabled = deathlink.get_enabled()
+            if deathlink_enabled:
                 icon = "GHOST_ENABLED"
-            box.operator("ap.deathlink_toggle", icon=icon, depress=deathlink.enabled)
+            box.operator("ap.deathlink_toggle", icon=icon, depress=deathlink_enabled)
             box.operator("ap.disconnect", icon="PANEL_CLOSE")
         elif client.is_connecting():
             box.operator("ap.connecting", icon="SORTTIME")
