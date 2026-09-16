@@ -45,7 +45,7 @@ class AP_OT_LoadTargetImage(bpy.types.Operator):
             popup.enqueue("Set active camera before loading the target image.")
             return {"FINISHED"}
 
-        image = bpy.data.images.load(self.filepath)
+        image = bpy.data.images.load(self.filepath, check_existing=True)
         context.scene.ap_target_image = image.name
         persist.ap_target_image = image.name
         context.scene.ap_target_image_filepath = self.filepath
