@@ -5,7 +5,8 @@ from . import ids, persist, redraw
 _thresholds_checked: dict[float, bool] = {}
 _thresholds_lock: threading.Lock = threading.Lock()
 
-goal_percent: int = 0
+# goal_percent is an int, so reads/writes are atomic under CPython's GIL.
+_goal_percent: int = 0
 
 
 def set_thresholds(thresholds: list[float], checked_locations: list[int]):
@@ -18,11 +19,6 @@ def set_thresholds(thresholds: list[float], checked_locations: list[int]):
         sorted_thresholds = sorted(_thresholds_checked.keys())
         for i in range(len(checked_locations)):
             _thresholds_checked[sorted_thresholds[i]] = True
-
-
-def set_goal_percent(goal: int):
-    global goal_percent
-    goal_percent = goal
 
 
 def get_thresholds() -> dict[float, bool]:
@@ -53,6 +49,16 @@ def get_thresholds_ids() -> list[int]:
                     checks.append(location_id)
             return checks
 
+
+def set_goal_percent(goal: int):
+    global _goal_percent
+    _goal_percent = goal
+
+
+def get_goal_percent() -> int:
+    return _goal_percent
+
+
 def update_state():
     bpy.app.timers.register(_update_thresholds)
     bpy.app.timers.register(_update_goal)
@@ -77,7 +83,7 @@ def _update_thresholds():
 def _update_goal():
     from . import client
 
-    if not bpy.context.scene.ap_has_reached_goal and bpy.context.scene.ap_current_percent >= goal_percent and client.is_connected():
+    if not bpy.context.scene.ap_has_reached_goal and bpy.context.scene.ap_current_percent >= _goal_percent and client.is_connected():
         bpy.context.scene.ap_has_reached_goal = True
         persist.ap_has_reached_goal = True
         client.send_goal_complete()

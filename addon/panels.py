@@ -19,7 +19,7 @@ class AP_PT_Similarity(bpy.types.Panel):
 
         box = layout.box()
         percent = persist.ap_current_percent
-        goal = progress.goal_percent
+        goal = progress.get_goal_percent()
 
         ap_difference = persist.ap_difference
         icon = "ARROW_LEFTRIGHT"
