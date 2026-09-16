@@ -33,6 +33,9 @@ _loop: asyncio.AbstractEventLoop = None
 _ws: websockets.WebSocketClientProtocol = None
 _connected: bool = False
 
+# Lock for _loop, _ws, _connected
+_connection_state_lock: threading.Lock = threading.Lock()
+
 # Use certifi's up-to-date CA bundle instead of Blender's outdated one
 _SSL_CONTEXT: ssl.SSLContext = ssl.create_default_context(cafile=certifi.where())
 
@@ -55,40 +58,47 @@ def connect(host: str, port: str, slot_name: str, password: str):
 
 
 def disconnect():
-    if _ws:
-        asyncio.run_coroutine_threadsafe(_ws.close(), _loop)
+    ws, _, loop = _get_state()
+    if ws:
+        asyncio.run_coroutine_threadsafe(ws.close(), loop)
         print("[Archipelago] Disconnected.")
 
 
 def send_check(location_id: int):
-    if not _connected:
+    _, connected, loop = _get_state()
+    if not connected:
         with _pending_checks_lock:
             _pending_checks.append(location_id)
         return
-    asyncio.run_coroutine_threadsafe(_send_checks([location_id]), _loop)
+    asyncio.run_coroutine_threadsafe(_send_checks([location_id]), loop)
 
 
 def send_goal_complete():
-    if _connected:
+    _, connected, loop = _get_state()
+    if connected:
         popup.enqueue("Goal completed!")
-        asyncio.run_coroutine_threadsafe(_send_goal_complete(), _loop)
+        asyncio.run_coroutine_threadsafe(_send_goal_complete(), loop)
 
 
 def is_connecting() -> bool:
-    return _thread is not None and _thread.is_alive() and not _connected
+    _, connected, _ = _get_state()
+    return _thread is not None and _thread.is_alive() and not connected
 
 
 def is_connected() -> bool:
-    return _connected
+    _, connected, _ = _get_state()
+    return connected
 
 
 def send_deathlink_tag_update():
-    if _connected:
-        asyncio.run_coroutine_threadsafe(_send_deathlink_tag_update(), _loop)
+    _, connected, loop = _get_state()
+    if connected:
+        asyncio.run_coroutine_threadsafe(_send_deathlink_tag_update(), loop)
 
 
 def send_deathlink(do: str):
-    if not _connected:
+    _, connected, loop = _get_state()
+    if not connected:
         return
     if not deathlink.get_enabled():
         return
@@ -102,7 +112,7 @@ def send_deathlink(do: str):
         """
 
     message = deathlink.choose_message(do)
-    asyncio.run_coroutine_threadsafe(_send_deathlink(message), _loop)
+    asyncio.run_coroutine_threadsafe(_send_deathlink(message), loop)
     explosion.spawn_animated_ref_image()
     popup.enqueue("Sent DeathLink.")
 
@@ -128,7 +138,8 @@ async def _connect(host: str, port: str, slot_name: str, password: str, secure: 
             max_size=_MAX_SIZE,
             open_timeout=15,
         ) as ws:
-            _ws = ws
+            with _connection_state_lock:
+                _ws = ws
 
             await ws.send(json.dumps([{
                 "cmd": "Connect",
@@ -190,14 +201,17 @@ async def _handle_room_info(packet: dict):
 
 
 async def _handle_connection_refused(packet: dict):
-    await _ws.close()
+    ws, _, _ = _get_state()
+    await ws.close()
     popup.enqueue(f"Connection refused: {packet.get('errors')}")
 
 
 async def _handle_connected(packet: dict):
     global _connected, _slot_info, _slot_id
 
-    _connected = True
+    with _connection_state_lock:
+        _connected = True
+
     _slot_info = packet.get("slot_info")
     _slot_id = packet.get("slot")
     render_settings.enforce_async()
@@ -205,12 +219,14 @@ async def _handle_connected(packet: dict):
     unlocks.clear_unlocks()
     progress.update_state()
     redraw.panels()
+
     if _pending_checks:
         # Shallow copy to avoid mutation during send
         with _pending_checks_lock:
             checks = _pending_checks.copy()
             _pending_checks.clear()
         await _send_checks(checks)
+
     slot_data = packet.get("slot_data")
     deathlink.set_enabled(slot_data.get("death_link"))
     if deathlink.get_enabled():
@@ -376,14 +392,22 @@ async def _send_goal_complete():
         }]))
 
 
+def _get_state():
+    with _connection_state_lock:
+        return _ws, _connected, _loop
+
+
 def _run_loop(host: str, port: str, slot_name: str, password: str):
     global _loop
-    _loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(_loop)
-    _loop.run_until_complete(_connect(host, port, slot_name, password))
-    _loop.close()
+    loop = asyncio.new_event_loop()
+    with _connection_state_lock:
+        _loop = loop
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(_connect(host, port, slot_name, password))
+    loop.close()
 
 
 def unregister():
-    if (_connected):
+    _, connected, _ = _get_state()
+    if (connected):
         disconnect()
