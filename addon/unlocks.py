@@ -23,11 +23,8 @@ class ItemCounts(bpy.types.PropertyGroup):
 
 _annotations = {}
 for item in ids.Item:
-    item_count = 1
-    if item == ids.Item.PROGRESSIVE_RENDER_WIDTH or item == ids.Item.PROGRESSIVE_RENDER_HEIGHT:
-        item_count = 0
-    _annotations[item.name] = bpy.props.IntProperty(name=item.name, default=item_count)
-    persist.ap_item_counts[item] = item_count
+    _annotations[item.name] = bpy.props.IntProperty(name=item.name)
+    persist.ap_item_counts[item] = 0
 
 ItemCounts.__annotations__ = _annotations
 

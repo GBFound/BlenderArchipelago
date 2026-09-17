@@ -3,6 +3,7 @@ import os
 import tempfile
 from bpy.app.handlers import persistent
 from . import (
+    clear_locked,
     client,
     full_arsenal,
     ids,
@@ -71,6 +72,10 @@ def _deathlink_redo(scene, depsgraph):
 
 @persistent
 def _mode_locked(scene = None, depsgraph = None):
+    if scene is None:
+        scene = bpy.context.scene
+    if not scene.ap_has_connected_before:
+        return
     if full_arsenal.is_unlock_all():
         return
 
@@ -101,7 +106,11 @@ def _mode_locked(scene = None, depsgraph = None):
 
 @persistent
 def _modifiers_locked(scene, depsgraph):
-    if full_arsenal.is_unlock_all() or persist.ap_item_counts[ids.Item.MODIFIERS]:
+    if not scene.ap_has_connected_before:
+        return
+    if persist.ap_item_counts[ids.Item.MODIFIERS]:
+        return
+    if full_arsenal.is_unlock_all():
         return
     
     obj = bpy.context.active_object
@@ -122,7 +131,11 @@ def _clear_legacy_modifiers(obj) -> bool:
 
 @persistent
 def _geometry_nodes_locked(scene, depsgraph):
-    if full_arsenal.is_unlock_all() or persist.ap_item_counts[ids.Item.GEOMETRY_NODES]:
+    if not scene.ap_has_connected_before:
+        return
+    if persist.ap_item_counts[ids.Item.GEOMETRY_NODES]:
+        return
+    if full_arsenal.is_unlock_all():
         return
     
     obj = bpy.context.active_object
@@ -143,7 +156,13 @@ def _clear_geometry_nodes(obj):
 
 @persistent
 def _materials_locked(scene = None, depsgraph = None):
-    if full_arsenal.is_unlock_all() or persist.ap_item_counts[ids.Item.MATERIALS]:
+    if scene is None:
+        scene = bpy.context.scene
+    if not scene.ap_has_connected_before:
+        return
+    if persist.ap_item_counts[ids.Item.MATERIALS]:
+        return
+    if full_arsenal.is_unlock_all():
         return
 
     obj = bpy.context.active_object
@@ -153,18 +172,14 @@ def _materials_locked(scene = None, depsgraph = None):
 
 
 @persistent
-def _clear_materials():
-    if persist.ap_item_counts[ids.Item.MATERIALS]:
-        return
-    
-    for obj in bpy.data.objects:
-        if hasattr(obj.data, "materials"):
-            obj.data.materials.clear()
-
-
-@persistent
 def _world_shaders_locked(scene = None, depsgraph = None):
-    if full_arsenal.is_unlock_all() or persist.ap_item_counts[ids.Item.WORLD_SHADERS]:
+    if scene is None:
+        scene = bpy.context.scene
+    if not scene.ap_has_connected_before:
+        return
+    if persist.ap_item_counts[ids.Item.WORLD_SHADERS]:
+        return
+    if full_arsenal.is_unlock_all():
         return
     
     if bpy.context.scene.world:
@@ -173,29 +188,19 @@ def _world_shaders_locked(scene = None, depsgraph = None):
 
 
 @persistent
-def _clear_world_shaders():
-    if persist.ap_item_counts[ids.Item.WORLD_SHADERS]:
-        return
-    
-    bpy.context.scene.world = None
-
-
-@persistent
 def _compositor_locked(scene = None, depsgraph = None):
-    if full_arsenal.is_unlock_all() or persist.ap_item_counts[ids.Item.COMPOSITOR]:
+    if scene is None:
+        scene = bpy.context.scene
+    if not scene.ap_has_connected_before:
+        return
+    if persist.ap_item_counts[ids.Item.COMPOSITOR]:
+        return
+    if full_arsenal.is_unlock_all():
         return
 
     if bpy.context.scene.compositing_node_group:
         bpy.context.scene.compositing_node_group = None
         popup.enqueue("Compositor is locked.")
-
-
-@persistent
-def _clear_compositor():
-    if persist.ap_item_counts[ids.Item.COMPOSITOR]:
-        return
-
-    bpy.context.scene.compositing_node_group = None
 
 
 @persistent
@@ -224,9 +229,7 @@ def _blender_properties_to_persist(scene, depsgraph):
 
 @persistent
 def _clear_locked_features(scene, depsgraph):
-    _clear_materials()
-    _clear_world_shaders()
-    _clear_compositor()
+    clear_locked.all()
 
 
 @persistent

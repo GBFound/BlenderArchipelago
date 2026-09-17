@@ -8,6 +8,7 @@ import ssl
 import certifi
 import traceback
 from . import (
+    clear_locked,
     data_package,
     deathlink,
     explosion,
@@ -223,8 +224,8 @@ async def _handle_connected(packet: dict):
     _initialize_from_slot_data(packet)
     connected_before_async()
     render_settings.enforce_async()
-    unlocks.clear_unlocks()
     progress.update_state()
+    clear_locked.all_async()
     redraw.panels()
 
     if _pending_checks:
