@@ -91,6 +91,11 @@ def is_connected() -> bool:
     return connected
 
 
+def connected_before():
+    bpy.context.scene.ap_has_connected_before = True
+    persist.ap_has_connected_before = True
+
+
 def resync():
     _, connected, loop = _get_state()
     if connected:
@@ -222,7 +227,7 @@ async def _handle_connected(packet: dict):
     _slot_info = packet.get("slot_info")
     _slot_id = packet.get("slot")
     _initialize_from_slot_data(packet)
-    connected_before_async()
+    _connected_before_async()
     render_settings.enforce_async()
     progress.update_state()
     clear_locked.all_async()
@@ -329,13 +334,8 @@ def _initialize_from_slot_data(packet: dict):
     full_arsenal.set_duration(full_arsenal_duration)
 
 
-def connected_before_async():
-    bpy.app.timers.register(_connected_before)
-
-
-def _connected_before():
-    bpy.context.scene.ap_has_connected_before = True
-    persist.ap_has_connected_before = True
+def _connected_before_async():
+    bpy.app.timers.register(connected_before)
 
 
 async def _check_data_package_checksums(packet: dict):

@@ -227,8 +227,7 @@ def _blender_properties_to_persist(scene, depsgraph):
         setattr(persist, field, value)
 
 
-@persistent
-def _clear_locked_features(scene, depsgraph):
+def _clear_locked_features():
     clear_locked.all()
 
 
@@ -243,8 +242,11 @@ def _enforce_render_border(scene, depsgraph):
 
 
 @persistent
-def _resync(scene, depsgraph):
+def _sync_with_client(scene, depsgraph):
+    if client.is_connected():
+        client.connected_before()
     client.resync()
+    _clear_locked_features()
 
 
 @persistent
@@ -271,9 +273,8 @@ _subscriptions = (
 _handlers = [
     (bpy.app.handlers.load_post,             _subscribe),
     (bpy.app.handlers.load_post,             _blender_properties_to_persist),
-    (bpy.app.handlers.load_post,             _clear_locked_features),
     (bpy.app.handlers.load_post,             _clear_full_arsenal_countdown),
-    (bpy.app.handlers.load_post,             _resync),
+    (bpy.app.handlers.load_post,             _sync_with_client),
     (bpy.app.handlers.depsgraph_update_post, _modifiers_locked),
     (bpy.app.handlers.depsgraph_update_post, _geometry_nodes_locked),
     (bpy.app.handlers.render_init,           _enforce_render_border),
