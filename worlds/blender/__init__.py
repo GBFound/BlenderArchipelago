@@ -63,6 +63,7 @@ class BlenderWorld(World):
             "death_link"                    : bool(self.options.death_link),
         }
 
+
     def _is_fill_error_prone(self) -> bool:
         width = 0
         height = 0
